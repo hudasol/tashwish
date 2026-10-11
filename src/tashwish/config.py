@@ -85,3 +85,11 @@ MIN_AIRCRAFT_PER_CELL = 5
 PERSISTENT_MIN_SAMPLES = 200
 PERSISTENT_MIN_DAYS = 3
 PERSISTENT_LOW_SHARE = 0.9
+
+# --- jamming-like detection (design choices, tested for sensitivity in docs/VALIDATION.md) ---
+DETECT_FDR_Q = 0.05
+DETECT_MIN_BAD = 3  # at least this many degraded aircraft in the cell-bucket
+DETECT_MIN_LOWER_BOUND = 0.20  # Wilson lower bound of the degraded share must exceed this (effect-size gate)
+DETECT_P0_FLOOR = 0.02  # baseline degraded share never assumed below this
+DETECT_HIGH_LOWER_BOUND = 0.40
+DETECT_MERGE_GAP_BUCKETS = 1  # events merge across at most this many empty buckets
