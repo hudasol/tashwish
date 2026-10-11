@@ -9,3 +9,8 @@ data/interim/
 node_modules/
 dist/
 .env
+data/interim/*
+!data/interim/.gitkeep
+data/raw/
+data/processed/*
+!data/processed/.gitkeep
