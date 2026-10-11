@@ -30,8 +30,8 @@ class Region:
 REGION = Region()
 
 # A trace point carries quality fields only when the source wrote an aircraft object for it. We carry the most
-# recent object forward for at most this many seconds. Measured on 2026-03-02: median gap between objects 8 s,
-# 95th percentile 78 s, 99th percentile 288 s (docs/DATA_QUALITY.md).
+# recent object forward for at most this many seconds. For airborne aircraft the 95th percentile gap between
+# consecutive own-quality rows is about 79 s (regenerated in docs/DATA_QUALITY.md), so 120 s covers well over 95%.
 QUALITY_MAX_AGE_S = 120.0
 
 # Source/type value for non-transponder emitters (e.g. airport ground vehicles). Excluded from aircraft metrics,
