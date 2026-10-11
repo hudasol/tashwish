@@ -1,0 +1,17 @@
+LICENSE
+README.md
+pyproject.toml
+src/tashwish/__init__.py
+src/tashwish/config.py
+src/tashwish/schema.py
+src/tashwish.egg-info/PKG-INFO
+src/tashwish.egg-info/SOURCES.txt
+src/tashwish.egg-info/dependency_links.txt
+src/tashwish.egg-info/requires.txt
+src/tashwish.egg-info/top_level.txt
+src/tashwish/ingest/__init__.py
+src/tashwish/ingest/__main__.py
+src/tashwish/ingest/pipeline.py
+src/tashwish/ingest/quality.py
+src/tashwish/ingest/source.py
+src/tashwish/ingest/trace.py
