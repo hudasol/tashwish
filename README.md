@@ -64,8 +64,7 @@ cells at once, and mark cells the receiver network cannot see as *insufficient d
 
 ## Data and licensing
 
-- Primary source: [adsb.lol](https://www.adsb.lol/) `globe_history` archives, ODbL 1.0. *Contains information from
-  adsb.lol, made available under the ODbL.* Details and every other source we checked: [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md).
+- Primary source: [adsb.lol](https://www.adsb.lol/) `globe_history` archives, ODbL 1.0. *Contains information from adsb.lol, which is made available here under the Open Database License (ODbL).* Licence analysis: [docs/LICENSING.md](docs/LICENSING.md). Details and every other source we checked: [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md).
 - Code: Apache-2.0 (see `LICENSE`). Released dataset: ODbL 1.0 (derived aggregates), with a data card.
 - Synthetic data is always labelled synthetic (filenames, schema, UI, docs) and never appears in real-data views.
 

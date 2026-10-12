@@ -1,6 +1,6 @@
 # Licensing analysis: adsb.lol globe_history, the derived Tashwish dataset, and the dashboard
 
-Prepared 2026-10-12. This is a working analysis by the project, not legal advice. Nothing here has been reviewed by a
+Prepared 2026-10-12, revised the same day after retrieving primary texts (see 8.1). This is a working analysis by the project, not legal advice. Nothing here has been reviewed by a
 lawyer or by adsb.lol. Rules used in this file:
 
 - Text in quotation marks was retrieved from the page named in section 8 during this session. Where a fetch tool
@@ -52,6 +52,27 @@ contributor can add terms to individual records (compare ODbL 2.4, tool excerpt:
 Which we follow: the ODbL, because the README and the data docs page name it for the archive itself, and it is the stricter
 of the two. If the ODbL turned out not to apply, releasing under ODbL anyway loses nothing for readers. If CC0 were the only
 licence, our attribution would still be good practice. Cost of being wrong in this direction is small.
+
+### 2.1a Resolved from primary text (revision)
+
+The adsb.lol repository ships its own copy of the ODbL (`LICENSE-ODbL.txt`, 25,241 bytes, sha256 `d93f9962...b88611`),
+retrieved in full by direct download. It is now vendored at `licenses/ODbL-1.0.txt`. It was not compared line by line with the
+opendatacommons.org page, but the same clauses were also retrieved there. Verbatim clauses from it:
+
+- 1.0 "Publicly" - "means to Persons other than You or under Your control by either more than 50% ownership or by the power to direct their activities (such as contracting with an independent consultant)."
+- 1.0 "Substantial" - "Means substantial in terms of quantity or quality or a combination of both. The repeated and systematic Extraction or Re-utilisation of insubstantial parts of the Contents may amount to the Extraction or Re-utilisation of a Substantial part of the Contents."
+- 1.0 "Convey" ends: "Conveying does not include interaction with a user through a computer network, or creating and Using a Produced Work, where no transfer of a copy of the Database or a Derivative Database occurs." Consequence: serving the dashboard over the web is not Conveying; handing out dataset files is.
+- 4.3 in full: "Creating and Using a Produced Work does not require the notice in Section 4.2. However, if you Publicly Use a Produced Work, You must include a notice associated with the Produced Work reasonably calculated to make any Person that uses, views, accesses, interacts with, or is otherwise exposed to the Produced Work aware that Content was obtained from the Database, Derivative Database, or the Database as part of a Collective Database, and that it is available under this License."
+- 4.3.a: "Contains information from DATABASE NAME, which is made available here under the Open Database License (ODbL)." followed by "DATABASE NAME should be replaced with the name of the Database and a hyperlink to the URI of the Database. "Open Database License" should contain a hyperlink to the URI of the text of this License. If hyperlinks are not possible, You should include the plain text of the required URI's with the above notice."
+- 4.4.a: Derivative Databases Publicly Used "must be only under the terms of: i. This License; ii. A later version of this License similar in spirit to this License; or iii. A compatible license." 4.4.b: "Extraction or Re-utilisation of the whole or a Substantial part of the Contents into a new database is a Derivative Database and must comply with Section 4.4."
+- 4.2.d: "If it is not possible to put the required notices in a particular file due to its structure, then You must include the notices in a location (such as a relevant directory) where users would be likely to look for it."
+
+Consequences now settled by text (not by legal opinion): the dashboard notice must hyperlink "adsb.lol" to the database URI and
+"Open Database License" to the licence text, or print the URLs; it must be visible to anyone who views or interacts with
+the work, which includes exported images. The repository README states: "This database is made available under the Open
+Database License: http://opendatacommons.org/licenses/odbl/1.0/." It also says the archive "includes data from ADSB.lol
+feeders and friends, FlyItalyADSB and TheAirTraffic.com" and "is a collection of all the data known to ADSB.lol". It gives no
+attribution instruction and does not mention CC0. The partner terms are still unverified (item 7 in section 6).
 
 ### 2.2 ODbL definitions that matter (section numbers from the ODbL page)
 
@@ -152,10 +173,10 @@ the underlying numbers, that download is a database extract and falls under 2.3,
 
 ### 3.2 Obligations
 
-- Notice (ODbL 4.3): when publicly using a Produced Work, include a notice associated with the work. The excerpt retrieved
-  stops at "a notice associated with the Produced Work"; the continuation (what the notice must make a viewer aware of) was
-  not captured verbatim. UNVERIFIED as a quote, owner should read 4.3 in full on the ODbL page. The example notice (4.3.a) is
-  the model.
+- Notice (ODbL 4.3): when publicly using a Produced Work, include a notice associated with the work. The full clause is
+  quoted in 2.1a: the notice must be "reasonably calculated" to make anyone viewing or interacting with the work aware that
+  Content came from the Database and is available under the ODbL. The example notice (4.3.a) is the model and is
+  stated to "satisfy notice under Section 4.3".
 - No share-alike on the Produced Work: 4.5.b.
 - 4.6 still applies because the dashboard is "a Produced Work from a Derivative Database" if the dataset is a Derivative
   Database. Therefore link to the dataset download on the dashboard.
@@ -177,8 +198,10 @@ Second line for the derived dataset:
 
 > Tashwish aggregates are a derived database, also made available under the ODbL 1.0. Download: [dataset link].
 
-The existing README and DATA_SOURCES.md string, "Contains information from adsb.lol, made available under the ODbL.", is
-close but drops "which is" and "Open Database License". Recommended to align it to the 4.3.a wording above.
+The README, DATA_SOURCES.md, NOTICE and the draft data card now carry exactly the primary notice, and the string lives in
+`src/tashwish/attribution.py` with a test (`tests/test_attribution.py`) that fails if any of them drifts. The dashboard (M7)
+must import it. The README link `opendatacommons.org/licenses/odbl/1.0/` is adsb.lol's own form; we use `.../1-0/`, which was
+retrieved for this analysis. Whether both resolve to the same page was not checked.
 
 ### 3.4 OSMF guidance (interpretive reference only, OSM specific)
 
@@ -202,7 +225,7 @@ source and the licence.
 | Where | String |
 |---|---|
 | Dashboard footer, chart image footer | `Contains information from adsb.lol, which is made available here under the Open Database License (ODbL).` |
-| Dataset README, data card, metadata `attribution` field | `Contains information from adsb.lol (globe_history archives, https://github.com/adsblol/globe_history), which is made available here under the Open Database License (ODbL). This derived database is also made available under the ODbL 1.0.` |
+| Dataset README, data card, metadata `attribution` field | primary string, then `This derived database (Tashwish aggregates) is also made available under the ODbL 1.0.` (`attribution.DATASET_ATTRIBUTION`), with the source and licence URLs beside it |
 | Dataset file header or sidecar (`NOTICE`) | The string above plus: `Source release tags: [list]. Built [date] with Tashwish [git commit].` Ship `LICENSE-ODbL.txt` beside the data (4.2.b) |
 | Code repository README | `Code: Apache-2.0. Data: ODbL 1.0. Contains information from adsb.lol.` |
 | Paper or report | `Data: adsb.lol globe_history archives (ODbL 1.0), accessed [date].` plus the dataset DOI or URL |
@@ -247,8 +270,8 @@ excerpt). Transitive dependencies were not enumerated.
 4. Whether adsb.lol wants any particular attribution form. No page we retrieved gives one.
 5. Whether database right or copyright subsists in adsb.lol's compilation in the jurisdictions that matter (UAE, UK, EU). Not
    researched, UNVERIFIED.
-6. Full wording of ODbL 4.3 after "a notice associated with the Produced Work", the rest of the "Publicly" and "Convey"
-   definitions, the "Substantial" repeated extraction sentence, and the 4.4.a items. Only excerpts were retrieved.
+6. RESOLVED in revision: the full wording of 4.3, "Publicly", "Convey", "Substantial" and 4.4.a was retrieved (2.1a).
+   Still unchecked: a line by line comparison of the vendored licence copy with the opendatacommons.org page.
 7. Licence terms of FlyItalyADSB and TheAirTraffic.com data beyond what adsb.lol's partners page says.
 8. The OSMF subpages specific to Produced Work and Substantial (for example the Produced Work and Substantial guideline
    subpages) were not fetched, only the Community Guidelines landing page and the Attribution Guidelines page.
@@ -261,8 +284,8 @@ Owner must fetch (pages that errored in this session, no workaround attempted):
 - https://www.adsb.lol/docs/open-data/overview/ (error)
 - https://www.adsb.lol/docs/overview/introduction/ (error)
 - https://www.adsb.lol/docs/ (error)
-- Full ODbL text read end to end from https://opendatacommons.org/licenses/odbl/1-0/ (the fetch tool only returned excerpts)
-- The text of `LICENSE-cc0.txt` and `LICENSE-ODbL.txt` beyond their first lines
+- Optional: read the ODbL once end to end (a full copy is now in `licenses/ODbL-1.0.txt`)
+- (done in revision) `LICENSE-ODbL.txt` retrieved in full; `LICENSE-cc0.txt` retrieved, standard CC0 1.0 text not compared
 - The adsb.lol GitHub organisation pages for any contributing or data policy file (not attempted)
 
 ## 7. Draft issue for adsb.lol maintainers
@@ -292,6 +315,17 @@ Body:
 > We will credit the project in the repository, data card and dashboard. Thank you.
 
 ## 8. Sources actually retrieved (2026-10-12)
+
+### 8.1 Added in revision
+
+| Source | URL | Result |
+|---|---|---|
+| `LICENSE-ODbL.txt`, full | https://raw.githubusercontent.com/adsblol/globe_history_2026/main/LICENSE-ODbL.txt | Downloaded in full, vendored |
+| `README.md`, 2026 repo | https://raw.githubusercontent.com/adsblol/globe_history_2026/main/README.md | Downloaded; licence sentence, partners, no attribution rule |
+| ODbL 4.3, 4.4, 4.2.d, definitions | https://opendatacommons.org/licenses/odbl/1-0/ | Verbatim excerpts via fetch tool |
+| `docs/open-data/overview/` | https://www.adsb.lol/docs/open-data/overview/ | Errored again, not worked around |
+
+### 8.2 First pass
 
 | Source | URL | Result |
 |---|---|---|
