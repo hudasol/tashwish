@@ -1,0 +1,15 @@
+{
+  "version": 8,
+  "name": "tashwish-local-basemap",
+  "metadata": {"note": "Local style. Sources are filled in by js/mapview.js: countries from data/ne_countries.json (Natural Earth, public domain), graticule generated in the browser. No tile servers, no glyphs, no sprites."},
+  "sources": {
+    "graticule": {"type": "geojson", "data": {"type": "FeatureCollection", "features": []}},
+    "countries": {"type": "geojson", "data": {"type": "FeatureCollection", "features": []}}
+  },
+  "layers": [
+    {"id": "background", "type": "background", "paint": {"background-color": "#e6ecef"}},
+    {"id": "countries-fill", "type": "fill", "source": "countries", "paint": {"fill-color": "#f7f2f0"}},
+    {"id": "countries-line", "type": "line", "source": "countries", "paint": {"line-color": "#8f8286", "line-width": 0.9}},
+    {"id": "graticule", "type": "line", "source": "graticule", "paint": {"line-color": "#b9aeb2", "line-width": 0.5, "line-dasharray": [2, 3]}}
+  ]
+}

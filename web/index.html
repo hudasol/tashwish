@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Dashboard | Tashwish</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-title-key="nav.dashboard" data-page="index">
+<div id="chrome-top"></div>
+<main id="main" tabindex="-1">
+  <h1 data-i18n="app.title"></h1>
+  <p class="lede" data-i18n="app.lede"></p>
+
+  <section class="panel" aria-labelledby="h-map">
+    <h2 id="h-map" data-i18n="map.heading"></h2>
+    <div class="toolbar">
+      <fieldset class="layers">
+        <legend data-i18n="map.layers"></legend>
+        <label><input type="checkbox" id="lay-share" checked> <span data-i18n="layer.share"></span></label>
+        <label><input type="checkbox" id="lay-cov"> <span data-i18n="layer.coverage"></span></label>
+        <label><input type="checkbox" id="lay-events" checked> <span data-i18n="layer.events"></span></label>
+      </fieldset>
+      <button type="button" class="btn primary" id="btn-export" data-i18n="map.export"></button>
+    </div>
+    <p class="help"><a href="#table-view" data-i18n="map.skip_to_table"></a></p>
+    <div class="map-wrap">
+      <div id="map" role="region" tabindex="-1" data-i18n-label="map.aria"></div>
+      <div class="watermark" id="watermark" aria-hidden="true" hidden></div>
+      <p class="map-msg" id="map-msg" role="status"></p>
+    </div>
+
+    <div class="time" role="group" aria-labelledby="h-time">
+      <h3 id="h-time" data-i18n="time.heading"></h3>
+      <div class="time-row">
+        <button type="button" class="btn icon" id="btn-prev" data-i18n-label="time.prev">&#8249;</button>
+        <button type="button" class="btn" id="btn-play" aria-pressed="false"></button>
+        <button type="button" class="btn icon" id="btn-next" data-i18n-label="time.next">&#8250;</button>
+        <input type="range" id="slider" min="0" max="0" step="1" value="0" aria-describedby="slider-help">
+      </div>
+      <p class="readout" id="time-readout"></p>
+      <p class="help" id="slider-help" data-i18n="time.help"></p>
+      <div class="sr-only" id="sr-live" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+    <div class="two">
+      <section aria-labelledby="h-legend" class="card">
+        <h3 id="h-legend" data-i18n="legend.heading"></h3>
+        <div id="legend"></div>
+      </section>
+      <section aria-labelledby="h-cell" class="card" aria-live="polite">
+        <h3 id="h-cell" data-i18n="cell.heading"></h3>
+        <div id="cell-detail"></div>
+      </section>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-events">
+    <h2 id="h-events" data-i18n="events.heading"></h2>
+    <p class="help" data-i18n="events.help"></p>
+    <div id="events-table" class="table-wrap" tabindex="0" role="region" data-i18n-label="events.aria"></div>
+    <section id="evidence" class="card evidence" aria-labelledby="h-evidence" aria-live="polite">
+      <h3 id="h-evidence" data-i18n="evidence.heading"></h3>
+      <div id="evidence-body"></div>
+    </section>
+  </section>
+
+  <section class="panel" aria-labelledby="h-table">
+    <h2 id="h-table" data-i18n="table.heading"></h2>
+    <details id="table-view">
+      <summary data-i18n="table.summary"></summary>
+      <p class="help" id="table-note"></p>
+      <div id="cells-table" class="table-wrap" tabindex="0" role="region" data-i18n-label="table.aria"></div>
+    </details>
+  </section>
+
+  <section class="panel" id="downloads" aria-labelledby="h-dl" tabindex="-1">
+    <h2 id="h-dl" data-i18n="dl.heading"></h2>
+    <div id="dl-body"></div>
+  </section>
+</main>
+<footer id="chrome-footer" class="site-footer"></footer>
+<noscript><p class="fatal">This dashboard needs JavaScript. Not for navigation or safety of life; no attribution to any actor.</p></noscript>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
