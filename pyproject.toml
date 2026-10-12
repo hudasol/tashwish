@@ -42,3 +42,4 @@ ignore = ["E501", "N818", "SIM105", "SIM115"]
 
 [tool.ruff.lint.per-file-ignores]
 "web/scripts/*.py" = ["SIM108", "B007", "N806"]
+"scripts/make_results_docs.py" = ["N806", "E741"]
