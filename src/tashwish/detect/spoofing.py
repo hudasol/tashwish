@@ -48,15 +48,18 @@ def find_jumps(points: pd.DataFrame) -> pd.DataFrame:
     sec = _epoch_s(d["ts"])
     a, b = d.iloc[:-1], d.iloc[1:]
     dt = sec[1:] - sec[:-1]
+    dt_eff = np.maximum(
+        dt, cfg.SPOOF_DT_FLOOR_S
+    )  # fixes closer than the floor are treated as the floor (conservative speed)
     dist = haversine_km(a["lat"].to_numpy(), a["lon"].to_numpy(), b["lat"].to_numpy(), b["lon"].to_numpy())
     with np.errstate(divide="ignore", invalid="ignore"):
-        kt = dist / dt / KM_PER_KT_S
+        kt = dist / dt_eff / KM_PER_KT_S
     gs = np.fmax(a["gs_kt"].to_numpy(dtype=float), b["gs_kt"].to_numpy(dtype=float))
     gs = np.where(np.isnan(gs), 0.0, gs)
     ref = np.maximum(gs, 100.0)
     ok = (
         same
-        & (dt >= cfg.SPOOF_DT_MIN_S)
+        & (dt >= 0)
         & (dt <= cfg.SPOOF_DT_MAX_S)
         & (dist >= cfg.SPOOF_JUMP_MIN_KM)
         & (kt >= cfg.SPOOF_JUMP_MIN_KT)

@@ -17,7 +17,7 @@ import pandas as pd
 
 from .spoofing import haversine_km
 
-SPACE_SLACK_KM = 60.0  # origin centroid within this distance of a jamming cell centre counts as overlapping
+SPACE_SLACK_KM = 100.0  # spoofing origin centroid within this distance of a jamming cell centre counts as overlapping
 TIME_SLACK = pd.Timedelta(hours=1)
 
 
@@ -28,10 +28,7 @@ def _jam_overlaps(spoof: pd.Series, jam: pd.DataFrame) -> np.ndarray:
             continue
         for c in e.cells.split(","):
             lat, lon = h3.cell_to_latlng(c)
-            if (
-                haversine_km(lat, lon, spoof["origin_lat"], spoof["origin_lon"])
-                <= SPACE_SLACK_KM + spoof["origin_spread_km"]
-            ):
+            if haversine_km(lat, lon, spoof["origin_lat"], spoof["origin_lon"]) <= SPACE_SLACK_KM:
                 hits[i] = True
                 break
     return hits
