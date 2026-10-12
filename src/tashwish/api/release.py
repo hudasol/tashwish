@@ -199,6 +199,12 @@ class Release:
         return self.manifest["dataset_version"]
 
     @property
+    def checksums_sha256(self) -> str:
+        """SHA-256 of checksums.sha256 as listed in the manifest. It covers every other release file, so it changes
+        whenever any content changes. Empty string if the manifest does not list it."""
+        return str((self.manifest["files"].get("checksums.sha256") or {}).get("sha256", ""))
+
+    @property
     def data_class(self) -> str:
         return self.manifest["data_class"]
 

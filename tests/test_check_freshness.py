@@ -84,3 +84,11 @@ def test_mark_failed_creates_file(tmp_path):
 @pytest.mark.parametrize("ts", ["2026-10-12T00:00:00Z", "2026-10-12T00:00:00+00:00"])
 def test_timestamp_forms(ts):
     assert cf.evaluate({"generated_at": ts, "latest_day": "2026-10-11"}, NOW)["level"] == "ok"
+
+
+def test_null_fields_are_unknown_not_a_crash(tmp_path):
+    p = tmp_path / "f.json"
+    p.write_text(json.dumps({"generated_at": None, "latest_day": None, "last_run_status": "noop"}))
+    with pytest.raises(ValueError):
+        cf.evaluate(json.loads(p.read_text()), NOW)
+    assert cf.main([str(p)]) == cf.EXIT["unknown"]

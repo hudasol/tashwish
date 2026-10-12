@@ -13,7 +13,7 @@ CB_KEEP = ["cell", "bucket", "stratum", "n_aircraft", "k_strong", "share_strong"
 
 
 def write_day(root: Path, day: str, cb: pd.DataFrame, events: pd.DataFrame, *, split: str, mode: str, rows: int,
-              aircraft: int, ingested_at: str | None) -> None:  # fmt: skip
+              aircraft: int, ingested_at: str | None, provenance: dict | None = None) -> None:  # fmt: skip
     d = root / "days" / day
     tmp = root / "days" / f".{day}.tmp"
     if tmp.exists():
@@ -22,8 +22,11 @@ def write_day(root: Path, day: str, cb: pd.DataFrame, events: pd.DataFrame, *, s
     cb[CB_KEEP].to_parquet(tmp / "cb.parquet", index=False)
     ev = events.drop(columns=[c for c in ("components",) if c in events.columns]).copy()
     ev.to_parquet(tmp / "events.parquet", index=False)
-    (tmp / "day.json").write_text(json.dumps({"day": day, "split": split, "mode": mode, "rows": int(rows),
-        "aircraft": int(aircraft), "ingested_at": ingested_at, "n_events": int(len(ev))}, indent=1))  # fmt: skip
+    meta = {"day": day, "split": split, "mode": mode, "data_class": "observed", "rows": int(rows),
+            "aircraft": int(aircraft), "ingested_at": ingested_at, "n_events": int(len(ev))}  # fmt: skip
+    if provenance:
+        meta["provenance"] = provenance
+    (tmp / "day.json").write_text(json.dumps(meta, indent=1, sort_keys=True))
     if d.exists():
         shutil.rmtree(d)
     tmp.replace(d)
