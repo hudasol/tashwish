@@ -9,7 +9,7 @@ import pyarrow.parquet as pq
 import pytest
 
 from tashwish import config as cfg
-from tashwish.attribution import DATASET_ATTRIBUTION
+from tashwish.attribution import SYNTHETIC_ATTRIBUTION
 from tashwish.interop.marsad import (
     SCHEMA_ID,
     ContextIndex,
@@ -51,7 +51,7 @@ def feat(fc, status=None, kind=None, band="enroute"):
 def test_valid_and_schema_fields(fc):
     assert validate_feature_collection(fc) == []
     assert fc["schema"] == SCHEMA_ID == "tashwish.interference.v1"
-    assert fc["attribution"] == DATASET_ATTRIBUTION
+    assert fc["attribution"] == SYNTHETIC_ATTRIBUTION
     assert "SYNTHETIC" in fc["notice"] and fc["data_class"] == "synthetic"
     assert json.loads(json.dumps(fc, allow_nan=False)) == fc
 
@@ -158,7 +158,7 @@ def test_parquet_equivalent_to_geojson(tmp_path, synth, fc):
     df, md = read_parquet_records(p)
     assert md["tashwish.schema"] == SCHEMA_ID and json.loads(md["tashwish.grid"])["h3_res"] == cfg.GRID_MAIN.h3_res
     assert len(df) == len(fc["features"])
-    assert set(df["data_class"]) == {"synthetic"} and set(df["attribution"]) == {DATASET_ATTRIBUTION}
+    assert set(df["data_class"]) == {"synthetic"} and set(df["attribution"]) == {SYNTHETIC_ATTRIBUTION}
     a = df.sort_values(["h3", "bucket_start", "alt_band"]).reset_index(drop=True)
     b = pd.DataFrame([f["properties"] for f in fc["features"]])
     b = b.sort_values(["h3", "bucket_start", "alt_band"]).reset_index(drop=True)
@@ -177,7 +177,7 @@ def test_query_retrospective_states(fc):
     lat, lon = h3.cell_to_latlng(ok["h3"])
     r = idx.query(lat, lon, "2026-01-01T10:30:00Z", alt_ft=36000)
     assert r["status"] == "ok" and r["usable_as_prior"] and r["record"]["event_id"] == "SYN-J-0001"
-    assert r["data_class"] == "synthetic" and r["attribution"] == DATASET_ATTRIBUTION
+    assert r["data_class"] == "synthetic" and r["attribution"] == SYNTHETIC_ATTRIBUTION
     ins = feat(fc, "insufficient")["properties"]
     lat, lon = h3.cell_to_latlng(ins["h3"])
     r = idx.query(lat, lon, "2026-01-01T07:00:00Z", alt_ft=36000)

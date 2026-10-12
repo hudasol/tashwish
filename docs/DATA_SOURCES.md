@@ -53,7 +53,7 @@ access method are recorded here. We respect each source's terms and rate limits 
 - **From our build environment:** main site and API unreachable or rate-limited; SSH port 2230 is not reachable through the
   HTTP(S)-only proxy. **Any OpenSky run must happen on the owner's own machine.**
 - **What the owner must do if this fallback is wanted:** register an OpenSky account; apply for research access with the
-  University of Stirling affiliation and a non-commercial research statement; ask OpenSky in writing whether a released
+  an institutional affiliation (if any) and a non commercial research statement; ask OpenSky in writing whether a released
   derived aggregate dataset is allowed and how to cite them; confirm the column names after access is granted.
 
 ## 3. Sources evaluated and rejected

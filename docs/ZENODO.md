@@ -7,7 +7,7 @@ from my environment, so compare each with what you see on screen.
 
 1. Create an account at https://zenodo.org (free). Signing in with the GitHub account `hudasol` is the easiest route.
 2. Choose **New upload**. Upload every file in `release/`: `cell_buckets.parquet`, `cell_buckets.csv.gz`, `events.parquet`,
-   `events.csv.gz`, `coverage.parquet`, `validation.json`, `freshness.json`, `manifest.json`, `DATA_CARD.md`, `NOTICE`,
+   `events.csv.gz`, `daily_region.csv`, `coverage.parquet`, `validation.json`, `freshness.json`, `manifest.json`, `DATA_CARD.md`, `NOTICE`,
    `ODbL-1.0.txt`, `checksums.sha256`. Do not upload anything from `data/` (raw and interim data are not part of the release).
 3. Metadata:
    - Resource type: **Dataset**.

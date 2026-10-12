@@ -16,4 +16,13 @@ NOTICE_LINKED_MD = (
 )
 DERIVED_NOTICE = "This derived database (Tashwish aggregates) is also made available under the ODbL 1.0."
 DATASET_ATTRIBUTION = f"{NOTICE} {DERIVED_NOTICE}"
+# Synthetic samples must never claim adsb.lol content. Valid only when data_class is "synthetic".
+SYNTHETIC_ATTRIBUTION = "SYNTHETIC SAMPLE: contains no information from adsb.lol."
+
+
+def attribution_for(data_class: str) -> str:
+    """Canonical attribution text for a data class ("synthetic" gets the synthetic notice, anything else the ODbL one)."""
+    return SYNTHETIC_ATTRIBUTION if data_class == "synthetic" else DATASET_ATTRIBUTION
+
+
 CODE_LICENCE_LINE = "Code: Apache-2.0. Data: ODbL 1.0. Contains information from adsb.lol."

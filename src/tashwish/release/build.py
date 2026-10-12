@@ -97,7 +97,16 @@ def load_processed(processed: Path) -> tuple[pd.DataFrame, pd.DataFrame, list[di
     )
 
 
+def _assert_observed(df: pd.DataFrame, name: str) -> None:
+    """The release builder only publishes observed data; a synthetic processed tree must not be relabelled."""
+    if "data_class" in df.columns:
+        bad = sorted(str(x) for x in set(df["data_class"].dropna().unique()) - {"observed"})
+        if bad:
+            raise ValueError(f"{name} carries data_class {bad}; the release builder accepts only 'observed' data")
+
+
 def release_cb(cb: pd.DataFrame) -> pd.DataFrame:
+    _assert_observed(cb, "cell buckets")
     ok = cb["status"] == "ok"
     out = pd.DataFrame({
         "h3": cb["cell"], "bucket_start": cb["bucket"], "slot": cb["slot"].astype(int), "stratum": cb["stratum"],
@@ -125,6 +134,7 @@ def daily_region(cb: pd.DataFrame, metas: list[dict]) -> pd.DataFrame:
 def release_events(ev: pd.DataFrame) -> pd.DataFrame:
     if ev.empty:
         return ev
+    _assert_observed(ev, "events")
     out = ev.copy()
     out["data_class"] = "observed"
     return out.sort_values(["start", "event_id"]).reset_index(drop=True)
