@@ -99,7 +99,9 @@ DETECT_MERGE_GAP_BUCKETS = 1  # events merge across at most this many empty buck
 SPOOF_JUMP_MIN_KT = 650.0  # implied ground speed between consecutive fixes
 SPOOF_JUMP_MIN_KM = 5.0
 SPOOF_JUMP_SPEED_RATIO = 2.5  # implied speed must also exceed this multiple of the reported speed (floor 100 kt)
-SPOOF_DT_MIN_S = 5.0
+SPOOF_DT_FLOOR_S = (
+    1.0  # implied speed is computed over at least this many seconds (median fix gap is about 4 s; 54% are < 5 s)
+)
 SPOOF_DT_MAX_S = 120.0
 SPOOF_CLUSTER_KM = 20.0  # jump destinations within this distance...
 SPOOF_CLUSTER_MIN = 30 * 60  # ...and this many seconds are the same cluster
