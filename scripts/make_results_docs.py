@@ -24,6 +24,23 @@ REPORT_DAYS = ["2026-02-28", "2026-03-13"]
 DEV_INCIDENT_DAYS = ["2026-03-02", "2026-03-07"]
 
 
+def load_regimes() -> pd.DataFrame | None:
+    p = ROOT / "results/regimes.csv"
+    return pd.read_csv(p) if p.exists() else None
+
+
+def regime_false_coverage(sp, regimes: pd.DataFrame) -> dict:
+    """Pooled class level false coverage by traffic regime, with a day bootstrap inside each regime."""
+    out = {}
+    cov = sp.cov.merge(regimes[["day", "traffic"]], on="day", how="left")
+    c = cov[cov["coverage_class"] == "covered"].assign(fail=lambda d: (~d["enough"]).astype(float))
+    for tr, g in c.groupby("traffic"):
+        days = g["day"].nunique()
+        lo, hi = cluster_bootstrap_rate(g, "fail") if days >= 2 else (float("nan"), float("nan"))
+        out[tr] = {"rate": float(g["fail"].mean()), "units": len(g), "days": days, "lo": lo, "hi": hi}
+    return out
+
+
 def f(x, d=3):
     return "n/a" if x is None or (isinstance(x, float) and math.isnan(x)) else f"{x:.{d}f}"
 
@@ -55,7 +72,7 @@ class Split:
         self.ok = (path / "synthetic_scenarios.csv").exists()
         if not self.ok:
             return
-        self.scen = pd.read_csv(path / "synthetic_scenarios.csv")
+        self.scen = pd.read_csv(path / "synthetic_scenarios.csv", keep_default_na=False, na_values=[""])
         self.ev = pd.read_csv(path / "observed_events.csv")
         self.cov = pd.read_csv(path / "observed_coverage_outcomes.csv")
         self.covsum = json.loads((path / "observed_coverage_summary.json").read_text())
@@ -279,6 +296,60 @@ def evaluate(held: Split, dev: Split, ingest: pd.DataFrame | None) -> list[dict]
             f"minimum share kept over the threshold settings: {f(share)}", share >= 0.70, 0.60, "Dev days only.")  # fmt: skip
         cv = dev.sens["day_to_day"]["cv"]
         add("X3", "Day to day variation is large", "std/mean of daily event count > 0.5", f"{f(cv)} (mean {f(dev.sens['day_to_day']['mean'], 2)}, std {f(dev.sens['day_to_day']['std'], 2)})", cv > 0.5, 0.60, "Dev days only.")  # fmt: skip
+    reg = load_regimes()
+    notes = {
+        "J4": "Amendment: this is the first bucket detection rate; delay is clipped at zero on a bucket grid.",
+        "J5": "Amendment: this is the real event rate of medium or high confidence events per held-out day; such events are not necessarily false.",
+        "S2": "Amendment: pipeline separation check, true close to by construction (each injection changes one input of one detector).",
+        "S3": "Amendment: pipeline separation check, true close to by construction.",
+        "S4": "Amendment: the committed label accuracy part is a pipeline separation check; uncertain share is per detected scenario event.",
+        "C4": "Amendment: close to tautological, because coverage_lost requires too few aircraft now.",
+    }
+    if reg is not None:
+        rfc = regime_false_coverage(held, reg)
+        txt = "; ".join(
+            f"traffic {k}: {f(v['rate'])} over {v['units']} units, {v['days']} days, day bootstrap {f(v['lo'])} to {f(v['hi'])}"
+            for k, v in rfc.items()
+        )
+        for pid in ("C1", "C3"):
+            notes[pid] = "Amendment, by traffic regime (class level false coverage): " + txt + "."
+        hreg = reg[reg["split"] == "held_out"].set_index("day")
+        evh = held.ev.merge(reg[["day", "degraded"]], on="day", how="left")
+        per_reg = []
+        for dg, days in hreg.groupby("degraded").groups.items():
+            e = evh[evh["day"].isin(days)]
+            per_reg.append(f"degraded {dg}: {len(e)} events over {len(days)} days ({f(len(e) / len(days), 2)} per day)")
+        for pid in ("R2", "R3", "R4"):
+            notes[pid] = "Amendment, events by degraded regime: " + "; ".join(per_reg) + "."
+        # A1
+        feb = [d for d in held.days if d <= "2026-02-26"]
+        late = [d for d in ("2026-03-03", "2026-03-08", "2026-03-10", "2026-03-13") if d in hreg.index]
+        okf = all(hreg.loc[d, "traffic"] == "normal" and hreg.loc[d, "degraded"] == "baseline" for d in feb)
+        okl = all(hreg.loc[d, "traffic"] == "reduced" and hreg.loc[d, "degraded"] == "elevated" for d in late)
+        add("A1", "Regime labels follow the development calendar", "held-out days to 02-26 normal/baseline; 03-03, 03-08, 03-10, 03-13 reduced/elevated",
+            f"February days matching: {sum(hreg.loc[d, 'traffic'] == 'normal' and hreg.loc[d, 'degraded'] == 'baseline' for d in feb)} of {len(feb)}; March days matching: {sum(hreg.loc[d, 'traffic'] == 'reduced' and hreg.loc[d, 'degraded'] == 'elevated' for d in late)} of {len(late)}. 02-28: {hreg.loc['2026-02-28', 'traffic']}/{hreg.loc['2026-02-28', 'degraded']}, 03-01: {hreg.loc['2026-03-01', 'traffic']}/{hreg.loc['2026-03-01', 'degraded']} (not predicted)",
+            okf and okl, 0.70)  # fmt: skip
+        ok_all = all(v["rate"] <= 0.10 for v in rfc.values())
+        add("A2", "Within regime, covered cells rarely lack data", "class level false coverage <= 0.10 in each traffic regime",
+            txt, ok_all, 0.60)  # fmt: skip
+        bl = hreg[hreg["degraded"] == "baseline"].index
+        mhb = held.ev[held.ev.day.isin(bl) & held.ev.confidence.isin(["medium", "high"])]
+        rate_b = len(mhb) / max(len(bl), 1)
+        add("A3", "Few medium or high events on degraded baseline days", "<= 0.5 per day on average",
+            f"{f(rate_b, 2)} per day ({len(mhb)} events over {len(bl)} days)", rate_b <= 0.5, 0.50)  # fmt: skip
+    ej = held.scen[(held.scen.kind == "jam_only") & (held.scen.tier == "easy")]
+    ra = rate_row(ej, "jam_detected")
+    add(
+        "A4",
+        "Easy tier recall not lowered by the new placement rule",
+        "easy tier recall >= 0.90",
+        fmt_rate(ra),
+        ra["rate"] >= 0.90,
+        0.75,
+    )
+    for r in out:
+        if r["id"] in notes:
+            r["note"] = (r["note"] + " " + notes[r["id"]]).strip()
     return out
 
 
@@ -467,6 +538,25 @@ def validation_md(
             L.append(
                 f"| {d} | {name} | {len(e)} | {(e.kind == 'jamming_like').sum()} | {(e.kind == 'spoofing_like').sum()} | {(e.kind == 'both').sum()} | {int(e.label_uncertain.sum())} |"
             )
+    reg = load_regimes()
+    if reg is not None:
+        L += [
+            "",
+            "### Regime labels per day (OBSERVED)",
+            "",
+            "Mechanical labels from `src/tashwish/regime.py`; baselines are fitted per label on development days only.",
+            "",
+            "| Day | Split | Traffic | Degraded | En route units | Tested degraded share |",
+            "|---|---|---|---|---|---|",
+        ]
+        for r in reg.itertuples():
+            L.append(f"| {r.day} | {r.split} | {r.traffic} | {r.degraded} | {int(r.units)} | {f(r.share)} |")
+        rfc = regime_false_coverage(held, reg)
+        L += ["", "Class level false coverage by traffic regime (held-out days; day bootstrap within regime):", ""]
+        for k, v in rfc.items():
+            L.append(
+                f"- {k}: {f(v['rate'])} over {v['units']} units on {v['days']} days (day bootstrap {f(v['lo'])} to {f(v['hi'])})"
+            )
     L += [
         "",
         "### Documented incident windows used as weak labels",
@@ -489,7 +579,7 @@ def validation_md(
             "### Region wide degraded share per day (OBSERVED)",
             "",
             "Sum over testable (`ok`) en route cell-buckets of aircraft counts, so one aircraft can count in several cells. This is the plain level "
-            "indicator; event counts are relative to a pooled baseline and understate a region wide change.",
+            "indicator; event counts are relative to a regime baseline and understate a region wide change.",
             "",
             "| Day | Split | Cell-bucket aircraft (ok) | Degraded | Share | Wilson 95% |",
             "|---|---|---|---|---|---|",

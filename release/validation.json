@@ -1,0 +1,47 @@
+{
+ "schema": "tashwish.validation.v1",
+ "data_class": "observed",
+ "results": [
+  {
+   "metric": "jamming_recall_easy",
+   "scenario": "synthetic_injection_held_out_days",
+   "value": 0.9167,
+   "ci_lo": 0.8378,
+   "ci_hi": 0.959,
+   "n": 84
+  },
+  {
+   "metric": "jamming_recall_medium",
+   "scenario": "synthetic_injection_held_out_days",
+   "value": 0.8214,
+   "ci_lo": 0.7261,
+   "ci_hi": 0.8887,
+   "n": 84
+  },
+  {
+   "metric": "jamming_recall_hard",
+   "scenario": "synthetic_injection_held_out_days",
+   "value": 0.0952,
+   "ci_lo": 0.0491,
+   "ci_hi": 0.1768,
+   "n": 84
+  },
+  {
+   "metric": "spoofing_recall_3plus_aircraft",
+   "scenario": "synthetic_injection_held_out_days",
+   "value": 0.5159,
+   "ci_lo": 0.4294,
+   "ci_hi": 0.6014,
+   "n": 126
+  },
+  {
+   "metric": "false_coverage_rate",
+   "scenario": "observed_held_out_days",
+   "value": 0.0907,
+   "ci_lo": 0.0864,
+   "ci_hi": 0.0952,
+   "n": 16410
+  }
+ ],
+ "note": "Precision-style and recall numbers marked synthetic_injection are measured on SYNTHETIC scenarios injected into real held-out traffic; they are not accuracy against real interference."
+}

@@ -1,0 +1,15 @@
+Tashwish
+Copyright 2026 Huda Mueen
+Code: Apache-2.0 (see LICENSE).
+Data and derived datasets: ODbL 1.0 (see licenses/ODbL-1.0.txt).
+
+Contains information from adsb.lol, which is made available here under the Open Database License (ODbL).
+Source: https://github.com/adsblol/globe_history
+Licence: https://opendatacommons.org/licenses/odbl/1-0/
+This derived database (Tashwish aggregates) is also made available under the ODbL 1.0.
+
+tests/fixtures contains excerpts of adsb.lol data under the ODbL 1.0. These excerpts remain in the repository only in
+anonymised form: aircraft addresses are replaced by fake addresses, and callsigns, squawk codes, registrations and type
+codes are removed. Positions carry a fixed offset and are not suitable for any analysis.
+
+Research and monitoring tool. Not for navigation or safety of life. No attribution of interference to any actor.
