@@ -48,15 +48,29 @@ class Context:
     cb_base: pd.DataFrame = field(repr=False, default=None)
 
 
+class ContextFactory:
+    """Loads DEV days once and hands out per-scoring-day contexts fitted on the other DEV days.
+
+    The persistent-low-emitter list is computed once from ALL dev days (a day in the baseline contributes to it even when
+    scored; the list needs at least 3 days of evidence per aircraft, so the self-influence is negligible). Nothing from a
+    held-out day is ever loaded into the factory.
+    """
+
+    def __init__(self, interim: Path, dev_days: list[str], grid: cfg.Grid = GRID):
+        self.interim, self.dev_days, self.grid = interim, list(dev_days), grid
+        self.ab = {d: build_ab(interim, d, grid) for d in self.dev_days}
+        self.persistent = persistent_from_daily({d: enroute_aircraft_stats(a) for d, a in self.ab.items()})
+        self.cb = {d: metrics_for_day(a, self.persistent) for d, a in self.ab.items()}
+
+    def context(self, score_day: str | None) -> Context:
+        base = [d for d in self.dev_days if d != score_day]
+        cb_base = pd.concat([self.cb[d] for d in base], ignore_index=True)
+        return Context(base, self.persistent, fit_coverage(cb_base, base, self.grid), fit_p0(cb_base, base), cb_base)
+
+
 def build_context(interim: Path, dev_days: list[str], score_day: str, grid: cfg.Grid = GRID) -> Context:
-    base = [d for d in dev_days if d != score_day]
-    abs_ = {d: build_ab(interim, d, grid) for d in base}
-    persistent = persistent_from_daily({d: enroute_aircraft_stats(a) for d, a in abs_.items()})
-    cb_base = pd.concat([metrics_for_day(a, persistent).assign(_d=d) for d, a in abs_.items()], ignore_index=True).drop(
-        columns="_d"
-    )
-    cov = fit_coverage(cb_base, base, grid)
-    return Context(base, persistent, cov, fit_p0(cb_base, base), cb_base)
+    """One-off context (slow path used by tests and debugging): factory over the dev days, scoring `score_day`."""
+    return ContextFactory(interim, [d for d in dev_days if d != score_day], grid).context(score_day)
 
 
 def day_buckets(day: str, grid: cfg.Grid = GRID) -> list[pd.Timestamp]:
@@ -122,47 +136,81 @@ def sample_sites(cb: pd.DataFrame, rng: np.random.Generator, per_bin: int) -> li
     return sites
 
 
+JAM_TIERS = ("easy", "medium", "hard", "random")
+
+
+def _tier_design(tier: str, rng: np.random.Generator) -> tuple[float, int, int, tuple[str, ...]]:
+    """(intensity, area, duration, allowed traffic bins) for a jamming-type scenario of a given difficulty tier."""
+    if tier == "easy":
+        return 0.8, int(rng.choice([3, 7])), int(rng.choice([2, 3])), ("high",)
+    if tier == "medium":
+        return 0.5, 3, 2, ("high",)
+    if tier == "hard":
+        return float(rng.choice([0.3, 0.5])), 1, 1, ("low", "mid") if rng.random() < 0.5 else ("low", "mid", "high")
+    return float(rng.choice(INTENSITIES)), int(rng.choice(AREAS)), int(rng.choice(DURATIONS)), ("low", "mid", "high")
+
+
 def make_scenarios(
     cb: pd.DataFrame, day: str, run: int, n_jam: int, n_spoof: int, n_both: int, n_null: int, grid: cfg.Grid = GRID
 ) -> list[dict]:
-    """Place non-interfering scenarios for one run. Returns dicts with `kind`, a JamScenario and/or SpoofScenario, and axes."""
+    """Place non-interfering scenarios for one run.
+
+    Jamming-type scenarios cycle through difficulty tiers (easy, medium, hard, random) so every tier has enough cases; spoofing
+    scenarios cycle through the number of displaced aircraft. Returns dicts with `kind`, `tier`, JamScenario/SpoofScenario and axes.
+    """
     rng = np.random.default_rng(seed_for("scenarios", day, run))
-    sites = sample_sites(cb, rng, per_bin=max(n_jam + n_spoof + n_both + n_null, 4))
+    pool = sample_sites(cb, rng, per_bin=max(n_jam + n_spoof + n_both + n_null, 4) * 2)
     wanted = ["jam_only"] * n_jam + ["spoof_jump"] * n_spoof + ["spoof_and_jam"] * n_both + ["null"] * n_null
     placed: list[dict] = []
-    si = 0
+    counters = {"jam": rng.integers(0, 4), "spoof": rng.integers(0, len(SPOOF_COUNTS))}
     for k, kind in enumerate(wanted):
-        while si < len(sites):
-            cell, bucket, tbin = sites[si]
-            si += 1
+        if kind in ("jam_only", "spoof_and_jam"):
+            tier = JAM_TIERS[counters["jam"] % 4] if kind == "jam_only" else ("easy", "medium")[counters["jam"] % 2]
+            counters["jam"] += 1
+        else:
+            tier = "none"
+        intensity, area, dur, bins = _tier_design(tier if tier != "none" else "random", rng)
+        if kind in ("spoof_jump", "spoof_and_jam"):
+            bins = ("high",)
+        if kind == "spoof_and_jam":
+            dur = min(dur, 2)
+        n_sp_forced = None
+        if kind == "spoof_jump":
+            n_sp_forced = SPOOF_COUNTS[counters["spoof"] % len(SPOOF_COUNTS)]
+            counters["spoof"] += 1
+        elif kind == "spoof_and_jam":
+            n_sp_forced = int(rng.choice([3, 5, 8]))
+        i = 0
+        while i < len(pool):
+            cell, bucket, tbin = pool[i]
+            i += 1
+            if tbin not in bins:
+                continue
             ring = sorted(h3.grid_disk(cell, 1))
-            area = int(rng.choice(AREAS))
             others = [c for c in ring if c != cell]
             rng.shuffle(others)
             cells = tuple(sorted([cell] + others[: {1: 0, 3: 2, 7: 6}[area]]))
-            dur = int(rng.choice(DURATIONS))
             lat, lon = _centre(cells)
             b0 = int((bucket - pd.Timestamp(day, tz="UTC")).total_seconds() // (3600 * grid.bucket_hours))
             if b0 + dur > 24 // grid.bucket_hours:
                 continue
             spoof_params = None
-            if kind in ("spoof_jump", "spoof_and_jam"):
-                n_sp = int(rng.choice(SPOOF_COUNTS))
+            if n_sp_forced is not None:
                 ang = rng.uniform(0, 2 * np.pi)
                 dist = float(rng.choice(DISPLACEMENTS_KM))
                 f_lat = lat + (dist * np.cos(ang)) / EARTH_KM * 180 / np.pi
                 f_lon = lon + (dist * np.sin(ang)) / (EARTH_KM * np.cos(np.radians(lat))) * 180 / np.pi
-                spoof_params = (n_sp, dist, f_lat, f_lon)
+                spoof_params = (n_sp_forced, dist, f_lat, f_lon)
             pts = [(lat, lon)] + ([(spoof_params[2], spoof_params[3])] if spoof_params else [])
             fp = {"pts": pts, "b0": b0, "b1": b0 + dur - 1}
             if not all(_compatible(fp, p["fp"]) for p in placed):
                 continue
+            pool.pop(i - 1)
             sid = f"{day}_r{run}_{k:02d}_{kind}"
             seed = seed_for(sid)
-            intensity = float(rng.choice(INTENSITIES))
-            rec = {"sid": sid, "kind": kind, "day": day, "run": run, "traffic_bin_centre": tbin, "fp": fp, "area": area,
-                   "duration": dur, "intensity": intensity, "cells": cells, "centre_lat": lat, "centre_lon": lon,
-                   "bucket0": bucket}  # fmt: skip
+            rec = {"sid": sid, "kind": kind, "tier": tier, "day": day, "run": run, "traffic_bin_centre": tbin, "fp": fp,
+                   "area": area, "duration": dur, "intensity": intensity, "cells": cells, "centre_lat": lat,
+                   "centre_lon": lon, "bucket0": bucket}  # fmt: skip
             if kind in ("jam_only", "spoof_and_jam"):
                 rec["jam"] = JamScenario(sid, day, cells, bucket, dur, intensity, seed)
             if spoof_params:
@@ -248,10 +296,9 @@ def match_scenario(rec: dict, result: dict, grid: cfg.Grid = GRID) -> dict:
 
 
 def run_day(
-    interim: Path, day: str, dev_days: list[str], runs: int, mix: tuple[int, int, int, int], grid: cfg.Grid = GRID
+    interim: Path, day: str, ctx: Context, runs: int, mix: tuple[int, int, int, int], grid: cfg.Grid = GRID
 ) -> dict:
     """Evaluate one scoring day: a null run plus `runs` injection runs. Returns scenario rows, event rows and context stats."""
-    ctx = build_context(interim, dev_days, day, grid)
     ab0 = build_ab(interim, day, grid)
     pts0 = load_points(interim, [day])
     null = score_ab(ab0, pts0, ctx, day, grid)
@@ -283,7 +330,7 @@ def run_day(
                 (cbi["stratum"] == "enroute") & cbi["cell"].isin(rec["cells"]) & cbi["bucket"].isin(tgt["bucket"])
             ]
             row.update({
-                "day": day, "run": run, "intensity": rec["intensity"], "area": rec["area"], "duration": rec["duration"],
+                "tier": rec["tier"], "day": day, "run": run, "intensity": rec["intensity"], "area": rec["area"], "duration": rec["duration"],
                 "n_spoof_requested": rec.get("n_spoof", 0), "displacement_km": rec.get("displacement_km", np.nan), "n_spoofed": infos[rec["sid"]].get("n_spoofed", 0),
                 "traffic_median": float(tgt["n_aircraft"].median()) if len(tgt) else np.nan,
                 "traffic_bin": traffic_bin(float(tgt["n_aircraft"].median())) if len(tgt) else "none",

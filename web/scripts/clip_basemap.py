@@ -4,6 +4,7 @@ usage: clip_basemap.py INPUT.geojson OUTPUT.json SOURCE_URL
 Only the standard library is used. Sutherland-Hodgman clipping against the rectangle; fine for display outlines.
 Natural Earth is public domain (https://www.naturalearthdata.com/about/terms-of-use/).
 """
+
 import datetime
 import hashlib
 import json
@@ -61,11 +62,13 @@ def main(src, dst, url):
         if not out:
             continue
         p = f["properties"]
-        feats.append({
-            "type": "Feature",
-            "properties": {"name": p.get("NAME") or p.get("ADMIN"), "iso_a3": p.get("ISO_A3")},
-            "geometry": {"type": "MultiPolygon", "coordinates": out},
-        })
+        feats.append(
+            {
+                "type": "Feature",
+                "properties": {"name": p.get("NAME") or p.get("ADMIN"), "iso_a3": p.get("ISO_A3")},
+                "geometry": {"type": "MultiPolygon", "coordinates": out},
+            }
+        )
     doc = {
         "type": "FeatureCollection",
         "name": "ne_countries_gulf",
@@ -73,7 +76,7 @@ def main(src, dst, url):
             "source": "Natural Earth ne_50m_admin_0_countries (public domain)",
             "url": url,
             "source_sha256": hashlib.sha256(raw).hexdigest(),
-            "fetched_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "fetched_at": datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "clip_window": {"west": WEST, "south": SOUTH, "east": EAST, "north": NORTH},
         },
         "features": feats,
