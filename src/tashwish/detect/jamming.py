@@ -22,8 +22,9 @@ from ..metrics.stats import benjamini_hochberg, binom_sf_pvalue, fit_beta_prior,
 def baseline_p0(cb: pd.DataFrame, baseline_days: list[str], tier: str = "strong") -> pd.DataFrame:
     """Per (cell, stratum) degraded share over baseline days, leave-one-day-out, shrunk and floored.
 
-    Returns one row per (cell, stratum, day) in `cb` with columns p0 and n_base. Contamination of the baseline by past
-    events can only raise p0, which makes the detector more conservative.
+    Returns one row per (cell, stratum, day) in `cb` with columns p0 and n_base. Contamination by past events raises p0 and so makes
+    the detector more conservative ONLY IF the baseline days resemble the scored day. Across a regime change that is false: baselines
+    are therefore fitted per regime (see `tashwish.regime`).
     """
     kcol = "k_strong" if tier == "strong" else "k_gpsjam"
     d = cb.assign(day=cb["bucket"].dt.tz_convert("UTC").dt.strftime("%Y-%m-%d"))

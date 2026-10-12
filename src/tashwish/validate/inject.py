@@ -53,6 +53,7 @@ class SpoofScenario:
     false_lon: float
     seed: int
     radius_km: float = 120.0
+    scatter_km: float = 1.5  # spread of the displaced aircraft around the common false location
 
 
 def mark_synthetic(df: pd.DataFrame) -> pd.DataFrame:
@@ -115,7 +116,7 @@ def inject_spoof(points: pd.DataFrame, sc: SpoofScenario, inplace: bool = False)
         rows = out.index[(out["icao24"] == icao) & ok]
         # skip the first fix in the window so a before-fix exists inside the data, then displace everything until t1
         rows = rows[1:] if len(rows) > 1 else rows
-        sx, sy = rng.normal(0, 1.5, 2)  # about 1.5 km scatter around the common false location
+        sx, sy = rng.normal(0, sc.scatter_km, 2)  # scatter around the common false location
         d_lat, d_lon = _km_to_deg(sc.false_lat, sx, sy)
         out.loc[rows, "lat"] = sc.false_lat + d_lat
         out.loc[rows, "lon"] = sc.false_lon + d_lon

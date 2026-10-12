@@ -77,25 +77,45 @@ def run(
     out = out_root / split_name
     out.mkdir(parents=True, exist_ok=True)
     if split_name == "held_out":
+        if max_days is not None or out_root.resolve() != (ROOT / "results").resolve():
+            raise SystemExit("the held-out run takes no --max-days and writes only to results/held_out")
+        if not (out_root / "FREEZE.json").exists():
+            raise SystemExit("no freeze: run --freeze first")
         freeze = json.loads((out_root / "FREEZE.json").read_text())
         state = code_state()
-        if freeze["src_sha256"] != state["src_sha256"]:
-            raise SystemExit("source changed since the freeze; refresh the freeze (and say so in the report) or revert")
-        if (out / "DONE").exists():
-            raise SystemExit("held-out evaluation already ran once; a second run must be reported as a second run")
+        if state["dirty"]:
+            raise SystemExit("uncommitted changes in src/ or tests/")
+        if freeze["commit"] != state["commit"] or freeze["src_sha256"] != state["src_sha256"]:
+            raise SystemExit(
+                "code differs from the freeze; a changed freeze must be recorded (see FREEZE_LOG.jsonl) and reported"
+            )
+        if (out / "DONE").exists() or (out / "RUNNING").exists():
+            raise SystemExit(
+                "a held-out run already started or finished; a second run must be reported as a second run"
+            )
         score_days = ingested(interim, held_all)
         if len(score_days) != len(held_all):
             raise SystemExit(f"held-out days missing: {sorted(set(held_all) - set(score_days))}")
         if len(dev_days) != len(dev_all):
             raise SystemExit(f"dev days missing: {sorted(set(dev_all) - set(dev_days))}")
+        (out / "RUNNING").write_text(
+            json.dumps({"commit": state["commit"], "started": pd.Timestamp.now("UTC").isoformat()})
+        )
     else:
         score_days = dev_days
     if max_days:
         score_days = score_days[:max_days]
     t0 = time.time()
     factory = ContextFactory(interim, dev_days)
-    ctx_for = (lambda d: factory.context(d)) if split_name == "dev" else (lambda d: factory.context(None))
-    meta = {"split": split_name, "score_days": score_days, "dev_days_used_for_fitting": dev_days, "runs_per_day": runs,
+    ctx_for = factory.context  # a held-out day is not in the factory's development days, so nothing is left out for it
+    ingest_hash = {}
+    mp = interim / "manifest.jsonl"
+    if mp.exists():
+        for line in mp.read_text().splitlines():
+            r = json.loads(line)
+            if r.get("status") == "complete" and r["day"] in score_days + dev_days:
+                ingest_hash[r["day"]] = r.get("out_sha256")
+    meta = {"split": split_name, "input_sha256": ingest_hash, "score_days": score_days, "dev_days_used_for_fitting": dev_days, "runs_per_day": runs,
             "mix": mix, "code": code_state(), "started": pd.Timestamp.now("UTC").isoformat()}  # fmt: skip
 
     # 1. controlled injection (SYNTHETIC)
@@ -156,8 +176,12 @@ def run(
         (out / "DONE").write_text(meta["finished"])
 
 
-def freeze(interim: Path, out_root: Path) -> None:
+def freeze(interim: Path, out_root: Path, reason: str = "") -> None:
     dev, held = split()
+    if (out_root / "held_out" / "RUNNING").exists() or (out_root / "held_out" / "DONE").exists():
+        raise SystemExit("the held-out run has started; the freeze can no longer be changed")
+    if (out_root / "FREEZE.json").exists() and not reason:
+        raise SystemExit("a freeze exists; to replace it pass --reason, which is recorded in FREEZE_LOG.jsonl")
     dev_all = [d.isoformat() for d in dev]
     held_all = [d.isoformat() for d in held]
     state = code_state()
@@ -166,6 +190,17 @@ def freeze(interim: Path, out_root: Path) -> None:
     out_root.mkdir(parents=True, exist_ok=True)
     (out_root / "FREEZE.json").write_text(json.dumps({**state, "frozen_at": pd.Timestamp.now("UTC").isoformat(),
                                                       "dev_days": dev_all, "held_out_days": held_all}, indent=1, default=str))  # fmt: skip
+    with open(out_root / "FREEZE_LOG.jsonl", "a") as fh:
+        fh.write(
+            json.dumps(
+                {
+                    "at": pd.Timestamp.now("UTC").isoformat(),
+                    "commit": state["commit"],
+                    "reason": reason or "first freeze",
+                }
+            )
+            + "\n"
+        )
     print("frozen at", state["commit"])
 
 
@@ -173,6 +208,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--split", choices=["dev", "held_out"])
     ap.add_argument("--freeze", action="store_true")
+    ap.add_argument("--reason", default="")
     ap.add_argument("--interim", default="data/interim")
     ap.add_argument("--out", default="results")
     ap.add_argument("--runs", type=int, default=4)
@@ -180,7 +216,7 @@ def main() -> None:
     ap.add_argument("--sensitivity", action="store_true")
     a = ap.parse_args()
     if a.freeze:
-        freeze(Path(a.interim), Path(a.out))
+        freeze(Path(a.interim), Path(a.out), a.reason)
         return
     run(a.split, Path(a.interim), Path(a.out), a.runs, DEFAULT_MIX, a.max_days, a.sensitivity)
 

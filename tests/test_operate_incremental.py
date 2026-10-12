@@ -9,8 +9,9 @@ from tashwish.operate.state import FrozenState
 
 
 def _state(tmp_path, end):
-    st = FrozenState(["2026-02-08", "2026-02-09"], pd.DataFrame({"icao24": []}), pd.DataFrame(), pd.DataFrame(),
-                     {"baseline_end": end})  # fmt: skip
+    st = FrozenState(pd.DataFrame({"icao24": []}), {"normal": pd.DataFrame()}, {"baseline": pd.DataFrame()},
+                     {"normal": ["2026-02-08", "2026-02-09"]}, {"baseline": ["2026-02-08", "2026-02-09"]},
+                     {"baseline_end": end, "ref_units": 1000.0})  # fmt: skip
     st.save(tmp_path / "state")
 
 
