@@ -345,7 +345,7 @@ def match_scenario(rec: dict, result: dict, grid: cfg.Grid = GRID) -> dict:
         sm = se[((d <= MATCH_KM) & (se["start"] < t1) & (se["end"] > t0)).to_numpy(dtype=bool)]
     out["spoof_detected"] = bool(len(sm))
     out["spoof_delay_min"] = float(max(0.0, (sm["start"].min() - s_t0).total_seconds() / 60)) if len(sm) else np.nan
-    mids = set(jm["event_id"]) | set(sm["event_id"]) if (len(jm) or len(sm)) else set()
+    mids = (set(jm["event_id"]) if len(jm) else set()) | (set(sm["event_id"]) if len(sm) else set())
     ev = result["events"]
     lab, unc, eids = "none", False, set()
     if len(ev) and mids:
