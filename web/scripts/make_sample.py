@@ -27,7 +27,7 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
-from tashwish.attribution import DATASET_ATTRIBUTION  # noqa: E402
+from tashwish.attribution import DATASET_ATTRIBUTION, SYNTHETIC_ATTRIBUTION  # noqa: E402
 
 OUT = ROOT / "web" / "data" / "sample_synthetic"
 SCHEMA = "tashwish.web.v1"
@@ -88,7 +88,7 @@ def envelope(now: str, commit: str) -> dict:
         "data_class": "synthetic",
         "generated_at": now,
         "code_commit": commit,
-        "attribution": DATASET_ATTRIBUTION,
+        "attribution": SYNTHETIC_ATTRIBUTION,  # the sample contains no adsb.lol data
     }
 
 
@@ -198,13 +198,12 @@ def build(now: dt.datetime) -> None:
                     ]
                 )
         all_rows[di] = rows
-        sum_n = sum(r[2] for r in rows)
         manifest_days.append(
             {
                 "day": day.isoformat(),
                 "split": "dev" if di in dev_idx else "held_out",
-                "rows": int(sum_n * 410),
-                "aircraft": int(sum_n / 3.1),
+                "rows": None,  # invented sample: no real row or aircraft counts are claimed
+                "aircraft": None,
                 "ingested_at": (
                     dt.datetime.combine(day, dt.time(0), dt.UTC)
                     + dt.timedelta(days=1, hours=2, minutes=int(rng.integers(0, 40)))
@@ -391,7 +390,8 @@ def check() -> int:
         if p.name.startswith("ne_"):
             continue
         d = json.loads(p.read_text(encoding="utf-8"))
-        if d.get("attribution") != DATASET_ATTRIBUTION:
+        want = SYNTHETIC_ATTRIBUTION if "sample_synthetic" in p.parts else DATASET_ATTRIBUTION
+        if d.get("attribution") != want:
             print(f"ATTRIBUTION MISMATCH {p}")
             bad += 1
         if d.get("schema") != SCHEMA:

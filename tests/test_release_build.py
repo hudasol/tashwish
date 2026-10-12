@@ -67,3 +67,14 @@ def test_build_is_idempotent_and_release_loads(tmp_path, monkeypatch):
     assert day["data_class"] == "observed" and len(day["cells"]) == 3
     assert [r for r in day["cells"] if r[6] != "ok"][0][4] is None
     Release(tmp_path / "rel", verify_hashes=True)  # the API accepts the builder's output and the checksums match
+
+
+def test_synthetic_data_class_is_refused_not_relabelled():
+    import pytest
+
+    cb = _cb("2026-01-01").assign(data_class="synthetic")
+    with pytest.raises(ValueError, match="observed"):
+        build.release_cb(cb)
+    ev = _ev("2026-01-01").assign(data_class="synthetic")
+    with pytest.raises(ValueError, match="observed"):
+        build.release_events(ev)

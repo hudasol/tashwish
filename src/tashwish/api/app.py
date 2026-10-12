@@ -21,7 +21,6 @@ from fastapi.responses import JSONResponse, Response, StreamingResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .. import __version__
-from ..attribution import DATASET_ATTRIBUTION
 from ..interop.marsad import STALENESS_MAX_AGE_HOURS
 from . import queries as q
 from .release import API_SCHEMA, Release, ReleaseError
@@ -99,7 +98,7 @@ def _etag(rel: Release, request: Request) -> str:
 
 def _release_headers(rel: Release) -> dict[str, str]:
     h = {
-        "X-Attribution": DATASET_ATTRIBUTION,
+        "X-Attribution": rel.attribution,
         "X-Data-Class": rel.data_class,
         "X-Dataset-Version": rel.dataset_version,
         "X-Content-Type-Options": "nosniff",
@@ -123,7 +122,7 @@ def _envelope(rel: Release, **fields) -> dict:
         "schema": API_SCHEMA,
         "dataset_version": rel.dataset_version,
         "data_class": rel.data_class,
-        "attribution": DATASET_ATTRIBUTION,
+        "attribution": rel.attribution,
     }
     if rel.synthetic:
         body["synthetic_notice"] = rel.notice

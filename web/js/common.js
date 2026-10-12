@@ -166,6 +166,8 @@ export async function loadData() {
     const f = data[n];
     if (f && f.data_class !== dc) throw new Error(t("error.mixed"));
   }
+  // the footer attribution must never silently vanish: refuse to show data without it
+  if (typeof manifest.attribution !== "string" || !manifest.attribution.trim()) throw new Error(t("error.attribution"));
   data.dataClass = dc;
   data.synthetic = dc === "synthetic";
   data.events_list = (data.events && (Array.isArray(data.events) ? data.events : data.events.events)) || [];
@@ -195,7 +197,8 @@ export function freshness() {
   const genAge = (now - gen) / 3600000;
   const dayAge = (now - latestEnd) / 3600000;
   const age = Math.max(genAge, dayAge);
-  const level = age > 7 * 24 ? "red" : age > 48 ? "amber" : "ok";
+  let level = age > 7 * 24 ? "red" : age > 48 ? "amber" : "ok";
+  if (m.data_class === "synthetic") level = "synthetic"; // a synthetic sample has no freshness to report
   return { level, genAge, dayAge, age };
 }
 
@@ -211,7 +214,7 @@ function linkedAttribution(text) {
   return frag;
 }
 
-export function attributionPlain() { return (state.data && state.data.manifest.attribution) || ""; }
+export function attributionPlain() { return state.data ? state.data.manifest.attribution : ""; }
 
 const NAV = [
   ["index.html", "nav.dashboard"],
@@ -261,7 +264,7 @@ export function mountChrome(page, onLang) {
   notice.append(linkedAttribution(a));
   const inner = el("div", { class: "footer-inner" },
     notice,
-    el("p", { text: t("footer.licences") }),
+    el("p", { text: t(d && d.synthetic ? "footer.licences_synthetic" : "footer.licences") }),
     el("p", { text: t("footer.basemap") + " " + t("footer.libs") }),
     el("p", {}, t("footer.downloads_pre") + " ", el("a", { href: "index.html#downloads", text: t("nav.downloads") }), ". ",
       t("footer.version", { version: d ? d.manifest.dataset_version : "", commit: d ? d.manifest.code_commit : "" })),
@@ -283,7 +286,12 @@ function renderFreshness() {
   wrap.append(el("h2", { id: "fresh-h", class: "fresh-h", text: t("fresh.title") }));
   const stateWord = t("fresh.state_" + f.level);
   const line = el("p", { class: "fresh-line" });
-  line.append(el("strong", { text: stateWord + ". " }));
+  line.append(el("strong", { text: stateWord + (f.level === "synthetic" ? "" : ". ") }));
+  if (f.level === "synthetic") {
+    line.append(". ", t("fresh.class") + " ", el("strong", { text: t("class." + d.dataClass) }), ".");
+    wrap.append(line);
+    return wrap;
+  }
   line.append(t("fresh.generated") + " ", el("span", { class: "nowrap", dir: "ltr" }, fmtStamp(m.generated_at)), " (",
     num(fmtInt(Math.max(0, Math.round(f.genAge))), "generated_at"), " " + t("fresh.hours_ago") + "). ");
   line.append(t("fresh.latest_day") + " ", num(m.latest_day, "latest_day"), ". ");
