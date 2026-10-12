@@ -7,7 +7,7 @@ import logging
 import os
 import threading
 import time
-from collections import defaultdict, deque
+from collections import OrderedDict, deque
 from collections.abc import Iterator
 from datetime import date, datetime
 from pathlib import Path
@@ -67,11 +67,16 @@ Mode = Literal["retrospective", "nowcast"]
 
 
 class _RateLimiter:
-    """Sliding window per client key, in memory (single process; the free tier runs one). 0 disables it."""
+    """Sliding window per client key, in memory (single process; the free tier runs one). 0 disables it.
 
-    def __init__(self, per_minute: int):
+    The key store is bounded: when more than `max_keys` keys are held, the least recently seen keys are evicted one by
+    one, so a flood of distinct keys cannot reset the buckets of other clients.
+    """
+
+    def __init__(self, per_minute: int, max_keys: int = 10_000):
         self.per_minute = per_minute
-        self._hits: dict[str, deque[float]] = defaultdict(deque)
+        self.max_keys = max(1, max_keys)
+        self._hits: OrderedDict[str, deque[float]] = OrderedDict()
         self._lock = threading.Lock()
 
     def check(self, key: str) -> int | None:
@@ -80,20 +85,47 @@ class _RateLimiter:
             return None
         now = time.monotonic()
         with self._lock:
-            dq = self._hits[key]
+            dq = self._hits.get(key)
+            if dq is None:
+                dq = self._hits[key] = deque()
+            self._hits.move_to_end(key)
             while dq and now - dq[0] > 60:
                 dq.popleft()
+            wait = None
             if len(dq) >= self.per_minute:
-                return max(1, int(60 - (now - dq[0])) + 1)
-            dq.append(now)
-            if len(self._hits) > 10_000:  # bound memory under a key flood
-                self._hits.clear()
-        return None
+                wait = max(1, int(60 - (now - dq[0])) + 1)
+            else:
+                dq.append(now)
+            while len(self._hits) > self.max_keys:
+                self._hits.popitem(last=False)
+        return wait
+
+
+def _trusted_hops() -> int:
+    """Number of trusted reverse proxies in front of the app (env TASHWISH_TRUSTED_PROXY_HOPS). 0 or unset: none."""
+    try:
+        return max(0, int(os.environ.get("TASHWISH_TRUSTED_PROXY_HOPS", "0")))
+    except ValueError:
+        return 0
+
+
+def client_key(request: Request) -> str:
+    """Rate limit key. X-Forwarded-For is client controlled, so it is ignored unless a trusted proxy count is set;
+    then the entry that many hops from the right (the address the outermost trusted proxy saw) is used."""
+    peer = request.client.host if request.client else "unknown"
+    hops = _trusted_hops()
+    if hops > 0:
+        parts = [p.strip() for p in request.headers.get("x-forwarded-for", "").split(",") if p.strip()]
+        if len(parts) >= hops:
+            return parts[-hops]
+    return peer
 
 
 def _etag(rel: Release, request: Request) -> str:
     items = sorted(request.query_params.multi_items())
-    h = hashlib.sha256(f"{rel.dataset_version}|{request.url.path}|{items}".encode()).hexdigest()[:24]
+    h = hashlib.sha256(f"{rel.dataset_version}|{rel.checksums_sha256}|{request.url.path}|{items}".encode()).hexdigest()[
+        :24
+    ]
     return f'W/"{h}"'
 
 
@@ -207,10 +239,7 @@ def create_app(release_dir: str | Path, *, rate_limit_per_minute: int | None = N
         if len(request.url.query) > MAX_QUERY_CHARS:
             return reject(414, "query_too_long", f"query string is longer than {MAX_QUERY_CHARS} characters")
         if path != "/health":
-            client = request.headers.get("x-forwarded-for", "").split(",")[0].strip() or (
-                request.client.host if request.client else "unknown"
-            )
-            wait = limiter.check(client)
+            wait = limiter.check(client_key(request))
             if wait is not None:
                 return reject(
                     429,

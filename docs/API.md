@@ -125,6 +125,7 @@ Every error is `{"error": {"code", "message", "details"?}}` (plus `synthetic_not
 ## Caching
 
 * Every cacheable response has a weak `ETag` derived from `dataset_version` and the request. Send `If-None-Match` to get a bodyless `304`.
+* The `ETag` hashes the dataset version, the SHA-256 of `checksums.sha256` from the manifest (which covers every release file), the path and the query. A rebuild with changed content therefore changes every ETag even if the day label is unchanged.
 * Default `Cache-Control: public, max-age=300, must-revalidate`.
 * Add `dataset_version=<current value>` to any `/v1` request to pin it: the answer cannot change for that version, so it is sent as
   `public, max-age=31536000, immutable`, and a version that is not the loaded one is `409`.
@@ -133,8 +134,10 @@ Every error is `{"error": {"code", "message", "details"?}}` (plus `synthetic_not
 ## Limits and safety
 
 * No unbounded response: lists are paged (cells and coverage at most 5000 rows, events at most 1000), downloads are streamed.
-* Per client sliding window rate limit, default 300 per minute (`TASHWISH_RATE_LIMIT_PER_MIN`, 0 disables), keyed on the first
-  `X-Forwarded-For` hop or the peer address. `/health` is exempt. The window lives in process memory.
+* Per client sliding window rate limit, default 300 per minute (`TASHWISH_RATE_LIMIT_PER_MIN`, 0 disables), keyed on the peer address.
+  `X-Forwarded-For` is client controlled and is ignored unless `TASHWISH_TRUSTED_PROXY_HOPS` is set to the number of trusted
+  proxies in front of the app; the entry that many hops from the right is then used. The key store is bounded (least recently
+  seen keys are evicted one at a time). `/health` is exempt. The window lives in process memory.
 * DuckDB runs with one thread and a 256 MB memory limit by default (`TASHWISH_DUCKDB_THREADS`, `TASHWISH_DUCKDB_MEMORY`).
   All request values are bound parameters; query text is fixed. Only whitelisted columns are selected, none identifies an aircraft.
 * CORS: any origin, `GET` only, no credentials. Preflight for any other method is refused.

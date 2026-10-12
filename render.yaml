@@ -26,5 +26,8 @@ services:
         value: "1"
       - key: TASHWISH_DUCKDB_MEMORY
         value: 256MB
+      # TASHWISH_TRUSTED_PROXY_HOPS is deliberately unset: without it the limiter keys on the peer address and ignores
+      # X-Forwarded-For. Behind Render's proxy that makes every client share one bucket; set the hop count only after
+      # checking how many proxies append to the header (UNVERIFIED, not checked here).
       - key: TASHWISH_RATE_LIMIT_PER_MIN
         value: "120"

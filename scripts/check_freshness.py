@@ -29,6 +29,9 @@ def _parse(ts: str) -> datetime:
 def evaluate(doc: dict, now: datetime | None = None) -> dict:
     """Return level, ages in hours and the run status fields. Raises ValueError/KeyError on a malformed document."""
     now = now or datetime.now(UTC)
+    for key in ("generated_at", "latest_day"):
+        if not isinstance(doc.get(key), str) or not doc[key]:
+            raise ValueError(f"{key} is missing or null (no run has produced data yet)")
     gen = _parse(doc["generated_at"])
     latest_end = datetime.fromisoformat(doc["latest_day"]).replace(tzinfo=UTC) + timedelta(days=1)
     gen_age = (now - gen).total_seconds() / 3600
@@ -76,7 +79,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     try:
         res = evaluate(json.loads(args.path.read_text()))
-    except (OSError, ValueError, KeyError) as e:
+    except (OSError, ValueError, KeyError, TypeError, AttributeError) as e:
         print(f"unknown: cannot evaluate {args.path}: {e}")
         return EXIT["unknown"]
     print(

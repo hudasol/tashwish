@@ -17,7 +17,7 @@ Rules used in this file:
 
 | Piece | Path | Role |
 |---|---|---|
-| Scheduled workflow | `.github/workflows/incremental.yml` | Weekly cron plus manual dispatch; runs everything below |
+| Scheduled workflow | `.github/workflows/incremental.yml` | Daily cron plus manual dispatch; runs everything below |
 | CI | `.github/workflows/ci.yml` | Lint and tests on pushes to `main` and on pull requests; never touches data |
 | Incremental CLI | `python -m tashwish.operate.incremental` | Finds the next missing archive day, streams and parses it, scores it against the frozen baseline in `state/`, appends to `processed/`, writes `processed/freshness.json` |
 | Release CLI | `python -m tashwish.release.build` | Builds dashboard JSON (`web/data`), the versioned dataset, data card and checksums (`release/`) |
@@ -27,10 +27,10 @@ Rules used in this file:
 
 ## 2. How a run works end to end
 
-1. Trigger: cron `17 3 * * 1` (Mondays 03:17 UTC) or Actions, "Incremental run", "Run workflow" with `max_days` (1 to 3, capped
-   at 3) and optional `start_day` (YYYY-MM-DD). The `concurrency` group `tashwish-incremental` queues a second run instead
+1. Trigger: cron `23 4 * * *` (daily 04:23 UTC, one day per run) or Actions, "Incremental run", "Run workflow" with `max_days` (1 to 3, capped
+   at 3, default 1) and optional `start_day` (YYYY-MM-DD). The `concurrency` group `tashwish-incremental` queues a second run instead
    of overlapping, and never cancels a running one.
-2. Checkout `main` (code and `state/`), Python 3.13, `pip install -e ".[dev]"`. Nothing large is cached; `actions/cache` is not
+2. Checkout `main` (code and `state/`) with `persist-credentials: false`, Python 3.13, `pip install -e ".[dev]"`. Nothing large is cached; `actions/cache` is not
    used for archives.
 3. Input validation (integer, date format).
 4. Guard tests: `tests/test_source.py`, `test_pipeline.py`, `test_trace.py`, `test_quality_config.py`, `test_split.py`,
@@ -38,13 +38,16 @@ Rules used in this file:
    any data is touched.
 5. A second working tree `dbranch/` is created from `origin/data` (or an empty orphan `data` branch the first time).
 6. For each of up to `max_days` slots, one call of the incremental CLI with `--max-days 1` (the first call also gets
-   `--start-day` if given), then a 120 s pause (`PAUSE_SECONDS`). Sequential only. The CLI streams each day through ranged
+   `--start-day` if given, later slots get `--append-status`), then a 120 s pause (`PAUSE_SECONDS`). Sequential only. The CLI streams each day through ranged
    downloads into `$RUNNER_TEMP/spool`, parses, scores, appends to `dbranch/processed`, and the spool is emptied after each day.
 7. `release.build` regenerates `dbranch/web/data` and `dbranch/release` from whatever `processed/` now holds, even if a later day
    failed, so days completed before a failure are published.
 8. `scripts/check_freshness.py` logs the resulting level.
-9. If anything under `processed/`, `web/data/` or `release/` changed, commit as `github-actions[bot]` and push to `data`.
-   A normal push, never forced.
+9. Only if the build step succeeded: if anything under `processed/`, `web/data/` or `release/` changed, commit as
+   `github-actions[bot]` and push to `data`. A normal push, never forced. The `GITHUB_TOKEN` is set on the remote in this
+   step only (and in the failure handler's push of `freshness.json`); checkout does not store it, so the install and test
+   steps never hold a push credential. The release build writes into temporary directories and swaps them in only when every
+   file was written, so a failed build leaves the previous `web/data` and `release` intact and exits non zero.
 10. If ingest or build failed the job is failed on purpose, and the failure handler runs (section 6). On a fully good run an
     open "Incremental run failed" issue is commented on and closed.
 
@@ -53,7 +56,7 @@ The workflow's job timeout is 240 minutes and the ingest step's is 200 minutes.
 ## 3. The CLI contract the workflow relies on
 
 ```
-python -m tashwish.operate.incremental --state state --processed processed --spool "$RUNNER_TEMP/spool" --max-days 3 [--start-day YYYY-MM-DD]
+python -m tashwish.operate.incremental --state state --processed processed --spool "$RUNNER_TEMP/spool" --max-days 1 [--start-day YYYY-MM-DD] [--append-status] [--allow-study-window]
 python -m tashwish.release.build --processed processed --web web/data --release release
 ```
 
@@ -68,10 +71,20 @@ What the workflow additionally requires from the parent implementation (it calls
 4. It writes `processed/freshness.json` on success (below). On its own failure it should set `last_run_status=failed` and
    `fallback_active=true` before exiting non zero; if it cannot, the workflow does that anyway through
    `check_freshness.py --mark-failed`.
-5. It treats `DayNotAvailable` for a day that is not yet published as "stop, nothing to do", and for a day older than the
-   newest available day as a gap to report, not to skip silently.
+5. It treats `DayNotAvailable` for a day that is not yet published as "stop, nothing to do". A day that is still unpublished
+   more than 2 days after it ended (`GAP_GRACE_DAYS`) is a gap: the run fails (exit 1, `failed`, `fallback_active`) so a
+   permanently missing day cannot stall the pipeline behind a green job.
+   Refusals exit 2 and change nothing: any day inside the study window (`STUDY_START` to `STUDY_END` in `src/tashwish/split.py`)
+   unless `--allow-study-window` is passed, and a `--start-day` that leaves a gap after the last processed day. The workflow never
+   passes `--allow-study-window`. `latest_day` never moves backwards (reprocessing an older day keeps the newer value). Each
+   processed day's `day.json` records `provenance`: code commit (`GITHUB_SHA`, else the local commit), SHA-256 of
+   `state/state.json`, and the SHA-256 of that day's ingest manifest record when available.
+   `--append-status` (used for slots after the first in one workflow run) keeps `days_added` and does not let a later `noop`
+   overwrite an earlier `ok`.
 6. `release.build` is idempotent, reads only `--processed`, and writes `generated_at` (UTC) and `latest_day` into
-   `web/data/manifest.json` as in `docs/WEB_DATA_CONTRACT.md`.
+   `web/data/manifest.json` as in `docs/WEB_DATA_CONTRACT.md`. `dataset_version` is `observed-<latest_day>-<8 hex>`, where the hex
+   is a content hash of the published cell buckets and events, so a backfill or correction changes it. Event times are rounded
+   to the 3 hour bucket (start floored, end ceiled) and destination coordinates are omitted when fewer than 5 aircraft support them.
 
 `processed/freshness.json` (written by the incremental CLI, read by `check_freshness.py`):
 
@@ -118,21 +131,27 @@ Arithmetic, with the stated assumptions (illustrative, not measured on GitHub):
   43 min. Three days plus two 2 min pauses: about 52 min at 10 MiB/s, about 133 min at 2 MiB/s, both under the 200 minute step
   timeout. Break even speed for three days in 200 minutes: (200 - 4) / 3 = 65 min per day, so about 56 min of download, so
   about 1.2 MiB/s. Below that the step times out and the days finished so far are kept.
-- Minutes: a 3 day run is about 1 hour, so weekly is about 4 to 5 hours a month. Free for public repositories if the recalled
+- Minutes: a 3 day run is about 1 hour, so a daily run of 1 day (about 20 to 45 minutes at the speeds above) is about 10 to 22 hours a month. Free for public repositories if the recalled
   policy holds (UNVERIFIED); on a private repository these minutes would count against a quota.
 
 ### What does not fit, exactly
 
-1. **Keeping pace is impossible at the configured cadence.** The archive adds 7 days a week; the workflow processes at most 3
-   per run and runs weekly, so the backlog grows by 4 days a week and `latest_day` will lag. The dashboard will then show amber
-   (over 48 h) and eventually red (over 7 days) even when every run succeeds. To track the archive you need at least 7 days of
-   processing per week, for example three runs a week of 3 days (change the cron to `17 3 * * 1,3,5`) or a daily run of 1 day
-   (cron `17 3 * * *`). Whether that is polite use of adsb.lol's GitHub releases is UNVERIFIED: no retrieved page states a rate
-   limit or fair use rule for `globe_history` downloads. Our measured footprint at daily cadence is about 4 GiB a day. The
-   owner should decide, and ideally ask the maintainers (docs/LICENSING.md section 6 lists the questions).
+1. **Keeping pace needs 7 days of processing per week.** The archive adds 7 days a week. The previous design (weekly cron, at
+   most 3 days per run) processed at most 3 days a week, so the backlog grew by 4 days a week and `latest_day` lagged: the dashboard
+   turned amber (over 48 h) and then red (over 7 days) even when every run succeeded. Recommended: **one run per day at an
+   off-peak minute, at most 1 day per run** (cron `23 4 * * *`, as configured). That is 7 days a week, uses about 1 hour of runner
+   time a day at the measured speeds, and a single failed run costs one day that the next run resumes at, because the CLI resumes at
+   the first missing day. Three runs a week of 3 days each would also cover 7 days, but delays freshness by up to 2 days; it is not
+   recommended. Whether daily downloads of about 4 GiB are polite use of adsb.lol's GitHub releases is
+   UNVERIFIED: no retrieved page states a rate limit or fair use rule for `globe_history` downloads. The owner should decide, and
+   ideally ask the maintainers (docs/LICENSING.md section 6 lists the questions).
+   Backfill limit: each dispatch processes at most `max_days` days (cap 3) and `start_day` applies to the first slot only, so
+   backfill is bounded by one to three days per dispatch and each dispatch is a separate run. Backfilling N days needs about N
+   divided by `max_days` dispatches, and a `start_day` that leaves a gap after the last processed day is refused. Days inside the
+   study window are not backfilled through this workflow at all (they are refused, see section 3 item 5).
 2. **The job time limit bounds catch-up.** If the 6 hour limit is right (UNVERIFIED), a single run cannot clear a long
-   backlog. Even ignoring the polite cap of 3, about 12 days at best is the ceiling for one run. Backfilling the 35 day study
-   window therefore takes at least 12 runs of 3 days, or many manual dispatches (section 6.4).
+   backlog. Even ignoring the polite cap of 3, about 12 days at best is the ceiling for one run. A long backlog after the study window is
+   cleared by repeated dispatches, not in one run (section 6).
 3. **Public repository is required.** The free minutes claim is for public repositories (UNVERIFIED). A private repository changes
    the arithmetic.
 4. **Scheduled workflows may be paused** after a long period without repository activity (recalled, UNVERIFIED). Data commits
@@ -168,7 +187,7 @@ badge cannot show "the last run failed" by itself, because it only reads the man
 as the issue, and in `freshness.json`.
 
 Because `latest_day` is a lagging quantity (a UTC day can only be ingested after it ends and is published), "ok" can never mean
-less than about 24 h old. With the weekly cadence, see section 4 item 1.
+less than about 24 h old. With the daily cadence this is about 24 to 48 h in normal operation; see section 4 item 1.
 
 ## 6. When a run fails
 
@@ -196,9 +215,11 @@ cd ../tashwish-data && git checkout -B data origin/data && git add processed web
 # 4. or simply re-run in the cloud: Actions > Incremental run > Run workflow (max_days 1)
 ```
 
-Backfill: dispatch the workflow with `start_day` set to the first missing day and `max_days` 3, repeat until the dashboard
-reads ok. Days are idempotent, so overlapping a finished day is harmless. For the study window (2026-02-07 to 2026-03-13)
-backfill is 12 dispatches of 3 days, at least.
+Backfill: dispatch the workflow with `start_day` set to the first missing day (or leave it empty to resume) and `max_days` 3,
+repeat until the dashboard reads ok. Days are idempotent, so overlapping a finished day is harmless, and `latest_day` does not
+move backwards. The study window (2026-02-07 to 2026-03-13) is not backfilled this way: the CLI refuses those days, because
+held out days must be scored once by the validation harness before they are published. Pass `--allow-study-window` locally only
+for a deliberate, documented exception.
 
 If the source is unreachable (timeouts, 5xx, 403): do not retry in a tight loop. The CLI retries per range with a backoff
 (`src/tashwish/ingest/source.py`); after that the run fails and waits for the next trigger. Check
@@ -232,7 +253,7 @@ git checkout -b refit-YYYY-MM-DD && git add state && git commit -m "state: refit
 ```
 
 After merging, bump the dataset version so consumers know scores before and after are not comparable, and note it in the data
-card. Do not refit from the weekly workflow.
+card. Do not refit from the scheduled workflow.
 
 ## 8. CI and the README badge
 
@@ -263,3 +284,14 @@ None of these could be retrieved when this file was written. Read them, then rep
 | Render free web service sleep and monthly hours | https://render.com/docs/free |
 | adsb.lol fair use or rate guidance for the archive | https://www.adsb.lol/docs/open-data/historical/ and https://github.com/adsblol/globe_history_2026 (ask the maintainers if silent) |
 | Archive publication lag after a UTC day ends | Not documented anywhere we read; measure it from release creation times |
+
+### Additional UNVERIFIED items on this free tier (kept unverified)
+
+- Whether GitHub Actions free minutes, the 6 hour job limit, runner RAM and disk, and the scheduled workflow disabling after
+  60 days without activity apply as recalled in section 4. None was retrieved or tested.
+- Whether a workflow that only pushes to the `data` branch counts as repository activity for the scheduling rule.
+- Whether `GITHUB_TOKEN` pushes to `data` are allowed by the repository's default workflow permission setting (it can be set to
+  read only at repository level; the owner must check Settings, Actions, General).
+- Whether the archive publishes a day soon enough for the 04:23 UTC run to find it (publication lag is not characterised). A day
+  not yet published is a noop; a day missing for more than 2 days fails the run.
+- No workflow linter (such as actionlint) is run in CI: it needs a download of an external binary and was not checked here.

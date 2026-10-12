@@ -12,8 +12,10 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import shutil
 import subprocess
+import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -29,6 +31,11 @@ WEB_SCHEMA = "tashwish.web.v1"
 REL_SCHEMA = "tashwish.release.v1"
 SCHEMA_VALIDATION = "tashwish.validation.v1"
 GRID = cfg.GRID_MAIN
+MIN_DEST_AIRCRAFT = 5  # destination coordinates are published only for spoofing events with at least this many aircraft
+ROUNDING_SENTENCE = (
+    f"Event times are rounded to the {GRID.bucket_hours} hour bucket; events with fewer than {MIN_DEST_AIRCRAFT} "
+    "aircraft omit destination coordinates."
+)
 
 
 def sha256_file(p: Path) -> str:
@@ -97,7 +104,31 @@ def load_processed(processed: Path) -> tuple[pd.DataFrame, pd.DataFrame, list[di
     )
 
 
+def assert_observed(df: pd.DataFrame, what: str) -> None:
+    """The builder publishes observed data only. A frame that carries another data_class is refused, not relabelled."""
+    if "data_class" in df.columns and len(df) and not (df["data_class"] == "observed").all():
+        raise ValueError(f"{what}: data_class is not 'observed'; refusing to build an observed release from it")
+
+
+def content_hash(cb: pd.DataFrame, ev: pd.DataFrame) -> str:
+    """Short hash of the published cell_buckets and events content (stable across rebuilds of the same data)."""
+    h = hashlib.sha256()
+    for name, df in (("cell_buckets", cb), ("events", ev)):
+        h.update(f"{name}|{list(df.columns)}|{len(df)}|".encode())
+        if len(df):
+            try:
+                h.update(pd.util.hash_pandas_object(df, index=False).to_numpy().tobytes())
+            except TypeError:  # unhashable cell values: fall back to the text form
+                h.update(df.to_csv(index=False).encode())
+    return h.hexdigest()
+
+
+def dataset_version_for(latest_day: str | None, cb: pd.DataFrame, ev: pd.DataFrame) -> str:
+    return f"observed-{latest_day}-{content_hash(cb, ev)[:8]}" if latest_day else "empty"
+
+
 def release_cb(cb: pd.DataFrame) -> pd.DataFrame:
+    assert_observed(cb, "cell buckets")
     ok = cb["status"] == "ok"
     out = pd.DataFrame({
         "h3": cb["cell"], "bucket_start": cb["bucket"], "slot": cb["slot"].astype(int), "stratum": cb["stratum"],
@@ -123,16 +154,27 @@ def daily_region(cb: pd.DataFrame, metas: list[dict]) -> pd.DataFrame:
 
 
 def release_events(ev: pd.DataFrame) -> pd.DataFrame:
+    """Events as published: times rounded to the grid bucket (start floored, end ceiled), destination coordinates
+    withheld when fewer than MIN_DEST_AIRCRAFT spoofing aircraft support them (small groups are quasi identifiers)."""
     if ev.empty:
         return ev
+    assert_observed(ev, "events")
     out = ev.copy()
+    freq = f"{GRID.bucket_hours}h"
+    out["start"] = pd.to_datetime(out["start"], utc=True).dt.floor(freq)
+    out["end"] = pd.to_datetime(out["end"], utc=True).dt.ceil(freq)
+    if "n_spoof_aircraft" in out.columns:
+        small = ~(pd.to_numeric(out["n_spoof_aircraft"], errors="coerce") >= MIN_DEST_AIRCRAFT)
+        for c in ("dest_lat", "dest_lon"):
+            if c in out.columns:
+                out[c] = out[c].astype("float64").mask(small)
     out["data_class"] = "observed"
     return out.sort_values(["start", "event_id"]).reset_index(drop=True)
 
 
 def write_web(web: Path, cb: pd.DataFrame, ev: pd.DataFrame, metas: list[dict], cov: pd.DataFrame | None,
               generated_at: str, latest_day: str | None, results_block: dict, methods: dict,
-              daily: pd.DataFrame | None = None) -> None:  # fmt: skip
+              daily: pd.DataFrame | None = None, dataset_version: str | None = None) -> None:  # fmt: skip
     common = {"schema": WEB_SCHEMA, "data_class": "observed", "generated_at": generated_at,
               "code_commit": code_commit(), "attribution": DATASET_ATTRIBUTION}  # fmt: skip
     shutil.rmtree(web / "days", ignore_errors=True)
@@ -168,7 +210,7 @@ def write_web(web: Path, cb: pd.DataFrame, ev: pd.DataFrame, metas: list[dict], 
     _dump(web / "methods.json", {**common, "metrics": methods})
     if daily is not None:
         _dump(web / "daily.json", {**common, "days": daily.round(4).to_dict(orient="records")})
-    _dump(web / "manifest.json", {**common, "dataset_version": f"observed-{latest_day}" if latest_day else "empty",
+    _dump(web / "manifest.json", {**common, "dataset_version": dataset_version or (f"observed-{latest_day}" if latest_day else "empty"),
           "grid": {"h3_res": GRID.h3_res, "bucket_hours": GRID.bucket_hours},
           "bbox": {"south": cfg.REGION.lat_min, "west": cfg.REGION.lon_min, "north": cfg.REGION.lat_max, "east": cfg.REGION.lon_max},
           "days": metas, "latest_day": latest_day, "freshness_hours_hint": 24})  # fmt: skip
@@ -195,6 +237,7 @@ def data_card(template: Path, metas: list[dict], cb: pd.DataFrame, ev: pd.DataFr
         "  `share`, `ci_lo`, `ci_hi` are empty unless status is `ok`.",
         "- `events.parquet` and `.csv.gz`: jamming-like, spoofing-like, both, and uncertain events. No identifiers.",
         "- `coverage.parquet`: baseline coverage per (cell, slot, stratum), fitted on development days only.",
+        f"- {ROUNDING_SENTENCE}",
         "- `validation.json`, `freshness.json`, `manifest.json`, `checksums.sha256`, `NOTICE`, `ODbL-1.0.txt`.",
         "",
         f"Cell-bucket rows by status: {', '.join(f'{k} {v}' for k, v in sorted(st.items()))}.",
@@ -216,15 +259,24 @@ def data_card(template: Path, metas: list[dict], cb: pd.DataFrame, ev: pd.DataFr
     return head + "\n".join(lines)
 
 
-def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--processed", type=Path, default=Path("processed"))
-    ap.add_argument("--web", type=Path, default=Path("web/data"))
-    ap.add_argument("--release", type=Path, default=Path("release"))
-    ap.add_argument("--state", type=Path, default=ROOT / "state")
-    ap.add_argument("--results", type=Path, default=ROOT / "results")
-    a = ap.parse_args()
+def _swap(tmp: Path, target: Path) -> None:
+    """Replace `target` by `tmp` with renames only. The previous directory is restored if the second rename fails."""
+    old = target.with_name(f".{target.name}.old-{os.getpid()}")
+    shutil.rmtree(old, ignore_errors=True)
+    had = target.exists()
+    if had:
+        target.rename(old)
+    try:
+        tmp.rename(target)
+    except OSError:
+        if had:
+            old.rename(target)
+        raise
+    shutil.rmtree(old, ignore_errors=True)
 
+
+def build(a: argparse.Namespace, tmp_web: Path, tmp_rel: Path) -> bool:
+    """Write the web data and the release into the temporary directories. False if there is nothing to build."""
     cb_raw, ev_raw, metas = load_processed(a.processed)
     fresh_p = a.processed / "freshness.json"
     fresh = json.loads(fresh_p.read_text()) if fresh_p.exists() else {}
@@ -233,7 +285,10 @@ def main() -> None:
     generated_at = fresh.get("generated_at") or (iso(pd.Timestamp.now("UTC")) if days else None)
     if not days:
         print("no processed days; nothing to build")
-        return
+        return False
+    for m in metas:
+        if m.get("data_class", "observed") != "observed":
+            raise ValueError(f"day {m.get('day')}: data_class {m.get('data_class')!r} is not 'observed'")
     cov = pd.read_parquet(a.state / "coverage.parquet") if (a.state / "coverage.parquet").exists() else None
     headline_p = a.results / "headline.json"
     results_block = json.loads(headline_p.read_text()) if headline_p.exists() else {"results": []}
@@ -243,14 +298,14 @@ def main() -> None:
     cb = release_cb(cb_raw)
     ev = release_events(ev_raw)
     dr = daily_region(cb, metas)
-    a.results.mkdir(parents=True, exist_ok=True)
-    dr.to_csv(a.results / "daily_region.csv", index=False)
-    write_web(a.web, cb, ev, metas, cov, generated_at, latest_day, results_block, methods, dr)
-
-    rel = a.release
-    rel.mkdir(parents=True, exist_ok=True)
-    dr.to_csv(rel / "daily_region.csv", index=False)
     cbo = cb.drop(columns=["day"])
+    version = dataset_version_for(latest_day, cbo, ev)
+    write_web(
+        tmp_web, cb, ev, metas, cov, generated_at, latest_day, results_block, methods, dr, dataset_version=version
+    )
+
+    rel = tmp_rel
+    dr.to_csv(rel / "daily_region.csv", index=False)
     cbo.to_parquet(rel / "cell_buckets.parquet", index=False, compression="zstd")
     cbo.to_csv(rel / "cell_buckets.csv.gz", index=False)
     ev_out = ev.copy()
@@ -282,14 +337,57 @@ def main() -> None:
         for n in [*names, "checksums.sha256"]
     }
     manifest = {
-        "schema": REL_SCHEMA, "dataset_version": f"observed-{latest_day}", "generated_at": generated_at,
+        "schema": REL_SCHEMA, "dataset_version": version, "generated_at": generated_at,
         "code_commit": code_commit(), "data_class": "observed", "attribution": DATASET_ATTRIBUTION,
         "grid": {"h3_res": GRID.h3_res, "bucket_hours": GRID.bucket_hours},
         "bbox": {"south": cfg.REGION.lat_min, "west": cfg.REGION.lon_min, "north": cfg.REGION.lat_max, "east": cfg.REGION.lon_max},
         "days": metas, "latest_day": latest_day, "files": files,
     }  # fmt: skip
     (rel / "manifest.json").write_text(json.dumps(manifest, indent=1, default=_json_default))
-    print(f"built release for {len(days)} days, latest {latest_day}")
+    a.results.mkdir(parents=True, exist_ok=True)
+    dr.to_csv(a.results / "daily_region.csv.tmp", index=False)
+    print(f"built release for {len(days)} days, latest {latest_day}, dataset_version {version}")
+    return True
+
+
+def main() -> None:
+    """Build into temporary directories next to the targets and swap them in only when every file was written.
+    On any failure the previous web data and release stay untouched and the exit status is 1."""
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--processed", type=Path, default=Path("processed"))
+    ap.add_argument("--web", type=Path, default=Path("web/data"))
+    ap.add_argument("--release", type=Path, default=Path("release"))
+    ap.add_argument("--state", type=Path, default=ROOT / "state")
+    ap.add_argument("--results", type=Path, default=ROOT / "results")
+    a = ap.parse_args()
+
+    pid = os.getpid()
+    tmp_web = a.web.with_name(f".{a.web.name}.new-{pid}")
+    tmp_rel = a.release.with_name(f".{a.release.name}.new-{pid}")
+    try:
+        for t in (tmp_web, tmp_rel):
+            shutil.rmtree(t, ignore_errors=True)
+        a.web.parent.mkdir(parents=True, exist_ok=True)
+        a.release.parent.mkdir(parents=True, exist_ok=True)
+        if a.web.exists():
+            shutil.copytree(a.web, tmp_web)  # keeps unrelated files such as web/data/sample_synthetic
+        else:
+            tmp_web.mkdir(parents=True)
+        tmp_rel.mkdir(parents=True)
+        if not build(a, tmp_web, tmp_rel):
+            return
+        _swap(tmp_web, a.web)
+        _swap(tmp_rel, a.release)
+        part = a.results / "daily_region.csv.tmp"
+        if part.exists():
+            part.replace(a.results / "daily_region.csv")
+    except Exception as e:  # noqa: BLE001
+        print(f"build failed, previous outputs left intact: {type(e).__name__}: {e}", file=sys.stderr)
+        sys.exit(1)
+    finally:
+        for t in (tmp_web, tmp_rel):
+            shutil.rmtree(t, ignore_errors=True)
+        (a.results / "daily_region.csv.tmp").unlink(missing_ok=True)
 
 
 if __name__ == "__main__":

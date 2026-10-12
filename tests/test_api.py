@@ -466,6 +466,59 @@ def test_rate_limiter_returns_429_with_retry_after_and_exempts_health(rel):
     assert c.get("/health").status_code == 200
 
 
+def test_rate_limiter_ignores_spoofed_forwarded_header_by_default(rel, monkeypatch):
+    monkeypatch.delenv("TASHWISH_TRUSTED_PROXY_HOPS", raising=False)
+    c = TestClient(create_app(rel.path, rate_limit_per_minute=2))
+    codes = [c.get("/v1/days", headers={"X-Forwarded-For": f"10.0.0.{i}"}).status_code for i in range(4)]
+    assert codes == [200, 200, 429, 429]
+
+
+def test_rate_limiter_uses_trusted_hop_when_configured(rel, monkeypatch):
+    monkeypatch.setenv("TASHWISH_TRUSTED_PROXY_HOPS", "1")
+    c = TestClient(create_app(rel.path, rate_limit_per_minute=1))
+    # the rightmost entry is the one the trusted proxy appended; the leftmost is client controlled
+    assert c.get("/v1/days", headers={"X-Forwarded-For": "1.1.1.1, 9.9.9.9"}).status_code == 200
+    assert c.get("/v1/days", headers={"X-Forwarded-For": "2.2.2.2, 9.9.9.9"}).status_code == 429
+    assert c.get("/v1/days", headers={"X-Forwarded-For": "2.2.2.2, 8.8.8.8"}).status_code == 200
+
+
+def test_rate_limiter_key_store_is_bounded_and_flood_does_not_reset_others():
+    from tashwish.api.app import _RateLimiter
+
+    lim = _RateLimiter(2, max_keys=50)
+    assert lim.check("victim") is None and lim.check("victim") is None
+    assert lim.check("victim") is not None
+    for i in range(30):  # fewer new keys than the bound: the victim stays limited
+        lim.check(f"flood{i}")
+    assert lim.check("victim") is not None
+    for i in range(500):
+        lim.check(f"flood-more{i}")
+    assert len(lim._hits) <= 50
+
+
+def test_etag_includes_manifest_checksums(rel, tmp_path):
+    import shutil
+
+    other = tmp_path / "rel2"
+    shutil.copytree(rel.path, other)
+    m = json.loads((other / "manifest.json").read_text())
+    m["files"]["checksums.sha256"]["sha256"] = "0" * 64  # same dataset_version, different content hash
+    (other / "manifest.json").write_text(json.dumps(m))
+    e1 = TestClient(create_app(rel.path, rate_limit_per_minute=0)).get("/v1/days").headers["ETag"]
+    e2 = TestClient(create_app(other, rate_limit_per_minute=0)).get("/v1/days").headers["ETag"]
+    assert e1 != e2
+
+
+def test_download_and_304_responses_carry_attribution(client):
+    r = client.get("/v1/download/NOTICE")
+    assert r.status_code == 200 and r.headers["X-Attribution"] == DATASET_ATTRIBUTION
+    first = client.get("/v1/days")
+    r304 = client.get("/v1/days", headers={"If-None-Match": first.headers["ETag"]})
+    assert r304.status_code == 304 and r304.headers["X-Attribution"] == DATASET_ATTRIBUTION
+    miss = client.get("/v1/download/not_listed.bin")
+    assert miss.status_code == 404 and miss.headers["X-Attribution"] == DATASET_ATTRIBUTION
+
+
 def test_unhandled_error_is_a_clean_500_with_headers(rel, monkeypatch):
     def boom(*a, **k):
         raise RuntimeError("secret internal detail")
