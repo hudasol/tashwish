@@ -29,7 +29,10 @@ def triple_outcomes(cov: pd.DataFrame, cb_day: pd.DataFrame, day: str, grid: cfg
     """One row per (cell, slot, enroute) known to the model OR observed on the day, with class and new-day count."""
     e = cb_day[cb_day["stratum"] == "enroute"].copy()
     e["slot"] = slot_of_day(e["bucket"], grid)
-    obs = e.groupby(["cell", "slot"], as_index=False).agg(n_new=("n_aircraft", "sum"))
+    agg = {"n_new": ("n_aircraft", "sum")}
+    if "status" in e.columns:
+        agg["status"] = ("status", "first")  # one row per (cell, slot) on a single day and stratum
+    obs = e.groupby(["cell", "slot"], as_index=False).agg(**agg)
     base = cov[cov["stratum"] == "enroute"][["cell", "slot", "presence", "mean_n", "coverage_class"]]
     m = base.merge(obs, on=["cell", "slot"], how="outer")
     m["coverage_class"] = m["coverage_class"].fillna("no_coverage")  # never seen in baseline => no coverage
@@ -37,6 +40,8 @@ def triple_outcomes(cov: pd.DataFrame, cb_day: pd.DataFrame, day: str, grid: cfg
     m["mean_n"] = m["mean_n"].fillna(0.0)
     m["n_new"] = m["n_new"].fillna(0).astype(int)
     m["enough"] = m["n_new"] >= cfg.MIN_AIRCRAFT_PER_CELL
+    if "status" in m.columns:
+        m["status"] = m["status"].fillna("no_row")
     m["day"] = day
     return m
 
@@ -75,6 +80,13 @@ def summarize(outcomes: pd.DataFrame) -> dict:
         lo, hi = wilson_interval(k, len(g))
         by_slot[int(slot)] = {"n": len(g), "false_coverage": k / len(g), "ci_lo": lo, "ci_hi": hi}
     res["covered_by_slot"] = by_slot
+    if "status" in outcomes.columns:
+        # What the system finally SAYS about covered units that turned out not to have enough aircraft. `ok` would be
+        # a wrong claim of testability; it cannot happen by construction (ok requires enough), and this verifies it.
+        bad = cov[~cov["enough"]]
+        res["covered_not_enough_status"] = {str(k): int(v) for k, v in bad["status"].value_counts().items()}
+        res["covered_not_enough_total"] = int(len(bad))
+        res["wrongly_ok"] = int(((outcomes["status"] == "ok") & ~outcomes["enough"]).sum())
     return res
 
 

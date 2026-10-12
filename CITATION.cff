@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software or dataset, please cite it as below."
+title: "Tashwish: Gulf GNSS Interference Observatory"
+type: software
+authors:
+  - family-names: "Mueen"
+    given-names: "Huda"
+repository-code: "https://github.com/hudasol/tashwish"
+license: Apache-2.0
+abstract: >-
+  Open pipeline and dashboard that derives aggregate maps and time series of GNSS jamming-like and spoofing-like
+  anomalies over the Gulf from public ADS-B data (adsb.lol, ODbL). Research and monitoring tool; not for navigation
+  or safety of life; makes no attribution to any actor.
+keywords:
+  - GNSS
+  - jamming
+  - spoofing
+  - ADS-B
+  - open data
