@@ -85,3 +85,14 @@ an open style). **No basemap tile service with restrictive terms will be used.**
 Any synthetic data (test fixtures, injected scenarios) is labelled synthetic in filenames (`*_synthetic_*`), in schemas
 (`data_class = "synthetic"`), in the UI and in the docs, and is never written into the real-data tables. See
 docs/METHODOLOGY.md and the data card.
+
+## 7. Study window and split (decided 2026-10-12, reversible until the held-out run)
+
+- **Window:** 2026-02-07 to 2026-03-13 inclusive, 35 UTC days, all from the `globe_history_2026` repository (prod or staging,
+  the larger release per day). It covers the cited 2026 incident dates 28 Feb, 2 Mar, 7 Mar and 13 Mar (docs/RESEARCH.md section 3).
+  Why this size: about 6 minutes of parsing plus download per day on 2 cores gives roughly 4 hours for the whole window in this
+  environment, and at least 14 days are needed for baselines. Pre-2025-12 events are out of reach of this archive.
+- **Resumable ingest:** `scripts/run_study_ingest.sh` skips complete days (manifest), writes each day atomically, retries a day up
+  to 4 times, and can be restarted at any time; a crash loses at most the day in progress. Raw archives are streamed from a spool
+  and deleted after each day; `data/raw` and `data/interim` are git-ignored, and only derived aggregates are ever released.
+- **Split:** `src/tashwish/split.py` and docs/PREDICTIONS.md. 21 DEV days, 14 HELD-OUT days, fixed by a hash of the date.
