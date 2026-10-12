@@ -1,0 +1,10 @@
+{
+ "aircraft": 667,
+ "data_class": "observed",
+ "day": "2026-03-08",
+ "ingested_at": "2026-10-12T05:37:21Z",
+ "mode": "frozen_baseline",
+ "n_events": 2,
+ "rows": 352159,
+ "split": "held_out"
+}

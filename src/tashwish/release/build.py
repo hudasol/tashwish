@@ -26,6 +26,19 @@ from .. import config as cfg
 from ..attribution import DATASET_ATTRIBUTION
 from ..operate.processed import list_days, read_day_meta
 
+EXTRA_METHODS = {
+    "evidence.n_spoof_aircraft": ("Aircraft in the position jump cluster", "event-definition"),
+    "evidence.dest_spread_km": ("Spread of jump destinations (km)", "confidence-grading"),
+    "evidence.median_implied_kt": ("Median implied speed of the jumps (kt)", "event-definition"),
+    "evidence.share_nominal_accuracy": ("Share of jump reports with nominal accuracy fields", "event-definition"),
+    "jamming_recall_easy": ("Recall, easy synthetic jamming scenarios", "validation-design"),
+    "jamming_recall_medium": ("Recall, medium synthetic jamming scenarios", "validation-design"),
+    "jamming_recall_hard": ("Recall, hard synthetic jamming scenarios", "validation-design"),
+    "spoofing_recall_3plus_aircraft": ("Recall, synthetic spoofing of 3 or more aircraft", "validation-design"),
+    "false_coverage_rate": ("Covered cells that lacked data on a held-out day", "coverage-model"),
+    "daily_degraded_share": ("Region wide degraded share per day", "degraded-definition"),
+}
+
 ROOT = Path(__file__).resolve().parents[3]
 WEB_SCHEMA = "tashwish.web.v1"
 REL_SCHEMA = "tashwish.release.v1"
@@ -294,6 +307,8 @@ def build(a: argparse.Namespace, tmp_web: Path, tmp_rel: Path) -> bool:
     results_block = json.loads(headline_p.read_text()) if headline_p.exists() else {"results": []}
     sample = ROOT / "web" / "data" / "sample_synthetic" / "methods.json"
     methods = json.loads(sample.read_text())["metrics"] if sample.exists() else {}
+    for k, (label, anchor) in EXTRA_METHODS.items():
+        methods.setdefault(k, {"label_en": label, "label_ar": label, "method_anchor": anchor})
 
     cb = release_cb(cb_raw)
     ev = release_events(ev_raw)
