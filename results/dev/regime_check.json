@@ -1,0 +1,42 @@
+{
+ "early_days": [
+  "2026-02-08",
+  "2026-02-09",
+  "2026-02-13",
+  "2026-02-14",
+  "2026-02-16",
+  "2026-02-17",
+  "2026-02-19",
+  "2026-02-20",
+  "2026-02-21",
+  "2026-02-22",
+  "2026-02-23",
+  "2026-02-25",
+  "2026-02-27"
+ ],
+ "late_days": [
+  "2026-03-02",
+  "2026-03-04",
+  "2026-03-05",
+  "2026-03-06",
+  "2026-03-07",
+  "2026-03-09",
+  "2026-03-11",
+  "2026-03-12"
+ ],
+ "early_aircraft_with_samples": 4372,
+ "early_sample_share_all": 0.014366729187922757,
+ "late_aircraft_with_samples": 1470,
+ "late_sample_share_all": 0.3393798890201768,
+ "n_aircraft_in_both_periods": 1237,
+ "same_aircraft_sample_share_early": 0.011164146588210666,
+ "same_aircraft_sample_share_late": 0.3516298500325439,
+ "paired_diff_median": 0.20307692307692307,
+ "share_aircraft_rise_gt_0.2": 0.5060630557801131,
+ "share_aircraft_fall_gt_0.2": 0.004042037186742118,
+ "only_late_aircraft": 233,
+ "only_late_sample_share": 0.22316308393976994,
+ "only_early_aircraft": 3135,
+ "only_early_sample_share": 0.01785737226840016,
+ "note": "Descriptive, dev days only. A rise for the same aircraft argues against a pure fleet mix explanation but does not identify a cause. No attribution to any actor."
+}
