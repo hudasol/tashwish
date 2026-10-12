@@ -76,7 +76,11 @@ Not yet available: the code lands with M1 and this section will then list exact,
 
 [Marsad](https://github.com/hudasol/marsad) is a per-vehicle and per-track position-trust layer. Tashwish is separate and
 complementary: a regional interference-context feed that could later inform Marsad as a prior. Tashwish does not
-duplicate vehicle trust, and Marsad is not modified by this project.
+duplicate vehicle trust, and Marsad is not modified by this project. The proposed interface is specified in [docs/MARSAD_INTERFACE.md](docs/MARSAD_INTERFACE.md).
+
+## Relationship to Sirb
+
+Sirb (a drone show planner and verifier) could read an empirical GNSS degradation parameter file built from public aircraft ADS-B data, as an illustrative stress prior only, not a drone receiver model: [docs/SIRB_INTERFACE.md](docs/SIRB_INTERFACE.md). Sirb is not modified by this project.
 
 ## Author
 
