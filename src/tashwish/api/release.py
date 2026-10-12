@@ -20,7 +20,7 @@ import duckdb
 import pyarrow.parquet as pq
 
 from .. import config as cfg
-from ..attribution import DATASET_ATTRIBUTION
+from ..attribution import DATASET_ATTRIBUTION, SYNTHETIC_ATTRIBUTION
 from ..interop.marsad import NOTICE_OBSERVED, NOTICE_SYNTHETIC
 
 RELEASE_SCHEMA = "tashwish.release.v1"
@@ -157,8 +157,14 @@ class Release:
             raise ReleaseError(f"manifest schema must be {RELEASE_SCHEMA!r}, got {m['schema']!r}")
         if m["data_class"] not in (cfg.DATA_CLASS_OBSERVED, cfg.DATA_CLASS_SYNTHETIC):
             raise ReleaseError("manifest data_class must be 'observed' or 'synthetic'")
-        if m["attribution"] != DATASET_ATTRIBUTION:
-            raise ReleaseError("manifest attribution must equal tashwish.attribution.DATASET_ATTRIBUTION")
+        allowed = {DATASET_ATTRIBUTION}
+        if m["data_class"] == cfg.DATA_CLASS_SYNTHETIC:
+            allowed.add(SYNTHETIC_ATTRIBUTION)  # the synthetic notice is valid only for synthetic releases
+        if m["attribution"] not in allowed:
+            raise ReleaseError(
+                "manifest attribution must equal tashwish.attribution.DATASET_ATTRIBUTION "
+                "(or SYNTHETIC_ATTRIBUTION when data_class is synthetic)"
+            )
         g = m["grid"]
         if not (isinstance(g, dict) and isinstance(g.get("h3_res"), int) and isinstance(g.get("bucket_hours"), int)):
             raise ReleaseError("manifest grid must hold integer h3_res and bucket_hours")
@@ -207,6 +213,10 @@ class Release:
     @property
     def data_class(self) -> str:
         return self.manifest["data_class"]
+
+    @property
+    def attribution(self) -> str:
+        return self.manifest["attribution"]
 
     @property
     def synthetic(self) -> bool:

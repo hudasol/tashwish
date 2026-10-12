@@ -32,7 +32,7 @@ import pyarrow.parquet as pq
 
 from .. import __version__
 from .. import config as cfg
-from ..attribution import DATASET_ATTRIBUTION
+from ..attribution import attribution_for
 
 SCHEMA_ID = "tashwish.interference.v1"
 SCHEMA_MAJOR = 1
@@ -282,7 +282,7 @@ def to_geojson(
         "generated_at": gen,
         "code_commit": commit,
         "tashwish_version": __version__,
-        "attribution": DATASET_ATTRIBUTION,
+        "attribution": attribution_for(data_class),
         "grid": {"h3_res": grid.h3_res, "bucket_hours": grid.bucket_hours},
         "max_age_hours": int(max_age_hours),
         "features": feats,
@@ -333,7 +333,7 @@ def to_parquet(
             "status": rec["status"].astype(str),
             "data_quality": rec["data_quality"].astype(str),
             "data_class": pa.array([data_class] * len(rec), type=pa.string()),
-            "attribution": pa.array([DATASET_ATTRIBUTION] * len(rec), type=pa.string()),
+            "attribution": pa.array([attribution_for(data_class)] * len(rec), type=pa.string()),
             "dataset_version": pa.array([dataset_version] * len(rec), type=pa.string()),
             "generated_at": pa.array([pd.Timestamp(gen)] * len(rec), type=pa.timestamp("ms", tz="UTC")),
         },
@@ -388,8 +388,8 @@ def validate_feature_collection(fc: dict, *, strict_attribution: bool = True) ->
     for key in ("dataset_version", "code_commit", "notice", "attribution", "generated_at"):
         if not isinstance(fc.get(key), str) or not fc.get(key):
             err(f"{key} must be a non-empty string")
-    if strict_attribution and fc.get("attribution") != DATASET_ATTRIBUTION:
-        err("attribution must equal tashwish.attribution.DATASET_ATTRIBUTION")
+    if strict_attribution and fc.get("attribution") != attribution_for(str(dc)):
+        err("attribution must equal tashwish.attribution.attribution_for(data_class)")
     if dc == cfg.DATA_CLASS_SYNTHETIC and "SYNTHETIC" not in str(fc.get("notice", "")):
         err("synthetic collections need a notice containing 'SYNTHETIC'")
     try:

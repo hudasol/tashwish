@@ -86,8 +86,9 @@ Each milestone ends with tests passing in CI, a small-commits history and a git 
 - Done when: a clean clone builds with documented commands and the live site matches the released dataset version.
 
 ## Phase 3: critique rounds (v0.9.0 and v1.0.0)
-Five rounds recorded in docs/REVIEW_ROUNDS.md: ADEO, EDGE, TII, ATRC, senior engineer. Each: critique, checklist,
-fixed, deliberately not fixed and why.
+Five internal self review rounds, each written from a different reader perspective (government, industry, research,
+engineering). Each: critique, checklist, fixed, deliberately not fixed and why. Recorded in docs/REVIEW_ROUNDS.md when
+written (the file does not exist yet).
 
 ## Phase 4: research output
 docs/REPORT.md (6 to 10 pages equivalent), one-page summary, 60 to 90 second demo script, docs/NEXT_STEPS.md.
