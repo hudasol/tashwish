@@ -1,7 +1,7 @@
 # Interface for Marsad: regional interference context prior (`tashwish.interference.v1`)
 
 This document is self contained. It specifies a file format and a query contract that Tashwish produces and that Marsad (a
-per vehicle position trust layer) could later read. Marsad's code and repository were not read or touched to write it, and
+per vehicle position trust layer) could later read. Marsad's code was read but not modified, and
 nothing here changes Marsad. The reference code is `src/tashwish/interop/marsad.py` and has no dependency on Marsad.
 
 ## 1. What this is, and what it is not
@@ -159,7 +159,7 @@ A tested cell with a synthetic jamming-like event: `h3 8443127ffffffff`, bucket 
 `alt_band enroute`, `p_interference 0.566667`, `ci_lo 0.391973`, `ci_hi 0.726225`, `kind jamming_like`,
 `event_id SYN-J-0001`, `n_obs 30`, `coverage_class covered`, `status ok`, `data_quality good`.
 
-A tested quiet cell: `h3 8443a1bffffffff`, bucket `06:00` to `09:00`, `p_interference 0.028571`, `ci_lo 0.005061`,
+A tested cell with no detected event: `h3 8443a1bffffffff`, bucket `06:00` to `09:00`, `p_interference 0.028571`, `ci_lo 0.005061`,
 `ci_hi 0.145331`, `kind none`, `n_obs 35`, `status ok`. Note that the interval does not shrink to zero: "none" here means
 "no event detected", and the upper bound is still above the point estimate.
 

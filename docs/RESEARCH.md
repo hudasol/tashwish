@@ -42,8 +42,8 @@ attributes interference to an actor.
   repository [UAE-WP5 = 6B].
 - **Saudi Arabia, CNS SG/15-WP/08** (7 May 2026) proposes a national automated GNSS RFI monitoring system and a
   centralised regional database or dashboard [19]. **Oman CNS SG/14-WP/9** (1 Oct 2025) addresses a regional approach to
-  GNSS RFI management [20]. Neither contains quantitative data. Together with the UAE paper these are direct evidence
-  that the regional need is acknowledged and unmet by an open tool.
+  GNSS RFI management [20]. Neither contains quantitative data. Together with the UAE paper these show that regional
+  bodies have asked for shared monitoring data; we did not find an open, method documented tool for the Gulf.
 - **IATA GPS Signal Interference Summary Report**, RASG-MID/12, May 2025, study period Jan 2023 to Sep 2024, names Iraq and
   Saudi Arabia (Baghdad and Jeddah FIRs) among the top areas in the Gulf region; the jamming/spoofing split method is not
   explained [18].
@@ -173,17 +173,16 @@ Labels: DIRECT = directly about GNSS interference; ADJACENT = thematically relat
 
 - DIRECT: UAE working papers to ICAO MID describe growing interference and ask for regional data sharing and a regional
   repository [6B, 13]. Saudi Arabia asks for an automated monitoring system and regional dashboard [19].
-- DIRECT (product level): EDGE's GPS-Protect anti-jam system [12B, 13B2] and ATRC/TII GPS-less navigation and zero-trust
-  flight control technologies adopted via VentureOne at IDEX 2025 [11B]. These are receiver-side or on-vehicle
-  capabilities; Tashwish is regional situational context and is complementary, not competing.
+- DIRECT (product level): commercial anti jam receivers and GPS free navigation products are on the regional market
+  [12B, 13B2, 11B]. These are receiver side capabilities; Tashwish is regional context.
 - ADJACENT: Abu Dhabi Government Digital Strategy 2025-2027 (AI-first government, sovereign cloud) [14B2].
 - Not found / unverified: a standalone GCAA, Dubai Airports or Abu Dhabi Airports notice on GNSS in 2026; any source on
   Tactica AI themes; any UAE national sovereign-PNT policy text; ADEO-specific pages.
 - Secondary-source figures about UAE-water vessel incidents (RICS citing Lloyd's List; AFP via Dawn) are **not
   independently verified** [8B2, 9B].
 
-Practical alignment: aviation safety awareness, critical-infrastructure resilience context for operators, and a
-sovereign-capability argument for owning an open, auditable monitoring pipeline. We make no claims beyond this.
+Practical relevance: aviation safety awareness and open, auditable monitoring. No organisation has reviewed or endorsed
+this project.
 
 ---
 

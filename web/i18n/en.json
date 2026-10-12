@@ -20,6 +20,7 @@
   "class.synthetic": "SYNTHETIC",
   "fresh.title": "Data freshness",
   "fresh.state_ok": "Fresh",
+  "fresh.state_synthetic": "Not applicable: synthetic sample",
   "fresh.state_amber": "Stale, older than 48 hours",
   "fresh.state_red": "Very stale, older than 7 days",
   "fresh.warn_amber": "Check the dates before relying on this view.",
@@ -119,7 +120,8 @@
   "dl.p_card": "data card",
   "export.title": "Tashwish degraded share, {day}, {slot}",
   "export.done": "Image exported.",
-  "footer.licences": "Code: Apache-2.0. Data: ODbL 1.0.",
+  "footer.licences": "Code: Apache-2.0. Data: ODbL 1.0. Contains information from adsb.lol.",
+  "footer.licences_synthetic": "Code: Apache-2.0. SYNTHETIC SAMPLE: contains no information from adsb.lol.",
   "footer.basemap": "Country outlines: Natural Earth (public domain), no map tile service is used.",
   "footer.libs": "Map libraries: MapLibre GL JS (BSD-3-Clause), deck.gl (MIT).",
   "footer.downloads_pre": "Dataset files:",
@@ -153,6 +155,7 @@
   "error.title": "The dashboard could not start",
   "error.no_data": "No data found. Expected data/manifest.json or data/sample_synthetic/manifest.json.",
   "error.schema": "Unexpected data schema: {schema}.",
+  "error.attribution": "Attribution missing; refusing to show data.",
   "error.data_class": "The data files do not declare a valid data class (observed or synthetic).",
   "error.mixed": "The data files mix data classes (synthetic and observed). Refusing to show them together."
 }

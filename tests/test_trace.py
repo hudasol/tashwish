@@ -106,7 +106,7 @@ def test_data_class_is_stamped():
 
 @pytest.mark.parametrize("name", sorted(p.name for p in FIX.glob("real_adsblol_2026-03-02_*.json.gz")))
 def test_real_derived_fixtures_parse_with_invariants(name):
-    """Fixtures are rebuilt from real adsb.lol points (ODbL) on 2026-03-02; checks shape invariants only."""
+    """Fixtures are anonymised excerpts of adsb.lol points (ODbL, see NOTICE); checks shape invariants only."""
     obj = json.loads(gzip.decompress((FIX / name).read_bytes()))
     r = parse_trace(obj, D0, D1)
     assert len(r) > 0
