@@ -200,6 +200,12 @@
    "ci_hi": 0.36386915122250446
   }
  },
+ "covered_not_enough_status": {
+  "coverage_lost": 11316,
+  "insufficient": 866
+ },
+ "covered_not_enough_total": 12182,
+ "wrongly_ok": 0,
  "false_coverage_ci_boot_days": [
   0.18133646198551714,
   0.5301409209888247

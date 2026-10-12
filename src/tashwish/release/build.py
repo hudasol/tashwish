@@ -109,6 +109,19 @@ def release_cb(cb: pd.DataFrame) -> pd.DataFrame:
     return out.sort_values(["bucket_start", "stratum", "h3"]).reset_index(drop=True)
 
 
+def daily_region(cb: pd.DataFrame, metas: list[dict]) -> pd.DataFrame:
+    """Region wide en route degraded share per day over testable (`ok`) cell-buckets. Units are aircraft per cell-bucket."""
+    from ..metrics.stats import wilson_interval
+
+    split = {m["day"]: m["split"] for m in metas}
+    e = cb[(cb["stratum"] == "enroute") & (cb["status"] == "ok")]
+    g = e.groupby("day", as_index=False).agg(n=("n_aircraft", "sum"), k=("k_strong", "sum"))
+    lo, hi = wilson_interval(g["k"].to_numpy(), g["n"].to_numpy())
+    g["share"], g["ci_lo"], g["ci_hi"] = g["k"] / g["n"], lo, hi
+    g["split"] = g["day"].map(split)
+    return g[["day", "split", "n", "k", "share", "ci_lo", "ci_hi"]]
+
+
 def release_events(ev: pd.DataFrame) -> pd.DataFrame:
     if ev.empty:
         return ev
@@ -118,7 +131,8 @@ def release_events(ev: pd.DataFrame) -> pd.DataFrame:
 
 
 def write_web(web: Path, cb: pd.DataFrame, ev: pd.DataFrame, metas: list[dict], cov: pd.DataFrame | None,
-              generated_at: str, latest_day: str | None, results_block: dict, methods: dict) -> None:  # fmt: skip
+              generated_at: str, latest_day: str | None, results_block: dict, methods: dict,
+              daily: pd.DataFrame | None = None) -> None:  # fmt: skip
     common = {"schema": WEB_SCHEMA, "data_class": "observed", "generated_at": generated_at,
               "code_commit": code_commit(), "attribution": DATASET_ATTRIBUTION}  # fmt: skip
     shutil.rmtree(web / "days", ignore_errors=True)
@@ -152,6 +166,8 @@ def write_web(web: Path, cb: pd.DataFrame, ev: pd.DataFrame, metas: list[dict], 
     _dump(web / "coverage.json", {**common, "cells": cov_rows})
     _dump(web / "validation.json", {**common, "results": results_block.get("results", [])})
     _dump(web / "methods.json", {**common, "metrics": methods})
+    if daily is not None:
+        _dump(web / "daily.json", {**common, "days": daily.round(4).to_dict(orient="records")})
     _dump(web / "manifest.json", {**common, "dataset_version": f"observed-{latest_day}" if latest_day else "empty",
           "grid": {"h3_res": GRID.h3_res, "bucket_hours": GRID.bucket_hours},
           "bbox": {"south": cfg.REGION.lat_min, "west": cfg.REGION.lon_min, "north": cfg.REGION.lat_max, "east": cfg.REGION.lon_max},
@@ -226,10 +242,14 @@ def main() -> None:
 
     cb = release_cb(cb_raw)
     ev = release_events(ev_raw)
-    write_web(a.web, cb, ev, metas, cov, generated_at, latest_day, results_block, methods)
+    dr = daily_region(cb, metas)
+    a.results.mkdir(parents=True, exist_ok=True)
+    dr.to_csv(a.results / "daily_region.csv", index=False)
+    write_web(a.web, cb, ev, metas, cov, generated_at, latest_day, results_block, methods, dr)
 
     rel = a.release
     rel.mkdir(parents=True, exist_ok=True)
+    dr.to_csv(rel / "daily_region.csv", index=False)
     cbo = cb.drop(columns=["day"])
     cbo.to_parquet(rel / "cell_buckets.parquet", index=False, compression="zstd")
     cbo.to_csv(rel / "cell_buckets.csv.gz", index=False)
