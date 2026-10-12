@@ -11,6 +11,7 @@ usage (from the repo root):
 The attribution string is imported from src/tashwish/attribution.py (single source of truth) and copied verbatim
 into every file.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -41,8 +42,14 @@ SOUTH, NORTH, WEST, EAST = 22.0, 31.0, 46.0, 60.0
 
 # Hub positions (lat, lon, strength). Invented traffic only; no claim about real traffic levels.
 HUBS = [
-    (25.25, 55.36, 9.0), (24.45, 54.65, 7.0), (25.27, 51.56, 6.0), (26.27, 50.63, 4.5),
-    (29.23, 47.97, 5.0), (23.59, 58.28, 4.0), (26.47, 49.80, 3.5), (24.96, 46.70, 3.0),
+    (25.25, 55.36, 9.0),
+    (24.45, 54.65, 7.0),
+    (25.27, 51.56, 6.0),
+    (26.27, 50.63, 4.5),
+    (29.23, 47.97, 5.0),
+    (23.59, 58.28, 4.0),
+    (26.47, 49.80, 3.5),
+    (24.96, 46.70, 3.0),
 ]
 DIURNAL = np.array([0.35, 0.30, 0.7, 1.0, 1.1, 1.0, 0.8, 0.55])
 
@@ -111,7 +118,10 @@ def build(now: dt.datetime) -> None:
         w = sum(s * math.exp(-((dist_deg(lat, lon, hl, ho) / 1.1) ** 2)) for hl, ho, s in HUBS)
         # corridor along the Gulf axis
         ax0, ay0, ax1, ay1 = 29.5, 48.5, 25.8, 56.5
-        t = max(0.0, min(1.0, ((lat - ax0) * (ax1 - ax0) + (lon - ay0) * (ay1 - ay0)) / ((ax1 - ax0) ** 2 + (ay1 - ay0) ** 2)))
+        t = max(
+            0.0,
+            min(1.0, ((lat - ax0) * (ax1 - ax0) + (lon - ay0) * (ay1 - ay0)) / ((ax1 - ax0) ** 2 + (ay1 - ay0) ** 2)),
+        )
         d = dist_deg(lat, lon, ax0 + t * (ax1 - ax0), ay0 + t * (ay1 - ay0))
         w += 4.0 * math.exp(-((d / 0.55) ** 2))
         lam[c] = 3.2 * w
@@ -161,7 +171,8 @@ def build(now: dt.datetime) -> None:
                 n, k = obs[di][(c, s)]
                 cls = cov_class[(c, s)]
                 in_outage = (
-                    di == OUTAGE["day"] and s in OUTAGE["slots"]
+                    di == OUTAGE["day"]
+                    and s in OUTAGE["slots"]
                     and dist_deg(lat, lon, OUTAGE["lat"], OUTAGE["lon"]) < OUTAGE["radius"]
                 )
                 if in_outage and cls in ("covered", "marginal"):
@@ -169,23 +180,37 @@ def build(now: dt.datetime) -> None:
                     continue
                 if n == 0:
                     continue
-                if cls == "no_coverage":
-                    status = "insufficient"
-                elif n < MIN_N:
+                if cls == "no_coverage" or n < MIN_N:
                     status = "insufficient"
                 else:
                     status = "ok"
                 lo, hi = wilson(k, n) if status == "ok" else (None, None)
-                rows.append([c, s, n, k, None if lo is None else round(lo, 4), None if hi is None else round(hi, 4), status, cls])
+                rows.append(
+                    [
+                        c,
+                        s,
+                        n,
+                        k,
+                        None if lo is None else round(lo, 4),
+                        None if hi is None else round(hi, 4),
+                        status,
+                        cls,
+                    ]
+                )
         all_rows[di] = rows
         sum_n = sum(r[2] for r in rows)
-        manifest_days.append({
-            "day": day.isoformat(),
-            "split": "dev" if di in dev_idx else "held_out",
-            "rows": int(sum_n * 410),
-            "aircraft": int(sum_n / 3.1),
-            "ingested_at": (dt.datetime.combine(day, dt.time(0), dt.timezone.utc) + dt.timedelta(days=1, hours=2, minutes=int(rng.integers(0, 40)))).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        })
+        manifest_days.append(
+            {
+                "day": day.isoformat(),
+                "split": "dev" if di in dev_idx else "held_out",
+                "rows": int(sum_n * 410),
+                "aircraft": int(sum_n / 3.1),
+                "ingested_at": (
+                    dt.datetime.combine(day, dt.time(0), dt.UTC)
+                    + dt.timedelta(days=1, hours=2, minutes=int(rng.integers(0, 40)))
+                ).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            }
+        )
 
     # Events derived from the generated data so the numbers agree with the day files.
     events = []
@@ -208,51 +233,77 @@ def build(now: dt.datetime) -> None:
         min_p = min(binom_tail(r[3], r[2], BASELINE_P) for _, r in sel)
 
         def stamp(di, s, end=False):
-            base = dt.datetime.combine(days[di], dt.time(0), dt.timezone.utc) + dt.timedelta(hours=BUCKET_HOURS * (s + (1 if end else 0)))
+            base = dt.datetime.combine(days[di], dt.time(0), dt.UTC) + dt.timedelta(
+                hours=BUCKET_HOURS * (s + (1 if end else 0))
+            )
             return base.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-        events.append({
-            "event_id": eid,
-            "kind": kind,
-            "label_uncertain": uncertain,
-            "confidence": conf,
-            "start": stamp(*first),
-            "end": stamp(*last, end=True),
-            "n_cells": len(cset),
-            "cells": cset,
-            "lat": round(float(np.mean([cells[c][0] for c in cset])), 4),
-            "lon": round(float(np.mean([cells[c][1] for c in cset])), 4),
-            "n_aircraft": int(n_air),
-            "k_degraded": int(k_deg),
-            "peak_share": round(best[1][3] / best[1][2], 4),
-            "peak_ci_lo": best[1][4],
-            "min_p": float(f"{min_p:.3e}"),
-            "evidence": {
-                "cell_buckets_flagged": len(sel),
-                "persistence_buckets": len({(di, r[1]) for di, r in sel}),
-                "median_share": round(float(np.median(shares)), 4),
-                "baseline_share": BASELINE_P,
-            },
-            "methods": ["event-definition", "wilson-interval", "fdr-control"],
-        })
+        events.append(
+            {
+                "event_id": eid,
+                "kind": kind,
+                "label_uncertain": uncertain,
+                "confidence": conf,
+                "start": stamp(*first),
+                "end": stamp(*last, end=True),
+                "n_cells": len(cset),
+                "cells": cset,
+                "lat": round(float(np.mean([cells[c][0] for c in cset])), 4),
+                "lon": round(float(np.mean([cells[c][1] for c in cset])), 4),
+                "n_aircraft": int(n_air),
+                "k_degraded": int(k_deg),
+                "peak_share": round(best[1][3] / best[1][2], 4),
+                "peak_ci_lo": best[1][4],
+                "min_p": float(f"{min_p:.3e}"),
+                "evidence": {
+                    "cell_buckets_flagged": len(sel),
+                    "persistence_buckets": len({(di, r[1]) for di, r in sel}),
+                    "median_share": round(float(np.median(shares)), 4),
+                    "baseline_share": BASELINE_P,
+                },
+                "methods": ["event-definition", "wilson-interval", "fdr-control"],
+            }
+        )
 
     # Validation (invented numbers, clearly synthetic).
     def vrow(metric, k, n, scenario):
         lo, hi = wilson(k, n)
-        return {"metric": metric, "scenario": scenario, "value": round(k / n, 4), "ci_lo": round(lo, 4), "ci_hi": round(hi, 4), "n": n}
+        return {
+            "metric": metric,
+            "scenario": scenario,
+            "value": round(k / n, 4),
+            "ci_lo": round(lo, 4),
+            "ci_hi": round(hi, 4),
+            "n": n,
+        }
 
     validation = dict(env)
     validation["results"] = [
         vrow("precision", 41, 48, "synthetic_injection"),
         vrow("recall", 37, 50, "synthetic_injection"),
-        {"metric": "detection_delay_hours", "scenario": "synthetic_injection", "value": 3.0, "ci_lo": 3.0, "ci_hi": 6.0, "n": 37},
+        {
+            "metric": "detection_delay_hours",
+            "scenario": "synthetic_injection",
+            "value": 3.0,
+            "ci_lo": 3.0,
+            "ci_hi": 6.0,
+            "n": 37,
+        },
         vrow("false_alarm_day_share", 2, 14, "held_out_days"),
     ]
 
     A = {
-        "grid-and-buckets": "grid-and-buckets", "unique": "unique-aircraft-count", "degraded": "degraded-definition",
-        "wilson": "wilson-interval", "minn": "minimum-sample-rule", "cov": "coverage-model", "event": "event-definition",
-        "fdr": "fdr-control", "conf": "confidence-grading", "prov": "data-provenance", "val": "validation-design",
+        "grid-and-buckets": "grid-and-buckets",
+        "unique": "unique-aircraft-count",
+        "degraded": "degraded-definition",
+        "wilson": "wilson-interval",
+        "minn": "minimum-sample-rule",
+        "cov": "coverage-model",
+        "event": "event-definition",
+        "fdr": "fdr-control",
+        "conf": "confidence-grading",
+        "prov": "data-provenance",
+        "val": "validation-design",
     }
 
     def m(en, ar, anchor):
@@ -292,20 +343,24 @@ def build(now: dt.datetime) -> None:
         "precision": m("Precision", "الدقة (precision)", "val"),
         "recall": m("Recall", "الاستدعاء (recall)", "val"),
         "detection_delay_hours": m("Detection delay (hours)", "زمن الكشف (ساعات)", "val"),
-        "false_alarm_day_share": m("Share of held out days with a false alarm", "نسبة الأيام المحجوبة ذات الإنذار الكاذب", "val"),
+        "false_alarm_day_share": m(
+            "Share of held out days with a false alarm", "نسبة الأيام المحجوبة ذات الإنذار الكاذب", "val"
+        ),
     }
     methods = dict(env)
     methods["metrics"] = metrics
 
     manifest = dict(env)
-    manifest.update({
-        "dataset_version": "sample-synthetic-0.1.0",
-        "grid": {"h3_res": H3_RES, "bucket_hours": BUCKET_HOURS},
-        "bbox": {"south": SOUTH, "west": WEST, "north": NORTH, "east": EAST},
-        "days": manifest_days,
-        "latest_day": days[-1].isoformat(),
-        "freshness_hours_hint": 24,
-    })
+    manifest.update(
+        {
+            "dataset_version": "sample-synthetic-0.1.0",
+            "grid": {"h3_res": H3_RES, "bucket_hours": BUCKET_HOURS},
+            "bbox": {"south": SOUTH, "west": WEST, "north": NORTH, "east": EAST},
+            "days": manifest_days,
+            "latest_day": days[-1].isoformat(),
+            "freshness_hours_hint": 24,
+        }
+    )
 
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "days").mkdir(exist_ok=True)
@@ -356,5 +411,9 @@ if __name__ == "__main__":
     a = ap.parse_args()
     if a.check:
         sys.exit(check())
-    t = dt.datetime.fromisoformat(a.now.replace("Z", "+00:00")) if a.now else dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+    t = (
+        dt.datetime.fromisoformat(a.now.replace("Z", "+00:00"))
+        if a.now
+        else dt.datetime.now(dt.UTC).replace(microsecond=0)
+    )
     build(t)

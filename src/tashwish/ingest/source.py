@@ -18,6 +18,7 @@ from typing import Protocol
 import httpx
 
 CHUNK_BYTES = 64 * 1024 * 1024
+USER_AGENT = "tashwish/0.1 (+https://github.com/hudasol/tashwish; research, sequential ranged downloads)"
 _URL = (
     "https://github.com/adsblol/globe_history_{repo_year}/releases/download/"
     "v{dot}-planes-readsb-{kind}-0/v{dot}-planes-readsb-{kind}-0.tar.{part}"
@@ -49,7 +50,7 @@ class HttpxFetcher:
     """Real network fetcher. Reuses one client; redirects are followed on every request."""
 
     def __init__(self, timeout: float = 120.0):
-        self._client = httpx.Client(follow_redirects=True, timeout=timeout)
+        self._client = httpx.Client(follow_redirects=True, timeout=timeout, headers={"User-Agent": USER_AGENT})
 
     def __call__(self, url: str, start: int, end: int) -> RangeResult:
         r = self._client.get(url, headers={"Range": f"bytes={start}-{end}"})

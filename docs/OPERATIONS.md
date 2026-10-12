@@ -1,0 +1,265 @@
+# Operations: the free tier scheduled incremental run
+
+Written 2026-10-12. Scope: how Tashwish keeps its dataset current using only free GitHub features (Actions on a public
+repository, a `data` branch for storage, the default `GITHUB_TOKEN`, no other secrets, no paid service).
+
+Rules used in this file:
+
+- "Measured here" means measured by this project in its own build environment (2 cores). **GitHub runners were NOT tested
+  by us.** Nothing below about runner speed, runner disk or download speed on GitHub is measured.
+- **No GitHub documentation page could be retrieved in the session that wrote this file** (the fetch tool's permission
+  request was not answered, four attempts on four URLs, no workaround attempted). Therefore **every GitHub limit below is
+  UNVERIFIED**. Figures marked "recalled" come from the author's memory and must not be relied on. Section 9 lists the pages
+  the owner must read before depending on any of them.
+- Anything we could not determine is marked UNVERIFIED.
+
+## 1. Pieces
+
+| Piece | Path | Role |
+|---|---|---|
+| Scheduled workflow | `.github/workflows/incremental.yml` | Weekly cron plus manual dispatch; runs everything below |
+| CI | `.github/workflows/ci.yml` | Lint and tests on pushes to `main` and on pull requests; never touches data |
+| Incremental CLI | `python -m tashwish.operate.incremental` | Finds the next missing archive day, streams and parses it, scores it against the frozen baseline in `state/`, appends to `processed/`, writes `processed/freshness.json` |
+| Release CLI | `python -m tashwish.release.build` | Builds dashboard JSON (`web/data`), the versioned dataset, data card and checksums (`release/`) |
+| Freshness check | `scripts/check_freshness.py` | Prints ok, amber or red from `freshness.json`; exit code 0, 1, 2 (3 if unreadable); also records a failed run |
+| Frozen baseline | `state/` on `main` | Changed only by a manual refit (section 7) |
+| Output | `data` branch: `processed/`, `web/data/`, `release/` | Written only by the workflow, never by hand, never `main` |
+
+## 2. How a run works end to end
+
+1. Trigger: cron `17 3 * * 1` (Mondays 03:17 UTC) or Actions, "Incremental run", "Run workflow" with `max_days` (1 to 3, capped
+   at 3) and optional `start_day` (YYYY-MM-DD). The `concurrency` group `tashwish-incremental` queues a second run instead
+   of overlapping, and never cancels a running one.
+2. Checkout `main` (code and `state/`), Python 3.13, `pip install -e ".[dev]"`. Nothing large is cached; `actions/cache` is not
+   used for archives.
+3. Input validation (integer, date format).
+4. Guard tests: `tests/test_source.py`, `test_pipeline.py`, `test_trace.py`, `test_quality_config.py`, `test_split.py`,
+   `test_check_freshness.py`, plus any `tests/test_operate*.py` and `tests/test_release*.py`. A failure here stops the run before
+   any data is touched.
+5. A second working tree `dbranch/` is created from `origin/data` (or an empty orphan `data` branch the first time).
+6. For each of up to `max_days` slots, one call of the incremental CLI with `--max-days 1` (the first call also gets
+   `--start-day` if given), then a 120 s pause (`PAUSE_SECONDS`). Sequential only. The CLI streams each day through ranged
+   downloads into `$RUNNER_TEMP/spool`, parses, scores, appends to `dbranch/processed`, and the spool is emptied after each day.
+7. `release.build` regenerates `dbranch/web/data` and `dbranch/release` from whatever `processed/` now holds, even if a later day
+   failed, so days completed before a failure are published.
+8. `scripts/check_freshness.py` logs the resulting level.
+9. If anything under `processed/`, `web/data/` or `release/` changed, commit as `github-actions[bot]` and push to `data`.
+   A normal push, never forced.
+10. If ingest or build failed the job is failed on purpose, and the failure handler runs (section 6). On a fully good run an
+    open "Incremental run failed" issue is commented on and closed.
+
+The workflow's job timeout is 240 minutes and the ingest step's is 200 minutes.
+
+## 3. The CLI contract the workflow relies on
+
+```
+python -m tashwish.operate.incremental --state state --processed processed --spool "$RUNNER_TEMP/spool" --max-days 3 [--start-day YYYY-MM-DD]
+python -m tashwish.release.build --processed processed --web web/data --release release
+```
+
+What the workflow additionally requires from the parent implementation (it calls the first CLI with `--max-days 1` in a loop):
+
+1. `--max-days 1` works, and with no `--start-day` the CLI resumes from the first missing day after the days already in
+   `processed/`. `--start-day D` means "begin the search at D".
+2. Exit code 0 when it processed the days it found **or there was nothing to do** (the next archive day is not published yet is
+   not an error; it must exit 0 and say so). Non zero for download failure, parse failure or a baseline mismatch.
+3. Each day is appended atomically (temp file then rename), so a crash never leaves `processed/` half written. A re-run of a
+   finished day is a no-op (this already holds for `tashwish.ingest`).
+4. It writes `processed/freshness.json` on success (below). On its own failure it should set `last_run_status=failed` and
+   `fallback_active=true` before exiting non zero; if it cannot, the workflow does that anyway through
+   `check_freshness.py --mark-failed`.
+5. It treats `DayNotAvailable` for a day that is not yet published as "stop, nothing to do", and for a day older than the
+   newest available day as a gap to report, not to skip silently.
+6. `release.build` is idempotent, reads only `--processed`, and writes `generated_at` (UTC) and `latest_day` into
+   `web/data/manifest.json` as in `docs/WEB_DATA_CONTRACT.md`.
+
+`processed/freshness.json` (written by the incremental CLI, read by `check_freshness.py`):
+
+```json
+{
+  "schema": "tashwish.freshness.v1",
+  "generated_at": "2026-10-12T03:41:07Z",
+  "latest_day": "2026-10-10",
+  "last_run_at": "2026-10-12T03:41:07Z",
+  "last_run_status": "ok",
+  "fallback_active": false,
+  "days_added": ["2026-10-08", "2026-10-09", "2026-10-10"],
+  "last_error": null
+}
+```
+
+`last_run_status` is `ok`, `noop` or `failed`. `generated_at` and `latest_day` only move forward on success. A failed run
+changes only `last_run_status`, `fallback_active`, `last_run_at` and `last_error`, so the previous good values (and therefore
+the dashboard age) stay honest.
+
+## 4. Free tier arithmetic
+
+Measured here (this project's environment, 2 cores, not GitHub runners):
+
+- Archive size per day: about 2.3 GiB (Jan 2026) to about 4.0 GiB (Oct 2026), prod release (docs/DATA_SOURCES.md section 1).
+- Parse: about 6 to 9 minutes per day on 2 cores, plus download time (docs/DATA_SOURCES.md section 7 says about 6 minutes
+  including download for the study window; the parent's later figure is 6 to 9 minutes of parsing).
+- Download is by 64 MiB byte ranges with resume (`src/tashwish/ingest/source.py`), so a cut connection loses at most one range.
+
+Not measured, UNVERIFIED (read the pages in section 9): runner CPU count and RAM, free disk, the job time limit, the
+monthly minutes policy, download speed from GitHub Releases to a GitHub runner.
+
+Recalled, not retrieved, so UNVERIFIED: standard Linux runners on public repositories have 4 vCPU, 16 GB RAM and about 14 GB
+of free disk (the figure the task brief also used); the job limit is 6 hours; Actions minutes on standard runners are free
+for public repositories; scheduled workflows in a public repository can be disabled by GitHub after 60 days without
+repository activity.
+
+Arithmetic, with the stated assumptions (illustrative, not measured on GitHub):
+
+- Disk: one day's spool is at most about 4 GiB, emptied after each day, plus `processed/` parquet and the dataset. Against
+  about 14 GB free that is a margin of about 3x, if the free disk figure holds. Only one day is ever on disk, which is why
+  days run one at a time.
+- Time per day = download (4 GiB / speed) + parse (9 min worst) . At 10 MiB/s: 6.8 + 9 = about 16 min. At 2 MiB/s: 34 + 9 = about
+  43 min. Three days plus two 2 min pauses: about 52 min at 10 MiB/s, about 133 min at 2 MiB/s, both under the 200 minute step
+  timeout. Break even speed for three days in 200 minutes: (200 - 4) / 3 = 65 min per day, so about 56 min of download, so
+  about 1.2 MiB/s. Below that the step times out and the days finished so far are kept.
+- Minutes: a 3 day run is about 1 hour, so weekly is about 4 to 5 hours a month. Free for public repositories if the recalled
+  policy holds (UNVERIFIED); on a private repository these minutes would count against a quota.
+
+### What does not fit, exactly
+
+1. **Keeping pace is impossible at the configured cadence.** The archive adds 7 days a week; the workflow processes at most 3
+   per run and runs weekly, so the backlog grows by 4 days a week and `latest_day` will lag. The dashboard will then show amber
+   (over 48 h) and eventually red (over 7 days) even when every run succeeds. To track the archive you need at least 7 days of
+   processing per week, for example three runs a week of 3 days (change the cron to `17 3 * * 1,3,5`) or a daily run of 1 day
+   (cron `17 3 * * *`). Whether that is polite use of adsb.lol's GitHub releases is UNVERIFIED: no retrieved page states a rate
+   limit or fair use rule for `globe_history` downloads. Our measured footprint at daily cadence is about 4 GiB a day. The
+   owner should decide, and ideally ask the maintainers (docs/LICENSING.md section 6 lists the questions).
+2. **The job time limit bounds catch-up.** If the 6 hour limit is right (UNVERIFIED), a single run cannot clear a long
+   backlog. Even ignoring the polite cap of 3, about 12 days at best is the ceiling for one run. Backfilling the 35 day study
+   window therefore takes at least 12 runs of 3 days, or many manual dispatches (section 6.4).
+3. **Public repository is required.** The free minutes claim is for public repositories (UNVERIFIED). A private repository changes
+   the arithmetic.
+4. **Scheduled workflows may be paused** after a long period without repository activity (recalled, UNVERIFIED). Data commits
+   to the `data` branch may or may not count as activity (UNVERIFIED); re-enable the workflow by hand in the Actions tab if
+   the scheduled runs stop.
+5. **Storage growth.** The `data` branch grows with every commit. Repository size and file size limits on GitHub are
+   UNVERIFIED, and the size of one day's parquet and of the released dataset has not been measured. If it grows too large,
+   attach the versioned dataset to a GitHub Release instead of committing it (still free) and keep only `web/data` on the branch.
+6. **Hosting the dashboard.** The dashboard is static (`web/`). Options and what we know:
+   - GitHub Pages: free for public repositories, but its terms, size limits and any restriction on commercial use are
+     UNVERIFIED (not retrieved).
+   - Vercel Hobby: recalled to be restricted to non commercial use, UNVERIFIED. Do not use it if the project becomes commercial.
+   - Render free web service (only needed for the optional `src/tashwish/api`): recalled to sleep after inactivity (slow first
+     request) and to have a monthly instance hour allowance, UNVERIFIED. The static JSON dashboard does not need it.
+   - A static site needs no API process at all, which is the free tier recommendation.
+7. **Publication lag of the archive was not characterised.** We do not know how long after a UTC day ends adsb.lol publishes its
+   release. Nothing in `src/tashwish/ingest/source.py`, its tests or the docs measures it (UNVERIFIED). Until measured, a run
+   that finds the next day missing exits as "nothing to do", and the dashboard shows the true age. The first scheduled runs
+   should log the day, the release creation time and the age at discovery; this is an open item.
+
+## 5. Freshness: how it is computed and shown
+
+The dashboard (`web/js/common.js`, `freshness()`) reads `manifest.generated_at` and `manifest.latest_day`:
+
+- `genAge` = hours since `generated_at`.
+- `dayAge` = hours since the end of `latest_day` (that day 00:00 UTC plus 24 h).
+- `age = max(genAge, dayAge)`; **red** if `age > 7 * 24` h, **amber** if `age > 48` h, otherwise ok.
+- The banner line shows when the data was generated, how many hours ago, and the latest day, and the amber or red warning text.
+
+`scripts/check_freshness.py` implements the same rule on `processed/freshness.json` (same fields, same thresholds, strictly
+greater than) so the workflow log and the dashboard agree. It also prints `last_run_status` and `fallback_active`. A dashboard
+badge cannot show "the last run failed" by itself, because it only reads the manifest; a failed run shows up as the age growing,
+as the issue, and in `freshness.json`.
+
+Because `latest_day` is a lagging quantity (a UTC day can only be ingested after it ends and is published), "ok" can never mean
+less than about 24 h old. With the weekly cadence, see section 4 item 1.
+
+## 6. When a run fails
+
+What happens automatically:
+
+1. The job fails. Days finished before the failure were still built and pushed.
+2. `check_freshness.py --mark-failed` sets `last_run_status=failed`, `fallback_active=true`, `last_run_at`, `last_error` in
+   `processed/freshness.json` on the `data` branch and pushes it. `generated_at` and `latest_day` are untouched.
+3. The last good dataset and `web/data` keep being served from the `data` branch. The dashboard badge turns amber after 48 h and
+   red after 7 days of age.
+4. One tracking issue titled exactly "Incremental run failed" is opened, or commented on if already open, with the run link,
+   the freshness line and the last 60 log lines. A good run closes it.
+
+Manual recovery, from a clone with the dev environment:
+
+```
+# 1. read the failed run's log in the Actions tab; the log tail is also in the issue
+# 2. reproduce one day locally into a scratch spool (needs about 4 GiB free; sequential, polite)
+git fetch origin data && git worktree add ../tashwish-data origin/data
+python -m tashwish.operate.incremental --state state --processed ../tashwish-data/processed --spool /tmp/spool --max-days 1
+python -m tashwish.release.build --processed ../tashwish-data/processed --web ../tashwish-data/web/data --release ../tashwish-data/release
+python scripts/check_freshness.py ../tashwish-data/processed/freshness.json
+# 3. publish only after the check prints ok or a level you accept
+cd ../tashwish-data && git checkout -B data origin/data && git add processed web/data release && git commit -m "data: manual recovery" && git push origin data
+# 4. or simply re-run in the cloud: Actions > Incremental run > Run workflow (max_days 1)
+```
+
+Backfill: dispatch the workflow with `start_day` set to the first missing day and `max_days` 3, repeat until the dashboard
+reads ok. Days are idempotent, so overlapping a finished day is harmless. For the study window (2026-02-07 to 2026-03-13)
+backfill is 12 dispatches of 3 days, at least.
+
+If the source is unreachable (timeouts, 5xx, 403): do not retry in a tight loop. The CLI retries per range with a backoff
+(`src/tashwish/ingest/source.py`); after that the run fails and waits for the next trigger. Check
+`https://github.com/adsblol/globe_history_2026/releases` by hand. Do not add mirrors or proxies; if the archive is gone, the
+documented fallback is OpenSky (docs/DATA_SOURCES.md section 2), which needs an approved research account and is a separate
+piece of work.
+
+If the release naming changes: the URL pattern is the single `_URL` in `src/tashwish/ingest/source.py`
+(`v{YYYY.MM.DD}-planes-readsb-{prod|staging}-0.tar.{aa,ab,...}`, repository `globe_history_{year}`). A naming change shows up as
+`DayNotAvailable` for days that exist in the browser. Fix `_URL`/`KINDS`, update `tests/test_source.py`, and re-run. Compare the
+result with an already ingested day before trusting it (row counts per cell).
+
+User agent: `HttpxFetcher` previously sent httpx's default agent. It now sends
+`tashwish/0.1 (+https://github.com/hudasol/tashwish; research, sequential ranged downloads)` (`USER_AGENT` in
+`src/tashwish/ingest/source.py`), so the maintainers can identify and contact us.
+
+## 7. Baseline refit policy
+
+The baseline in `state/` is frozen: scoring a new day never changes it, which keeps the dataset comparable over time and the
+held-out evaluation honest. Refit manually, on a branch of `main`, when either:
+
+- every N weeks (suggested N = 12, a project choice, not derived), or
+- after a coverage step change: the receiver network visibly changed (a drop or jump in `coverage.json` presence, a new feeder
+  region, or many `coverage_lost` cells). Look at the coverage layer on the dashboard first.
+
+Commands (the refit CLI is not part of this contract; the parent should provide one, here called `tashwish.operate.refit`):
+
+```
+python -m tashwish.operate.refit --processed ../tashwish-data/processed --state state --window-days 21 --write
+git checkout -b refit-YYYY-MM-DD && git add state && git commit -m "state: refit baseline" && open a pull request
+```
+
+After merging, bump the dataset version so consumers know scores before and after are not comparable, and note it in the data
+card. Do not refit from the weekly workflow.
+
+## 8. CI and the README badge
+
+`ci.yml` runs ruff (check and format) and pytest with coverage on Python 3.11 and 3.13, with read only permissions, a 20 minute
+timeout and cancellation of superseded runs. At the time of writing, `ruff check .` and `ruff format --check .` report errors
+in `web/scripts/*.py`, `src/tashwish/api/app.py` and `tests/test_api.py`, so CI would fail until `ruff check . --fix` and
+`ruff format .` are run and the remaining findings fixed. This was not touched here to avoid editing files other work is changing.
+
+Badge snippets to paste into the README when the owner wants them (replace nothing; the owner and repo are `hudasol/tashwish`):
+
+```
+[![CI](https://github.com/hudasol/tashwish/actions/workflows/ci.yml/badge.svg)](https://github.com/hudasol/tashwish/actions/workflows/ci.yml)
+[![Incremental run](https://github.com/hudasol/tashwish/actions/workflows/incremental.yml/badge.svg)](https://github.com/hudasol/tashwish/actions/workflows/incremental.yml)
+```
+
+## 9. Owner must fetch (UNVERIFIED items and the page to read)
+
+None of these could be retrieved when this file was written. Read them, then replace "UNVERIFIED" here with the quote and date.
+
+| Claim | Page to read |
+|---|---|
+| Job and workflow time limits, concurrency, scheduled workflow disabling | https://docs.github.com/en/actions/reference/limits and https://docs.github.com/en/actions/administering-github-actions/usage-limits-billing-and-administration |
+| Runner CPU, RAM, free disk, free minutes for public repositories | https://docs.github.com/en/actions/reference/runners/github-hosted-runners and https://docs.github.com/en/billing/managing-billing-for-your-products/managing-billing-for-github-actions/about-billing-for-github-actions |
+| Disabling of scheduled workflows after inactivity | https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/disabling-and-enabling-a-workflow |
+| Repository and file size limits for the `data` branch | https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github |
+| GitHub Pages limits and acceptable use | https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits and https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features |
+| Vercel Hobby non commercial restriction | https://vercel.com/docs/plans/hobby |
+| Render free web service sleep and monthly hours | https://render.com/docs/free |
+| adsb.lol fair use or rate guidance for the archive | https://www.adsb.lol/docs/open-data/historical/ and https://github.com/adsblol/globe_history_2026 (ask the maintainers if silent) |
+| Archive publication lag after a UTC day ends | Not documented anywhere we read; measure it from release creation times |
