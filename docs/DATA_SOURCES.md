@@ -31,8 +31,9 @@ access method are recorded here. We respect each source's terms and rate limits 
   populated is measured by our probe and reported in docs/DATA_QUALITY.md.**
 - **Coverage caveat:** the data is the union of adsb.lol's feeders and partner feeds. It is **not** a uniform receiver
   network, and the receiver set changes over time. This is the central confounder and is why M3 exists.
-- **Attribution:** "Contains information from adsb.lol, made available under the ODbL." We cite the project and the
+- **Attribution:** "Contains information from adsb.lol, which is made available here under the Open Database License (ODbL)." (ODbL 4.3.a wording; single source in `src/tashwish/attribution.py`) We cite the project and the
   repository in the README, the data card and the dashboard footer.
+- **Full analysis:** docs/LICENSING.md (what is verified, what is not, questions for the maintainers).
 - **Share-alike caveat (our reading, not legal advice):** the ODbL generally requires derived databases to be shared
   under the ODbL with attribution. Our released dataset is an aggregated derivative (cell-hour counts and event
   tables), not the raw traces. **We release it under ODbL 1.0 to be safe; code is Apache-2.0.** A university IP office or
