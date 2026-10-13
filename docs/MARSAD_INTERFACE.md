@@ -31,7 +31,7 @@ Rules that every producer and consumer must keep:
 | `h3` | string | H3 cell index. Resolution is `grid.h3_res` of the collection (4 in the default grid, `tashwish.config.GRID_MAIN`). |
 | `bucket_start`, `bucket_end` | string (ISO 8601 UTC, ending in `Z`) | Half open interval `[start, end)`. Length is `grid.bucket_hours` (3 in the default grid), aligned to UTC multiples of that length. |
 | `alt_band` | string | `enroute` (barometric altitude at or above `ENROUTE_MIN_FT`), `high`, `mid`, `low`. Bands overlap: `enroute` is the union of `mid` and `high`. Cut points are in `tashwish.config`. |
-| `p_interference` | number or null | Point estimate of the share of aircraft in the cell-bucket that were degraded (the `share_strong` of the metrics table: unique aircraft counted once, degraded means NIC below 4 or NACp below 5 for at least half of the aircraft's samples). **Null unless `status` is `ok`.** It is a share of aircraft, not the probability that any vehicle is affected. |
+| `p_interference` | number or null | Point estimate of the share of aircraft in the cell bucket that were degraded (the `share_strong` of the metrics table: unique aircraft counted once, degraded means NIC below 4 or NACp below 5 for at least half of the aircraft's samples). **Null unless `status` is `ok`.** It is a share of aircraft, not the probability that any vehicle is affected. |
 | `ci_lo`, `ci_hi` | number or null | 95% Wilson score interval for that share. Null unless `status` is `ok`. |
 | `kind` | string | `jamming_like`, `spoofing_like`, `both`: an event of that kind overlaps the cell and bucket. `none`: the cell was tested and no event was detected at the detector's thresholds (this is not a statement that interference is absent). `unknown`: the record cannot be classified (not testable, or an altitude band the detectors were not run on). |
 | `event_id` | string or null | Id of the overlapping event, as in `events.json` of the web contract. Non null exactly when `kind` is `jamming_like`, `spoofing_like` or `both`. If several events overlap, the smallest id is given and `kind` is merged (`both` if the kinds differ). |
@@ -90,7 +90,7 @@ assert validate_feature_collection(fc) == []
 to_parquet(cb, events, "context.parquet", dataset_version=..., data_class="observed")
 ```
 
-`cb` is the cell-bucket metrics table from `tashwish.metrics.aggregate.cell_bucket_metrics` after
+`cb` is the cell bucket metrics table from `tashwish.metrics.aggregate.cell_bucket_metrics` after
 `tashwish.coverage.model.apply_coverage` (columns `cell, bucket, stratum, n_aircraft, share_strong, ci_lo_strong,
 ci_hi_strong, status, coverage_class`). `events` is the table from `tashwish.detect.discriminate.combine`
 (`event_id, kind, start, end, lat, lon, cells`). An event is attached to every cell it lists and every bucket it overlaps;
@@ -172,12 +172,12 @@ Marsad scores a vehicle track with its own evidence (for example kinematic consi
 regional prior can only move the starting point of that scoring, in four steps:
 
 1. For the vehicle's position and time, call the query. If `usable_as_prior` is false, or `data_class` is synthetic, skip the
-   prior and use Marsad's own default starting point. This is the main path for missing data and is deliberately a no-op.
+   prior and use Marsad's own default starting point. This is the main path for missing data and is deliberately a no op.
 2. If `ok`, convert the Tashwish share into a bounded adjustment of Marsad's prior odds that "the environment around this
    vehicle is degraded". Use the interval, not only the point estimate: the adjustment is computed from `ci_lo` and `ci_hi`, so a
    wide interval (small `n_obs`) produces a small and uncertain adjustment, and `data_quality` of `limited` shrinks it further.
    The share is a share of aircraft at altitude, so for vehicles far from that altitude the adjustment should be damped by a
-   Marsad-side factor that Marsad must calibrate on its own data. Tashwish does not supply that factor.
+   Marsad side factor that Marsad must calibrate on its own data. Tashwish does not supply that factor.
 3. Combine with the vehicle evidence in the usual Bayesian way: posterior odds = adjusted prior odds times the likelihood ratio from
    the vehicle's own evidence. The regional prior never acts as evidence about the vehicle; it only changes how much vehicle
    evidence is needed.

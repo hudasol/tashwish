@@ -1,7 +1,8 @@
 # Data card: Tashwish Gulf GNSS interference dataset
 
-**Status: DRAFT template. No dataset has been released.** Fields marked `FROM RESULTS` are filled by the release script
-from result files, never by hand. Nothing below is a result.
+**Status: release candidate, study snapshot of fixed days, not a live feed.** Fields marked `FROM RESULTS` are filled by the
+release script from result files, never by hand. Nothing below is a result. A DOI exists only after the maintainer publishes
+the release (see `docs/ZENODO.md`).
 
 ## Licence and attribution (final wording, applies to every release)
 
@@ -14,6 +15,18 @@ Contains information from adsb.lol, which is made available here under the Open 
   uncertain; see `docs/LICENSING.md`.
 - ODbL 4.6: the full dataset and the build method are offered free of charge as machine readable files.
 - Source release tags and build commit: `FROM RESULTS`.
+- Study window: `FROM RESULTS`.
+
+## Regimes and independence (read before using any rate)
+
+The study window contains a sharp change from about 2026-03-02: the degraded share of en route reports rises from about 1 percent
+to more than 10 percent and traffic in the data falls to a fraction of its earlier level. Baselines and coverage are fitted per
+regime (`docs/METHODOLOGY.md`, section Regimes). No cause is identified and none is asserted, so do not read the change as
+interference beginning or as a fault. Rates pooled across the change describe neither side.
+
+Days are not independent samples. Development and held out days interleave inside a trending series, so held out days are not
+later in time than the days used for fitting, and cells and scenarios within a day share traffic. Use intervals that resample
+whole days. The held out days were scored once after a freeze (`results/FREEZE.json`).
 
 ## What it is
 

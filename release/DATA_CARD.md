@@ -1,7 +1,8 @@
 # Data card: Tashwish Gulf GNSS interference dataset
 
-**Status: generated for a release candidate.** Fields marked `FROM RESULTS` are filled by the release script
-from result files, never by hand. Nothing below is a result.
+**Status: generated for a release candidate, study snapshot of fixed days, not a live feed.** Fields marked `FROM RESULTS` are filled by the
+release script from result files, never by hand. Nothing below is a result. A DOI exists only after the maintainer publishes
+the release (see `docs/ZENODO.md`).
 
 ## Licence and attribution (final wording, applies to every release)
 
@@ -13,7 +14,19 @@ Contains information from adsb.lol, which is made available here under the Open 
 - The ODbL is applied conservatively: we treat the aggregates as a Derivative Database. Whether that is legally required is
   uncertain; see `docs/LICENSING.md`.
 - ODbL 4.6: the full dataset and the build method are offered free of charge as machine readable files.
-- Build commit: `262684a`. Source: adsb.lol globe_history daily releases (the release kind and tag are in the ingest manifest).
+- Build commit: `e61fbc3`. Source: adsb.lol globe_history daily releases (the release kind and tag are in the ingest manifest).
+- Study window: 2026-02-07 to 2026-03-13, 35 UTC days.
+
+## Regimes and independence (read before using any rate)
+
+The study window contains a sharp change from about 2026-03-02: the degraded share of en route reports rises from about 1 percent
+to more than 10 percent and traffic in the data falls to a fraction of its earlier level. Baselines and coverage are fitted per
+regime (`docs/METHODOLOGY.md`, section Regimes). No cause is identified and none is asserted, so do not read the change as
+interference beginning or as a fault. Rates pooled across the change describe neither side.
+
+Days are not independent samples. Development and held out days interleave inside a trending series, so held out days are not
+later in time than the days used for fitting, and cells and scenarios within a day share traffic. Use intervals that resample
+whole days. The held out days were scored once after a freeze (`results/FREEZE.json`).
 
 ## What it is
 
@@ -31,7 +44,7 @@ jamming-like and spoofing-like anomalies. No raw traces, no aircraft identifiers
 
 ## Files, schema, coverage, validation numbers, known biases
 
-Generated 2026-10-13T12:56:19Z from processed result files. Latest day: 2026-03-13. Days: 35 (dev 21, held_out 14).
+Generated 2026-10-13T13:07:06Z from processed result files. Latest day: 2026-03-13. Days: 35 (dev 21, held_out 14).
 
 - `cell_buckets.parquet` and `.csv.gz`: h3, bucket_start, slot, stratum, n_aircraft, k_strong, share, ci_lo, ci_hi, status, coverage_class, data_class.
   `share`, `ci_lo`, `ci_hi` are empty unless status is `ok`.
@@ -40,7 +53,7 @@ Generated 2026-10-13T12:56:19Z from processed result files. Latest day: 2026-03-
 - Event times are rounded to the 3 hour bucket; events with fewer than 5 aircraft omit destination coordinates.
 - `validation.json`, `freshness.json`, `manifest.json`, `checksums.sha256`, `NOTICE`, `ODbL-1.0.txt`.
 
-Cell-bucket rows by status: coverage_lost 2968, insufficient 79986, ok 100663.
+Cell bucket rows by status: coverage_lost 2968, insufficient 79986, ok 100663.
 Events by kind: both 2, jamming_like 6, spoofing_like 19; marked uncertain: 23.
 
 Validation numbers: see `validation.json` and docs/VALIDATION.md in the repository (generated from result files).
