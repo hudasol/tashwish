@@ -1,4 +1,6 @@
-import { boot, state, t, el, methodLabel } from "./common.js";
+import { boot, state, t, el, methodLabel, hasKey } from "./common.js";
+
+const title = (a) => (hasKey("method." + a) ? t("method." + a) : a);
 
 function render() {
   const body = document.getElementById("methods-body");
@@ -17,12 +19,12 @@ function render() {
   });
   const toc = el("nav", { "aria-label": t("methods.toc"), class: "toc" }, el("h2", { text: t("methods.toc") }));
   const ul = el("ul");
-  [...groups.keys()].sort().forEach((a) => ul.append(el("li", {}, el("a", { href: "#" + a, text: a }))));
+  [...groups.keys()].sort().forEach((a) => ul.append(el("li", {}, el("a", { href: "#" + a, text: title(a) }))));
   toc.append(ul);
   body.append(toc);
   [...groups.keys()].sort().forEach((a) => {
     const sec = el("section", { id: a, class: "panel method-sec", "aria-labelledby": "h-" + a });
-    sec.append(el("h2", { id: "h-" + a, text: a }));
+    sec.append(el("h2", { id: "h-" + a, text: title(a) }));
     sec.append(el("p", { class: "help" }, t("methods.spec_pre") + " ", el("code", { text: "docs/METHODOLOGY.md#" + a }), "."));
     const tbl = el("table", { class: "data" },
       el("caption", { class: "sr-only", text: t("methods.caption", { anchor: a }) }),

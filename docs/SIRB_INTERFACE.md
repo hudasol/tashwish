@@ -96,8 +96,8 @@ degraded episode requires a new major version. `provenance.code_commit` and `dat
 ## 7. Files
 
 * `src/tashwish/interop/sirb.py`: `build_params(points, days_meta, ...)`, the CLI, and the helper functions.
-* `interop/samples/sirb_gnss_params_DRAFT.json`: a draft file built from the development days that were ingested when it was
-  made. The days used are recorded in its `provenance.days`. It is a draft: the study window is not fully ingested and the file
-  will be rebuilt when it is. It is real (observed) data and carries the same caveats.
+* `interop/samples/sirb_gnss_params_dev21.json`: the file built from all 21 development days (the earlier draft used 7 and was removed).
+  The days used are recorded in its `provenance.days`. It is built from development days only (held-out days are excluded by default) and the file
+  should be rebuilt if more days are ingested. It is real (observed) data and carries the same caveats.
 * `tests/test_interop_sirb.py`: tests on SYNTHETIC point tables with known answers (episode count, duration, rate, transitions,
   dropout shares, category counts), exclusion rules, insufficient blocks, the held-out refusal, the CLI, and seed determinism.

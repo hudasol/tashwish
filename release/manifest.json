@@ -1,8 +1,8 @@
 {
  "schema": "tashwish.release.v1",
  "dataset_version": "observed-2026-03-13-73ebe3c6",
- "generated_at": "2026-10-12T06:40:54Z",
- "code_commit": "94eafcd",
+ "generated_at": "2026-10-13T12:56:13Z",
+ "code_commit": "262684a",
  "data_class": "observed",
  "attribution": "Contains information from adsb.lol, which is made available here under the Open Database License (ODbL). This derived database (Tashwish aggregates) is also made available under the ODbL 1.0.",
  "grid": {
@@ -371,7 +371,7 @@
  "files": {
   "DATA_CARD.md": {
    "path": "DATA_CARD.md",
-   "sha256": "c6be23022b6f2f9b62c29bccb714abaecd67d9a8542597f830a0d926d6327cf4",
+   "sha256": "2bc1e2631069184642a251a0b17faba018092aed958e858bfb39f8aa96b261d7",
    "bytes": 3661
   },
   "NOTICE": {
@@ -386,7 +386,7 @@
   },
   "cell_buckets.csv.gz": {
    "path": "cell_buckets.csv.gz",
-   "sha256": "9e60d2077a17d787dad1606645c2c58fc70378699bb6b7c99864550fd4e8a230",
+   "sha256": "337bad5ae82f276453454cabbf229a7b1f8c3ea3809505f2e0da5b7f307019f6",
    "bytes": 1450997
   },
   "cell_buckets.parquet": {
@@ -406,7 +406,7 @@
   },
   "events.csv.gz": {
    "path": "events.csv.gz",
-   "sha256": "6fb8a480f2b0edcab0ded34cd4fc3429b9d15d38edfe179a32fe496e60b9f999",
+   "sha256": "493ca6804de922c52714480348390b92e9fabed3d26fcb3d93ebaec1fa1dc28c",
    "bytes": 2125
   },
   "events.parquet": {
@@ -416,18 +416,23 @@
   },
   "freshness.json": {
    "path": "freshness.json",
-   "sha256": "ba94ec06b7fb0ee08204e612a60ff82f5a7fde519e27ad6a1a907ba9c087b595",
+   "sha256": "fda44f20572f392c2c8b45f457cb6d3e203bbf51c3751d8b92050195ce2156b9",
    "bytes": 72
   },
   "validation.json": {
    "path": "validation.json",
-   "sha256": "d9999d2158f82a7e99811c82c8d773d6a7a695870e82d624999b157be7f69944",
-   "bytes": 1124
+   "sha256": "30d6c3db91889a6f42d6474f9ad653b6bf45d47bcbe6a527f3ef15c1b1545d59",
+   "bytes": 4940
   },
   "checksums.sha256": {
    "path": "checksums.sha256",
-   "sha256": "632184a047b77f1c7f2b6e88c43423588fb21537b4a8c2591a88415e112474c6",
+   "sha256": "7d29522c65e34f2e261ac0555eaef2a9873f02060bbf75bf4ad0298f728a5895",
    "bytes": 894
   }
+ },
+ "mode": "study_snapshot",
+ "study_window": {
+  "start": "2026-02-07",
+  "end": "2026-03-13"
  }
 }

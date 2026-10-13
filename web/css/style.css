@@ -92,6 +92,8 @@ main:focus { outline: none; }
 .freshness { max-inline-size: 1280px; margin: .5rem auto 0; padding: .5rem 1rem; border-inline-start: 6px solid var(--accent); background: var(--ok-bg); color: var(--ok-ink); }
 .freshness[data-level="amber"] { background: var(--warn-bg); color: var(--warn-ink); border-inline-start-color: #c77d00; }
 .freshness[data-level="red"] { background: var(--red-bg); color: var(--red-ink); border-inline-start-color: #b00020; }
+.freshness[data-level="snapshot"] { background: var(--sakura); color: var(--text); border-inline-start-color: var(--accent); }
+.freshness[data-level="snapshot"] strong:first-of-type { letter-spacing: .03em; }
 .fresh-h { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; margin: 0; }
 .fresh-line { margin: .1rem 0 0; font-size: .95rem; }
 .freshness a { color: inherit; }
@@ -205,3 +207,25 @@ details > summary { cursor: pointer; font-weight: 600; padding: .5rem 0; min-blo
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* chips: text always carries the meaning, colour only supports it */
+.chip { display: inline-block; font-size: .75rem; font-weight: 800; letter-spacing: .04em; padding: .1rem .5rem; border-radius: 999px; border: 2px solid currentColor; white-space: normal; line-height: 1.4; }
+.chip.syn { background: var(--syn); color: var(--syn-ink); border-color: var(--syn); }
+.chip.obs { background: var(--ok-bg); color: var(--ok-ink); }
+.chip.warn { background: var(--warn-bg); color: var(--warn-ink); }
+.chip.plain { background: transparent; color: var(--muted); font-weight: 600; }
+.cell-sub { display: block; color: var(--muted); font-size: .85rem; }
+.group-h { margin-block: 1.2rem .3rem; }
+
+/* regime panel: inline SVG bar charts */
+.charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: .8rem; margin-block: .6rem; }
+.chart { margin: 0; }
+.chart figcaption { font-weight: 600; font-size: .9rem; margin-block-end: .2rem; }
+.chart svg { inline-size: 100%; block-size: auto; display: block; direction: ltr; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; }
+.chart .bar { fill: var(--accent); }
+.chart .bar.after { fill: var(--focus); }
+.chart .axis { stroke: var(--line); stroke-width: 1; }
+.chart .tick { fill: var(--muted); font-size: 10px; font-family: inherit; }
+.chart .mark { stroke: var(--text); stroke-width: 1.5; stroke-dasharray: 4 3; }
+#events-table table.data tbody th { min-inline-size: 13rem; }
+#events-table .linkbtn { text-align: start; line-height: 1.35; }

@@ -1,6 +1,11 @@
 """Build the dataset release and the dashboard JSON from processed/ (idempotent).
 
   python -m tashwish.release.build --processed processed --web web/data --release release [--state state] [--results results]
+                                   [--mode live|study_snapshot]
+
+`--mode` (default: environment variable TASHWISH_MODE, else `live`) is written to both manifests. `live` is the behaviour of
+the scheduled incremental workflow: the dashboard warns when the data is stale. `study_snapshot` marks a fixed study
+dataset: the dashboard then shows a "study snapshot, not live" label with the study window instead of a staleness warning.
 
 Inputs hold no aircraft identifiers. Everything written here is derived from files, never typed by hand: the data card
 numbers, the validation block and the manifest all come from processed/ and results/.
@@ -27,17 +32,55 @@ from ..attribution import DATASET_ATTRIBUTION
 from ..operate.processed import list_days, read_day_meta
 
 EXTRA_METHODS = {
-    "evidence.n_spoof_aircraft": ("Aircraft in the position jump cluster", "event-definition"),
-    "evidence.dest_spread_km": ("Spread of jump destinations (km)", "confidence-grading"),
-    "evidence.median_implied_kt": ("Median implied speed of the jumps (kt)", "event-definition"),
-    "evidence.share_nominal_accuracy": ("Share of jump reports with nominal accuracy fields", "event-definition"),
-    "jamming_recall_easy": ("Recall, easy synthetic jamming scenarios", "validation-design"),
-    "jamming_recall_medium": ("Recall, medium synthetic jamming scenarios", "validation-design"),
-    "jamming_recall_hard": ("Recall, hard synthetic jamming scenarios", "validation-design"),
-    "spoofing_recall_3plus_aircraft": ("Recall, synthetic spoofing of 3 or more aircraft", "validation-design"),
-    "false_coverage_rate": ("Covered cells that lacked data on a held-out day", "coverage-model"),
-    "daily_degraded_share": ("Region wide degraded share per day", "degraded-definition"),
+    "evidence.n_spoof_aircraft": (
+        "Aircraft in the position jump cluster",
+        "عدد الطائرات في مجموعة قفزات الموقع",
+        "event-definition",
+    ),
+    "evidence.dest_spread_km": ("Spread of jump destinations (km)", "تشتت وجهات القفزات (كم)", "confidence-grading"),
+    "evidence.median_implied_kt": (
+        "Median speed implied by the position jumps (kt), not a physical speed",
+        "وسيط السرعة التي تفترضها قفزات الموقع (عقدة)، وليست سرعة فعلية",
+        "event-definition",
+    ),
+    "evidence.share_nominal_accuracy": (
+        "Share of jump reports with nominal accuracy fields",
+        "نسبة بلاغات القفزات ذات حقول الدقة الاعتيادية",
+        "event-definition",
+    ),
+    "jamming_recall_easy": (
+        "Recall, easy synthetic jamming scenarios",
+        "الاستدعاء في سيناريوهات التشويش الاصطناعية السهلة",
+        "validation-design",
+    ),
+    "jamming_recall_medium": (
+        "Recall, medium synthetic jamming scenarios",
+        "الاستدعاء في سيناريوهات التشويش الاصطناعية المتوسطة",
+        "validation-design",
+    ),
+    "jamming_recall_hard": (
+        "Recall, hard synthetic jamming scenarios",
+        "الاستدعاء في سيناريوهات التشويش الاصطناعية الصعبة",
+        "validation-design",
+    ),
+    "spoofing_recall_3plus_aircraft": (
+        "Recall, synthetic spoofing of 3 or more aircraft",
+        "الاستدعاء في سيناريوهات الخداع الاصطناعية التي تشمل 3 طائرات أو أكثر",
+        "validation-design",
+    ),
+    "false_coverage_rate": (
+        "Covered cells that lacked data on a held out day",
+        "نسبة الخلايا المعدودة مغطاة لكن بلا بيانات كافية في يوم محجوب",
+        "coverage-model",
+    ),
+    "daily_degraded_share": (
+        "Region wide degraded share per day",
+        "نسبة التدني على مستوى المنطقة في كل يوم",
+        "degraded-definition",
+    ),
 }
+MODES = ("live", "study_snapshot")
+DATA_CLASSES = ("synthetic", "observed")
 
 ROOT = Path(__file__).resolve().parents[3]
 WEB_SCHEMA = "tashwish.web.v1"
@@ -185,9 +228,40 @@ def release_events(ev: pd.DataFrame) -> pd.DataFrame:
     return out.sort_values(["start", "event_id"]).reset_index(drop=True)
 
 
+def mode_fields(mode: str, metas: list[dict]) -> dict:
+    """Manifest fields for the build mode. A study snapshot also records its window (first and last processed day)."""
+    if mode not in MODES:
+        raise ValueError(f"mode {mode!r} is not one of {MODES}")
+    out: dict = {"mode": mode}
+    days = sorted(m["day"] for m in metas)
+    if mode == "study_snapshot" and days:
+        out["study_window"] = {"start": days[0], "end": days[-1]}
+    return out
+
+
+def normalise_results(rows: list[dict]) -> list[dict]:
+    """Bring validation rows to the row contract. Rows from the older shape (no per row fields) are accepted:
+    data_class is inferred from the scenario id (`synthetic...` is synthetic, anything else observed), regime defaults to
+    `pooled`, ci_method to `wilson`. Each row states its own data class; the file level flag cannot (it is `observed`
+    because the web loader needs one class per file)."""
+    out = []
+    for r in rows:
+        r = dict(r)
+        r.setdefault("scenario", "")
+        dc = r.get("data_class") or ("synthetic" if str(r["scenario"]).startswith("synthetic") else "observed")
+        if dc not in DATA_CLASSES:
+            raise ValueError(f"validation row {r.get('metric')!r}: data_class {dc!r} is not one of {DATA_CLASSES}")
+        r["data_class"] = dc
+        r["regime"] = r.get("regime") or "pooled"
+        r["ci_method"] = r.get("ci_method") or "wilson"
+        r.setdefault("note", "")
+        out.append(r)
+    return out
+
+
 def write_web(web: Path, cb: pd.DataFrame, ev: pd.DataFrame, metas: list[dict], cov: pd.DataFrame | None,
               generated_at: str, latest_day: str | None, results_block: dict, methods: dict,
-              daily: pd.DataFrame | None = None, dataset_version: str | None = None) -> None:  # fmt: skip
+              daily: pd.DataFrame | None = None, dataset_version: str | None = None, mode: str = "live") -> None:  # fmt: skip
     common = {"schema": WEB_SCHEMA, "data_class": "observed", "generated_at": generated_at,
               "code_commit": code_commit(), "attribution": DATASET_ATTRIBUTION}  # fmt: skip
     shutil.rmtree(web / "days", ignore_errors=True)
@@ -219,14 +293,15 @@ def write_web(web: Path, cb: pd.DataFrame, ev: pd.DataFrame, metas: list[dict], 
         cov_rows = [{"h3": r.cell, "slot": int(r.slot), "presence": round(float(r.presence), 3), "class": r.coverage_class}
                     for r in c.itertuples()]  # fmt: skip
     _dump(web / "coverage.json", {**common, "cells": cov_rows})
-    _dump(web / "validation.json", {**common, "results": results_block.get("results", [])})
+    _dump(web / "validation.json", {**common, "results": normalise_results(results_block.get("results", [])),
+          **({"note": results_block["note"]} if results_block.get("note") else {})})  # fmt: skip
     _dump(web / "methods.json", {**common, "metrics": methods})
     if daily is not None:
         _dump(web / "daily.json", {**common, "days": daily.round(4).to_dict(orient="records")})
     _dump(web / "manifest.json", {**common, "dataset_version": dataset_version or (f"observed-{latest_day}" if latest_day else "empty"),
           "grid": {"h3_res": GRID.h3_res, "bucket_hours": GRID.bucket_hours},
           "bbox": {"south": cfg.REGION.lat_min, "west": cfg.REGION.lon_min, "north": cfg.REGION.lat_max, "east": cfg.REGION.lon_max},
-          "days": metas, "latest_day": latest_day, "freshness_hours_hint": 24})  # fmt: skip
+          "days": metas, "latest_day": latest_day, "freshness_hours_hint": 24, **mode_fields(mode, metas)})  # fmt: skip
 
 
 def data_card(template: Path, metas: list[dict], cb: pd.DataFrame, ev: pd.DataFrame, latest_day: str | None,
@@ -307,8 +382,20 @@ def build(a: argparse.Namespace, tmp_web: Path, tmp_rel: Path) -> bool:
     results_block = json.loads(headline_p.read_text()) if headline_p.exists() else {"results": []}
     sample = ROOT / "web" / "data" / "sample_synthetic" / "methods.json"
     methods = json.loads(sample.read_text())["metrics"] if sample.exists() else {}
-    for k, (label, anchor) in EXTRA_METHODS.items():
-        methods.setdefault(k, {"label_en": label, "label_ar": label, "method_anchor": anchor})
+    for k, (label, label_ar, anchor) in EXTRA_METHODS.items():
+        methods[k] = {"label_en": label, "label_ar": label_ar, "method_anchor": anchor}
+    for k in list(methods):  # regime split rows reuse the base metric text with a regime suffix
+        if k in EXTRA_METHODS and not k.startswith(("evidence.", "daily_")):
+            for suf, en, ar in (
+                ("_normal", "normal traffic days", "أيام الحركة العادية"),
+                ("_reduced", "reduced traffic days", "أيام الحركة المخفضة"),
+            ):
+                b = methods[k]
+                methods[k + suf] = {
+                    "label_en": f"{b['label_en']} ({en})",
+                    "label_ar": f"{b['label_ar']} ({ar})",
+                    "method_anchor": b["method_anchor"],
+                }
 
     cb = release_cb(cb_raw)
     ev = release_events(ev_raw)
@@ -316,7 +403,18 @@ def build(a: argparse.Namespace, tmp_web: Path, tmp_rel: Path) -> bool:
     cbo = cb.drop(columns=["day"])
     version = dataset_version_for(latest_day, cbo, ev)
     write_web(
-        tmp_web, cb, ev, metas, cov, generated_at, latest_day, results_block, methods, dr, dataset_version=version
+        tmp_web,
+        cb,
+        ev,
+        metas,
+        cov,
+        generated_at,
+        latest_day,
+        results_block,
+        methods,
+        dr,
+        dataset_version=version,
+        mode=a.mode,
     )
 
     rel = tmp_rel
@@ -329,7 +427,12 @@ def build(a: argparse.Namespace, tmp_web: Path, tmp_rel: Path) -> bool:
     if cov is not None:
         cov_out = cov.rename(columns={"cell": "h3"})[["h3", "slot", "stratum", "presence", "mean_n", "coverage_class"]]
         cov_out.to_parquet(rel / "coverage.parquet", index=False)
-    val = {"schema": SCHEMA_VALIDATION, "data_class": "observed", **results_block}
+    val = {
+        "schema": SCHEMA_VALIDATION,
+        "data_class": "observed",
+        **results_block,
+    }  # each row carries its own data_class
+    val["results"] = results_block["results"] = normalise_results(results_block.get("results", []))
     (rel / "validation.json").write_text(json.dumps(val, indent=1, default=_json_default, allow_nan=False))
     (rel / "freshness.json").write_text(
         json.dumps({**fresh, "generated_at": generated_at, "latest_day": latest_day}, indent=1)
@@ -356,7 +459,7 @@ def build(a: argparse.Namespace, tmp_web: Path, tmp_rel: Path) -> bool:
         "code_commit": code_commit(), "data_class": "observed", "attribution": DATASET_ATTRIBUTION,
         "grid": {"h3_res": GRID.h3_res, "bucket_hours": GRID.bucket_hours},
         "bbox": {"south": cfg.REGION.lat_min, "west": cfg.REGION.lon_min, "north": cfg.REGION.lat_max, "east": cfg.REGION.lon_max},
-        "days": metas, "latest_day": latest_day, "files": files,
+        "days": metas, "latest_day": latest_day, "files": files, **mode_fields(a.mode, metas),
     }  # fmt: skip
     (rel / "manifest.json").write_text(json.dumps(manifest, indent=1, default=_json_default))
     a.results.mkdir(parents=True, exist_ok=True)
@@ -374,6 +477,8 @@ def main() -> None:
     ap.add_argument("--release", type=Path, default=Path("release"))
     ap.add_argument("--state", type=Path, default=ROOT / "state")
     ap.add_argument("--results", type=Path, default=ROOT / "results")
+    ap.add_argument("--mode", choices=MODES, default=os.environ.get("TASHWISH_MODE") or "live",
+                    help="live (default, or TASHWISH_MODE) keeps staleness warnings; study_snapshot marks a fixed study dataset")  # fmt: skip
     a = ap.parse_args()
 
     pid = os.getpid()

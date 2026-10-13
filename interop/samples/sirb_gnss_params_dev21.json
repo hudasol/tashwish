@@ -1,0 +1,2780 @@
+{
+ "schema": "tashwish.sirb_gnss_params.v1",
+ "data_class": "observed",
+ "notice": "Empirical stress prior from public aircraft ADS-B broadcasts. It does not describe drone receivers. No actor attribution. See caveats.",
+ "provenance": {
+  "source": "adsb.lol globe_history archives (ODbL 1.0)",
+  "dataset_version": "draft-d62f30012daf",
+  "days": [
+   {
+    "day": "2026-02-08",
+    "split": "dev",
+    "rows": 1678759,
+    "aircraft": 2111,
+    "out_sha256": "d1a126f145bf64f901b31095cf3f6f30bd85991774a501c24922ee733bf8d29e",
+    "ingested_utc": "2026-10-12T01:36:25Z",
+    "ingest_code_version": "0.1.0+bbfc80f"
+   },
+   {
+    "day": "2026-02-09",
+    "split": "dev",
+    "rows": 1748228,
+    "aircraft": 2066,
+    "out_sha256": "6a51a443d8d298a3ed30180f77e745232543f6f4158ed98898c5fd00e8ba78c9",
+    "ingested_utc": "2026-10-12T01:43:33Z",
+    "ingest_code_version": "0.1.0+bbfc80f"
+   },
+   {
+    "day": "2026-02-13",
+    "split": "dev",
+    "rows": 1816188,
+    "aircraft": 2146,
+    "out_sha256": "68a99a55efc825acca6dfcb037f77fe6363d71ada900663b9843e100844ecd8b",
+    "ingested_utc": "2026-10-12T01:52:12Z",
+    "ingest_code_version": "0.1.0+d6db8a8"
+   },
+   {
+    "day": "2026-02-14",
+    "split": "dev",
+    "rows": 1793546,
+    "aircraft": 2138,
+    "out_sha256": "e9c7b68666077d21b4d9df81b957ab4c75322149676685841e98a1931220d997",
+    "ingested_utc": "2026-10-11T02:56:20Z",
+    "ingest_code_version": "0.1.0+af4e828"
+   },
+   {
+    "day": "2026-02-16",
+    "split": "dev",
+    "rows": 1643083,
+    "aircraft": 2051,
+    "out_sha256": "68030d96ea6d0332e32bdb9798b0d329dc6e7c7411a44623028774698cc96d1a",
+    "ingested_utc": "2026-10-12T01:57:21Z",
+    "ingest_code_version": "0.1.0+d6db8a8"
+   },
+   {
+    "day": "2026-02-17",
+    "split": "dev",
+    "rows": 1664449,
+    "aircraft": 2052,
+    "out_sha256": "2cee535b53d5adcb59a990bdd127b24c7e69742d6233d9e6b70a2aaaad005bdb",
+    "ingested_utc": "2026-10-12T02:02:53Z",
+    "ingest_code_version": "0.1.0+d6db8a8"
+   },
+   {
+    "day": "2026-02-19",
+    "split": "dev",
+    "rows": 1741242,
+    "aircraft": 2041,
+    "out_sha256": "adcf1e05f790d754ea0a2e86d28e44e785b154b5311922613d04654a87093b85",
+    "ingested_utc": "2026-10-12T02:12:47Z",
+    "ingest_code_version": "0.1.0+a35b798"
+   },
+   {
+    "day": "2026-02-20",
+    "split": "dev",
+    "rows": 1715407,
+    "aircraft": 2021,
+    "out_sha256": "60fb68312031737db4af8bfb1a5b7126b67af5b108e88c18297c7f172cc84c4c",
+    "ingested_utc": "2026-10-12T02:21:36Z",
+    "ingest_code_version": "0.1.0+d21c8b6"
+   },
+   {
+    "day": "2026-02-21",
+    "split": "dev",
+    "rows": 1652045,
+    "aircraft": 1955,
+    "out_sha256": "e725b7cacd5dfaa7954be1793b8cf0d5b5c5b1887b63b0557016cf61f4053f57",
+    "ingested_utc": "2026-10-12T02:28:57Z",
+    "ingest_code_version": "0.1.0+d21c8b6"
+   },
+   {
+    "day": "2026-02-22",
+    "split": "dev",
+    "rows": 1649467,
+    "aircraft": 2019,
+    "out_sha256": "eb3535c309251c52f1cb8ad30cfb24103af93db33140be1cf6e8f733a77dee0f",
+    "ingested_utc": "2026-10-12T02:37:23Z",
+    "ingest_code_version": "0.1.0+d21c8b6"
+   },
+   {
+    "day": "2026-02-23",
+    "split": "dev",
+    "rows": 1797065,
+    "aircraft": 1994,
+    "out_sha256": "052571ef467e06ea96c0ce02e2365cd062c2cf19b63b17e24d5069c9e23eba2f",
+    "ingested_utc": "2026-10-12T02:45:23Z",
+    "ingest_code_version": "0.1.0+99e8d94"
+   },
+   {
+    "day": "2026-02-25",
+    "split": "dev",
+    "rows": 1681313,
+    "aircraft": 1985,
+    "out_sha256": "93f30d449ab8a82de7bb30edb253eeb296709d4fa1eb487c09a10835a143e474",
+    "ingested_utc": "2026-10-12T02:52:35Z",
+    "ingest_code_version": "0.1.0+99e8d94"
+   },
+   {
+    "day": "2026-02-27",
+    "split": "dev",
+    "rows": 1652576,
+    "aircraft": 1969,
+    "out_sha256": "4a844da651d9f76ef9db245d0f833b68a90e0174bb316d79af7648878a914dab",
+    "ingested_utc": "2026-10-12T02:58:43Z",
+    "ingest_code_version": "0.1.0+99e8d94"
+   },
+   {
+    "day": "2026-03-02",
+    "split": "dev",
+    "rows": 528142,
+    "aircraft": 549,
+    "out_sha256": "cade30dec489d9500950215b97b0eb5a60c08c7f127115b52c72a14a2f90f146",
+    "ingested_utc": "2026-10-11T02:49:11Z",
+    "ingest_code_version": "0.1.0+3a48ff8"
+   },
+   {
+    "day": "2026-03-04",
+    "split": "dev",
+    "rows": 486915,
+    "aircraft": 688,
+    "out_sha256": "feba596edc07fd1a0ec80f2e306de0bae7344ad08ec89755520145227078e912",
+    "ingested_utc": "2026-10-12T03:06:08Z",
+    "ingest_code_version": "0.1.0+99e8d94"
+   },
+   {
+    "day": "2026-03-05",
+    "split": "dev",
+    "rows": 447185,
+    "aircraft": 732,
+    "out_sha256": "ccab6d3f9072163577ab3ebd13d1072ec65172c66c01d4358707a96df90dee96",
+    "ingested_utc": "2026-10-12T03:11:58Z",
+    "ingest_code_version": "0.1.0+99e8d94"
+   },
+   {
+    "day": "2026-03-06",
+    "split": "dev",
+    "rows": 376544,
+    "aircraft": 756,
+    "out_sha256": "3b7ec8affc93f087d31a64e6853e241eab913637d081155da6786d7ad6b01584",
+    "ingested_utc": "2026-10-12T03:18:58Z",
+    "ingest_code_version": "0.1.0+99e8d94"
+   },
+   {
+    "day": "2026-03-07",
+    "split": "dev",
+    "rows": 357260,
+    "aircraft": 675,
+    "out_sha256": "16d95dadb6318cdae35530596c7088b5fb28ef06c4926e039bc29c274f2c2619",
+    "ingested_utc": "2026-10-12T03:25:03Z",
+    "ingest_code_version": "0.1.0+99e8d94"
+   },
+   {
+    "day": "2026-03-09",
+    "split": "dev",
+    "rows": 380287,
+    "aircraft": 747,
+    "out_sha256": "fa98c7579c3e67172d42845b246fc3e6677bbe683d276b933a3ec7bfd8b92e8f",
+    "ingested_utc": "2026-10-12T03:30:57Z",
+    "ingest_code_version": "0.1.0+99e8d94"
+   },
+   {
+    "day": "2026-03-11",
+    "split": "dev",
+    "rows": 382707,
+    "aircraft": 787,
+    "out_sha256": "7a9f6a4f0fb49f4d6b0f42eb3fa1f8261df829df0867041f87b6f6b1d674b3e5",
+    "ingested_utc": "2026-10-12T03:36:36Z",
+    "ingest_code_version": "0.1.0+99e8d94"
+   },
+   {
+    "day": "2026-03-12",
+    "split": "dev",
+    "rows": 345554,
+    "aircraft": 744,
+    "out_sha256": "a64d11559d337a58e5bfdebf8033abb7f870fe4b6fea7e71b3e8dbb0b43f7241",
+    "ingested_utc": "2026-10-12T03:44:59Z",
+    "ingest_code_version": "0.1.0+99e8d94"
+   }
+  ],
+  "dev_only": true,
+  "split_rule": "tashwish-heldout-v1",
+  "code_commit": "262684a",
+  "tashwish_version": "0.1.0",
+  "attribution": "Contains information from adsb.lol, which is made available here under the Open Database License (ODbL). This derived database (Tashwish aggregates) is also made available under the ODbL 1.0.",
+  "generated_at": "2026-10-13T12:40:02Z",
+  "seed": 20261012,
+  "n_boot": 1000,
+  "bootstrap_unit": "aircraft-day, resampled with replacement",
+  "confidence_level": 0.95
+ },
+ "definitions": {
+  "sample_filter": "airborne, src_type adsb_icao (own transponder), inside the region box, with barometric altitude; duplicates of (icao24, ts) removed",
+  "quality_sample": "a sample with its own NIC (not carried forward from an earlier message)",
+  "strongly_degraded": "NIC < 4 or NACp < 5",
+  "episode": "maximal run of one aircraft's consecutive quality samples, all strongly degraded, neighbours at most 120 s apart, at least 2 samples; duration is last minus first sample time",
+  "baseline": "quality samples (or intervals starting at samples) that are not strongly degraded",
+  "degraded_episode": "quality samples inside an episode (intervals: starting at a sample inside an episode)",
+  "isolated_degraded": "strongly degraded runs shorter than the episode minimum belong to neither class; counted in n",
+  "strata": {
+   "enroute": "barometric altitude >= 10000 ft",
+   "high": ">= 25000 ft",
+   "mid": "10000 to 25000 ft",
+   "low": "< 10000 ft",
+   "note": "enroute is the union of mid and high; strata overlap by construction"
+  },
+  "update_interval": "seconds between consecutive position samples of one aircraft-day, up to 600 s; longer gaps and samples flagged as a new leg are excluded and counted; quantiles use 0.1 s bins below 30 s",
+  "dropout": "share of intervals longer than 20 s and 60 s",
+  "episode_rate": "episodes started per aircraft hour of observed quality-sample time (neighbours within the gap)",
+  "transitions": "probability that the next quality sample is strongly degraded given the current one is degraded or nominal, within one aircraft and gap",
+  "intervals": "boot_lo/boot_hi: percentile bootstrap over aircraft-days; wilson_*: ignores clustering, too narrow; poisson_exact_*: assumes independent episodes, too narrow",
+  "min_sizes": {
+   "aircraft_days": 10,
+   "quality_samples_categorical": 30,
+   "episodes_for_duration": 20
+  }
+ },
+ "caveats": {
+  "summary": "These parameters come from public aircraft ADS-B broadcasts, mostly at cruise-type altitudes, over the Gulf. They describe how aircraft avionics report position quality and how often those reports pause during en-route interference. They do NOT describe a drone-scale receiver, low-altitude urban multipath, or a small antenna. Use them only as an illustrative stress prior for scenario testing, never as a measured model of a drone's GNSS behaviour, and never as a certification input.",
+  "points": [
+   "Source: adsb.lol globe_history archives of volunteer receivers (ODbL 1.0). Coverage differs by place and time.",
+   "NIC and NACp are accuracy classes that an aircraft transmits about its own position, not measured position errors.",
+   "A low NIC or NACp can also come from old avionics, installation faults or ADS-B version differences, so a degraded episode is evidence of degraded reporting, not proof of interference.",
+   "Update intervals and dropouts mix three things: aircraft transmission behaviour, receiver coverage gaps, and the thinning applied by the archive. They are not the dropout behaviour of a drone receiver.",
+   "In the archive, update intervals rarely run much beyond the 20 second mark that the source itself uses to flag a gap in position, so the upper tail of the update interval and the 20 second dropout share reflect archive sampling as well as real gaps. Read them as properties of this data source, not of a receiver.",
+   "Counts of samples are not independent (one aircraft contributes many consecutive samples). Wilson intervals treat samples as independent and are therefore too narrow; the bootstrap intervals resample aircraft-days and are the ones to use.",
+   "Parameters are built from the listed days only, which are development days. They may not transfer to other days or seasons.",
+   "A block marked insufficient does not have enough aircraft-days or events to report an interval, and is not a statement of zero.",
+   "No attribution: the file says nothing about who or what caused any degradation."
+  ],
+  "not_for": [
+   "navigation or flight planning",
+   "safety of life decisions",
+   "claims about a specific drone, receiver or site",
+   "attributing interference to any state or actor"
+  ]
+ },
+ "regions": {
+  "gulf_box": {
+   "bbox": {
+    "lat_min": 22.0,
+    "lat_max": 31.0,
+    "lon_min": 46.0,
+    "lon_max": 62.0
+   },
+   "strata": {
+    "enroute": {
+     "n": {
+      "position_samples": 9968830,
+      "quality_samples": 2492844,
+      "isolated_degraded_samples": 5064,
+      "intervals_used": 9924190,
+      "intervals_over_horizon": 21906,
+      "samples_flag_no_position_20s": 254998,
+      "single_sample_runs": 5064,
+      "aircraft": 4836,
+      "aircraft_days": 28326
+     },
+     "baseline": {
+      "quality_categories": {
+       "n_quality_samples": 2406431,
+       "n_aircraft_days": 27493,
+       "status": "ok",
+       "nic": {
+        "0": {
+         "k": 0,
+         "n": 2406431,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 1.5963278e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "1": {
+         "k": 0,
+         "n": 2406431,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 1.5963278e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "2": {
+         "k": 0,
+         "n": 2406431,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 1.5963278e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "3": {
+         "k": 0,
+         "n": 2406431,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 1.5963278e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "4": {
+         "k": 2485,
+         "n": 2406431,
+         "share": 0.0010326496,
+         "wilson_lo": 0.00099285819,
+         "wilson_hi": 0.001074034,
+         "boot_lo": 0.0009091235,
+         "boot_hi": 0.0011690412
+        },
+        "5": {
+         "k": 6783,
+         "n": 2406431,
+         "share": 0.0028186971,
+         "wilson_lo": 0.0027525018,
+         "wilson_hi": 0.0028864796,
+         "boot_lo": 0.0025321433,
+         "boot_hi": 0.0031208806
+        },
+        "6": {
+         "k": 15284,
+         "n": 2406431,
+         "share": 0.0063513145,
+         "wilson_lo": 0.0062517282,
+         "wilson_hi": 0.0064524768,
+         "boot_lo": 0.005867959,
+         "boot_hi": 0.0068239064
+        },
+        "7": {
+         "k": 28299,
+         "n": 2406431,
+         "share": 0.011759739,
+         "wilson_lo": 0.011624312,
+         "wilson_hi": 0.011896725,
+         "boot_lo": 0.011059883,
+         "boot_hi": 0.012510707
+        },
+        "8": {
+         "k": 2350188,
+         "n": 2406431,
+         "share": 0.97662804,
+         "wilson_lo": 0.9764364,
+         "wilson_hi": 0.97681817,
+         "boot_lo": 0.97543036,
+         "boot_hi": 0.97780732
+        },
+        "9": {
+         "k": 3037,
+         "n": 2406431,
+         "share": 0.0012620349,
+         "wilson_lo": 0.0012179678,
+         "wilson_hi": 0.0013076944,
+         "boot_lo": 0.00089286633,
+         "boot_hi": 0.0016869574
+        },
+        "10": {
+         "k": 333,
+         "n": 2406431,
+         "share": 0.0001383792,
+         "wilson_lo": 0.00012429411,
+         "wilson_hi": 0.00015406018,
+         "boot_lo": 2.7528989e-05,
+         "boot_hi": 0.00027517773
+        },
+        "11": {
+         "k": 22,
+         "n": 2406431,
+         "share": 9.1421695e-06,
+         "wilson_lo": 6.037652e-06,
+         "wilson_hi": 1.3842986e-05,
+         "boot_lo": 0.0,
+         "boot_hi": 2.7444855e-05
+        }
+       },
+       "nacp": {
+        "0": {
+         "k": 0,
+         "n": 2391982,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 1.6059706e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "1": {
+         "k": 0,
+         "n": 2391982,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 1.6059706e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "2": {
+         "k": 0,
+         "n": 2391982,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 1.6059706e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "3": {
+         "k": 0,
+         "n": 2391982,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 1.6059706e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "4": {
+         "k": 0,
+         "n": 2391982,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 1.6059706e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "5": {
+         "k": 4914,
+         "n": 2391982,
+         "share": 0.0020543633,
+         "wilson_lo": 0.0019977774,
+         "wilson_hi": 0.0021125486,
+         "boot_lo": 0.0017977775,
+         "boot_hi": 0.0023342155
+        },
+        "6": {
+         "k": 5156,
+         "n": 2391982,
+         "share": 0.0021555346,
+         "wilson_lo": 0.0020975557,
+         "wilson_hi": 0.0022151126,
+         "boot_lo": 0.0019225989,
+         "boot_hi": 0.0023956333
+        },
+        "7": {
+         "k": 6517,
+         "n": 2391982,
+         "share": 0.0027245188,
+         "wilson_lo": 0.0026592552,
+         "wilson_hi": 0.0027913796,
+         "boot_lo": 0.0023481123,
+         "boot_hi": 0.0031098497
+        },
+        "8": {
+         "k": 192386,
+         "n": 2391982,
+         "share": 0.080429535,
+         "wilson_lo": 0.080085565,
+         "wilson_hi": 0.080774852,
+         "boot_lo": 0.076548263,
+         "boot_hi": 0.083942053
+        },
+        "9": {
+         "k": 2064798,
+         "n": 2391982,
+         "share": 0.86321636,
+         "wilson_lo": 0.86278032,
+         "wilson_hi": 0.86365124,
+         "boot_lo": 0.85888714,
+         "boot_hi": 0.86771142
+        },
+        "10": {
+         "k": 117219,
+         "n": 2391982,
+         "share": 0.049004967,
+         "wilson_lo": 0.048732115,
+         "wilson_hi": 0.049279269,
+         "boot_lo": 0.046442416,
+         "boot_hi": 0.051545548
+        },
+        "11": {
+         "k": 992,
+         "n": 2391982,
+         "share": 0.00041471884,
+         "wilson_lo": 0.00038970656,
+         "wilson_hi": 0.00044133576,
+         "boot_lo": 0.00023159513,
+         "boot_hi": 0.00063404715
+        }
+       },
+       "n_nacp_missing": 14449
+      },
+      "update_interval_and_dropout": {
+       "n_intervals": 9515913,
+       "n_aircraft_days": 27444,
+       "status": "ok",
+       "update_interval_s": {
+        "q50": {
+         "value": 8.7806075,
+         "boot_lo": 8.7024237,
+         "boot_hi": 8.8583438
+        },
+        "q90": {
+         "value": 19.699578,
+         "boot_lo": 19.694711,
+         "boot_hi": 19.703895
+        },
+        "q95": {
+         "value": 19.875312,
+         "boot_lo": 19.873328,
+         "boot_hi": 19.87729
+        },
+        "q99": {
+         "value": 23.98171,
+         "boot_lo": 23.715183,
+         "boot_hi": 24.228234
+        }
+       },
+       "dropout": {
+        "share_gt_20s": {
+         "k": 124207,
+         "n": 9515913,
+         "share": 0.013052557,
+         "wilson_lo": 0.01298064,
+         "wilson_hi": 0.013124868,
+         "boot_lo": 0.012825881,
+         "boot_hi": 0.013263128
+        },
+        "share_gt_60s": {
+         "k": 25745,
+         "n": 9515913,
+         "share": 0.0027054682,
+         "wilson_lo": 0.0026726652,
+         "wilson_hi": 0.0027386727,
+         "boot_lo": 0.0026542034,
+         "boot_hi": 0.0027552618
+        }
+       }
+      }
+     },
+     "degraded_episode": {
+      "quality_categories": {
+       "n_quality_samples": 81349,
+       "n_aircraft_days": 3218,
+       "status": "ok",
+       "nic": {
+        "0": {
+         "k": 67967,
+         "n": 81349,
+         "share": 0.8354989,
+         "wilson_lo": 0.83293548,
+         "wilson_hi": 0.83803064,
+         "boot_lo": 0.81394406,
+         "boot_hi": 0.85678231
+        },
+        "1": {
+         "k": 629,
+         "n": 81349,
+         "share": 0.0077321172,
+         "wilson_lo": 0.0071530118,
+         "wilson_hi": 0.0083577121,
+         "boot_lo": 0.0038206666,
+         "boot_hi": 0.012694885
+        },
+        "2": {
+         "k": 1288,
+         "n": 81349,
+         "share": 0.015833016,
+         "wilson_lo": 0.014997789,
+         "wilson_hi": 0.016713967,
+         "boot_lo": 0.011512828,
+         "boot_hi": 0.020678609
+        },
+        "3": {
+         "k": 3112,
+         "n": 81349,
+         "share": 0.038254926,
+         "wilson_lo": 0.036958489,
+         "wilson_hi": 0.039594971,
+         "boot_lo": 0.026342573,
+         "boot_hi": 0.051299652
+        },
+        "4": {
+         "k": 7994,
+         "n": 81349,
+         "share": 0.098267957,
+         "wilson_lo": 0.096241306,
+         "wilson_hi": 0.10033255,
+         "boot_lo": 0.085097245,
+         "boot_hi": 0.11218054
+        },
+        "5": {
+         "k": 135,
+         "n": 81349,
+         "share": 0.0016595164,
+         "wilson_lo": 0.0014023602,
+         "wilson_hi": 0.0019637356,
+         "boot_lo": 0.0012445442,
+         "boot_hi": 0.002115671
+        },
+        "6": {
+         "k": 86,
+         "n": 81349,
+         "share": 0.0010571734,
+         "wilson_lo": 0.00085618551,
+         "wilson_hi": 0.0013052812,
+         "boot_lo": 0.00076762087,
+         "boot_hi": 0.0013636775
+        },
+        "7": {
+         "k": 72,
+         "n": 81349,
+         "share": 0.00088507542,
+         "wilson_lo": 0.00070294594,
+         "wilson_hi": 0.001114341,
+         "boot_lo": 0.00064705857,
+         "boot_hi": 0.0011263822
+        },
+        "8": {
+         "k": 66,
+         "n": 81349,
+         "share": 0.00081131913,
+         "wilson_lo": 0.00063782521,
+         "wilson_hi": 0.0010319562,
+         "boot_lo": 0.00059340672,
+         "boot_hi": 0.0010541904
+        },
+        "9": {
+         "k": 0,
+         "n": 81349,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 4.7219725e-05,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "10": {
+         "k": 0,
+         "n": 81349,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 4.7219725e-05,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "11": {
+         "k": 0,
+         "n": 81349,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 4.7219725e-05,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        }
+       },
+       "nacp": {
+        "0": {
+         "k": 56865,
+         "n": 81098,
+         "share": 0.70118869,
+         "wilson_lo": 0.69802886,
+         "wilson_hi": 0.70432945,
+         "boot_lo": 0.67426553,
+         "boot_hi": 0.72779774
+        },
+        "1": {
+         "k": 507,
+         "n": 81098,
+         "share": 0.0062516955,
+         "wilson_lo": 0.0057321157,
+         "wilson_hi": 0.0068180488,
+         "boot_lo": 0.0024484947,
+         "boot_hi": 0.010850516
+        },
+        "2": {
+         "k": 638,
+         "n": 81098,
+         "share": 0.0078670251,
+         "wilson_lo": 0.0072818616,
+         "wilson_hi": 0.0084988092,
+         "boot_lo": 0.004320385,
+         "boot_hi": 0.012240892
+        },
+        "3": {
+         "k": 2240,
+         "n": 81098,
+         "share": 0.027620903,
+         "wilson_lo": 0.026515159,
+         "wilson_hi": 0.028771397,
+         "boot_lo": 0.016547145,
+         "boot_hi": 0.039472283
+        },
+        "4": {
+         "k": 8686,
+         "n": 81098,
+         "share": 0.10710498,
+         "wilson_lo": 0.10499519,
+         "wilson_hi": 0.109252,
+         "boot_lo": 0.0930338,
+         "boot_hi": 0.12195104
+        },
+        "5": {
+         "k": 461,
+         "n": 81098,
+         "share": 0.0056844805,
+         "wilson_lo": 0.0051899483,
+         "wilson_hi": 0.0062258401,
+         "boot_lo": 0.0036357129,
+         "boot_hi": 0.0084082053
+        },
+        "6": {
+         "k": 1255,
+         "n": 81098,
+         "share": 0.015475104,
+         "wilson_lo": 0.014648245,
+         "wilson_hi": 0.016347863,
+         "boot_lo": 0.011921225,
+         "boot_hi": 0.019667102
+        },
+        "7": {
+         "k": 1650,
+         "n": 81098,
+         "share": 0.020345755,
+         "wilson_lo": 0.019396567,
+         "wilson_hi": 0.021340381,
+         "boot_lo": 0.01677987,
+         "boot_hi": 0.024687035
+        },
+        "8": {
+         "k": 4998,
+         "n": 81098,
+         "share": 0.06162914,
+         "wilson_lo": 0.059994716,
+         "wilson_hi": 0.063305091,
+         "boot_lo": 0.054439301,
+         "boot_hi": 0.069765048
+        },
+        "9": {
+         "k": 3697,
+         "n": 81098,
+         "share": 0.045586821,
+         "wilson_lo": 0.044172626,
+         "wilson_hi": 0.047044063,
+         "boot_lo": 0.035029796,
+         "boot_hi": 0.058901489
+        },
+        "10": {
+         "k": 100,
+         "n": 81098,
+         "share": 0.001233076,
+         "wilson_lo": 0.0010140242,
+         "wilson_hi": 0.0014993769,
+         "boot_lo": 2.4149495e-05,
+         "boot_hi": 0.003012385
+        },
+        "11": {
+         "k": 1,
+         "n": 81098,
+         "share": 1.233076e-05,
+         "wilson_lo": 2.1766853e-06,
+         "wilson_hi": 6.9849532e-05,
+         "boot_lo": 0.0,
+         "boot_hi": 3.8546893e-05
+        }
+       },
+       "n_nacp_missing": 251
+      },
+      "update_interval_and_dropout": {
+       "n_intervals": 307552,
+       "n_aircraft_days": 3218,
+       "status": "ok",
+       "update_interval_s": {
+        "q50": {
+         "value": 4.0722603,
+         "boot_lo": 3.9050859,
+         "boot_hi": 4.2856786
+        },
+        "q90": {
+         "value": 19.350105,
+         "boot_lo": 19.240616,
+         "boot_hi": 19.432802
+        },
+        "q95": {
+         "value": 19.789941,
+         "boot_lo": 19.769357,
+         "boot_hi": 19.807789
+        },
+        "q99": {
+         "value": 30.41199,
+         "boot_lo": 28.686107,
+         "boot_hi": 31.994117
+        }
+       },
+       "dropout": {
+        "share_gt_20s": {
+         "k": 5559,
+         "n": 307552,
+         "share": 0.018074992,
+         "wilson_lo": 0.017610143,
+         "wilson_hi": 0.01855188,
+         "boot_lo": 0.016728781,
+         "boot_hi": 0.019400193
+        },
+        "share_gt_60s": {
+         "k": 1000,
+         "n": 307552,
+         "share": 0.0032514827,
+         "wilson_lo": 0.0030563954,
+         "wilson_hi": 0.003458979,
+         "boot_lo": 0.0029838459,
+         "boot_hi": 0.0035667344
+        }
+       }
+      },
+      "episodes": {
+       "n_episodes": 5932,
+       "n_aircraft_days": 27699,
+       "exposure_aircraft_hours": 26776.488,
+       "rate_per_aircraft_hour": {
+        "value": 0.22153764,
+        "boot_lo": 0.21105144,
+        "boot_hi": 0.23104786,
+        "poisson_exact_lo": 0.21593548,
+        "poisson_exact_hi": 0.22724836
+       },
+       "duration_s": {
+        "status": "ok",
+        "quantiles": {
+         "q05": {
+          "value": 4.28,
+          "boot_lo": 3.9000001,
+          "boot_hi": 4.8320002
+         },
+         "q25": {
+          "value": 26.58,
+          "boot_lo": 24.81,
+          "boot_hi": 28.57
+         },
+         "q50": {
+          "value": 78.4,
+          "boot_lo": 75.90975,
+          "boot_hi": 82.49
+         },
+         "q75": {
+          "value": 244.61,
+          "boot_lo": 225.76525,
+          "boot_hi": 263.62125
+         },
+         "q95": {
+          "value": 2425.38,
+          "boot_lo": 2273.9837,
+          "boot_hi": 2578.16
+         }
+        }
+       },
+       "status": "ok"
+      }
+     },
+     "transitions": {
+      "n_aircraft_days": 27699,
+      "status": "ok",
+      "p_next_degraded_given_current_degraded": {
+       "k": 75836,
+       "n": 80729,
+       "share": 0.93938981,
+       "wilson_lo": 0.93772281,
+       "wilson_hi": 0.94101499,
+       "boot_lo": 0.93415295,
+       "boot_hi": 0.94385545
+      },
+      "p_next_degraded_given_current_nominal": {
+       "k": 5674,
+       "n": 2350624,
+       "share": 0.0024138271,
+       "wilson_lo": 0.0023519037,
+       "wilson_hi": 0.0024773769,
+       "boot_lo": 0.0022954533,
+       "boot_hi": 0.0025344383
+      }
+     }
+    },
+    "high": {
+     "n": {
+      "position_samples": 6158475,
+      "quality_samples": 1540178,
+      "isolated_degraded_samples": 3914,
+      "intervals_used": 6123889,
+      "intervals_over_horizon": 15465,
+      "samples_flag_no_position_20s": 211472,
+      "single_sample_runs": 3914,
+      "aircraft": 4526,
+      "aircraft_days": 25171
+     },
+     "baseline": {
+      "quality_categories": {
+       "n_quality_samples": 1487350,
+       "n_aircraft_days": 24365,
+       "status": "ok",
+       "nic": {
+        "0": {
+         "k": 0,
+         "n": 1487350,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 2.5827471e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "1": {
+         "k": 0,
+         "n": 1487350,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 2.5827471e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "2": {
+         "k": 0,
+         "n": 1487350,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 2.5827471e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "3": {
+         "k": 0,
+         "n": 1487350,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 2.5827471e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "4": {
+         "k": 1901,
+         "n": 1487350,
+         "share": 0.0012781121,
+         "wilson_lo": 0.0012219678,
+         "wilson_hi": 0.0013368325,
+         "boot_lo": 0.0011064591,
+         "boot_hi": 0.0014663096
+        },
+        "5": {
+         "k": 4711,
+         "n": 1487350,
+         "share": 0.0031673782,
+         "wilson_lo": 0.0030783493,
+         "wilson_hi": 0.0032589735,
+         "boot_lo": 0.0028483759,
+         "boot_hi": 0.0034956201
+        },
+        "6": {
+         "k": 12194,
+         "n": 1487350,
+         "share": 0.0081984738,
+         "wilson_lo": 0.0080548213,
+         "wilson_hi": 0.0083446667,
+         "boot_lo": 0.0076377811,
+         "boot_hi": 0.0088484671
+        },
+        "7": {
+         "k": 19488,
+         "n": 1487350,
+         "share": 0.013102498,
+         "wilson_lo": 0.012921002,
+         "wilson_hi": 0.013286508,
+         "boot_lo": 0.012217087,
+         "boot_hi": 0.014002742
+        },
+        "8": {
+         "k": 1447246,
+         "n": 1487350,
+         "share": 0.97303661,
+         "wilson_lo": 0.97277507,
+         "wilson_hi": 0.9732957,
+         "boot_lo": 0.97163886,
+         "boot_hi": 0.97438795
+        },
+        "9": {
+         "k": 1656,
+         "n": 1487350,
+         "share": 0.0011133896,
+         "wilson_lo": 0.0010610678,
+         "wilson_hi": 0.0011682884,
+         "boot_lo": 0.00072346119,
+         "boot_hi": 0.0015629976
+        },
+        "10": {
+         "k": 152,
+         "n": 1487350,
+         "share": 0.00010219518,
+         "wilson_lo": 8.7189532e-05,
+         "wilson_hi": 0.00011978305,
+         "boot_lo": 1.3421237e-06,
+         "boot_hi": 0.00026777119
+        },
+        "11": {
+         "k": 2,
+         "n": 1487350,
+         "share": 1.3446734e-06,
+         "wilson_lo": 3.6875803e-07,
+         "wilson_hi": 4.903329e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 4.0676811e-06
+        }
+       },
+       "nacp": {
+        "0": {
+         "k": 0,
+         "n": 1474942,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 2.6044745e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "1": {
+         "k": 0,
+         "n": 1474942,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 2.6044745e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "2": {
+         "k": 0,
+         "n": 1474942,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 2.6044745e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "3": {
+         "k": 0,
+         "n": 1474942,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 2.6044745e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "4": {
+         "k": 0,
+         "n": 1474942,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 2.6044745e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "5": {
+         "k": 3230,
+         "n": 1474942,
+         "share": 0.0021899166,
+         "wilson_lo": 0.0021157627,
+         "wilson_hi": 0.0022666636,
+         "boot_lo": 0.0018914023,
+         "boot_hi": 0.002490762
+        },
+        "6": {
+         "k": 4449,
+         "n": 1474942,
+         "share": 0.0030163898,
+         "wilson_lo": 0.0029291738,
+         "wilson_hi": 0.0031061946,
+         "boot_lo": 0.0027053224,
+         "boot_hi": 0.0033621911
+        },
+        "7": {
+         "k": 4983,
+         "n": 1474942,
+         "share": 0.0033784379,
+         "wilson_lo": 0.0032860777,
+         "wilson_hi": 0.003473385,
+         "boot_lo": 0.0028747553,
+         "boot_hi": 0.0038999038
+        },
+        "8": {
+         "k": 118302,
+         "n": 1474942,
+         "share": 0.0802079,
+         "wilson_lo": 0.079770649,
+         "wilson_hi": 0.080647337,
+         "boot_lo": 0.075747796,
+         "boot_hi": 0.084617688
+        },
+        "9": {
+         "k": 1281397,
+         "n": 1474942,
+         "share": 0.86877789,
+         "wilson_lo": 0.86823203,
+         "wilson_hi": 0.86932183,
+         "boot_lo": 0.86383357,
+         "boot_hi": 0.87368905
+        },
+        "10": {
+         "k": 62201,
+         "n": 1474942,
+         "share": 0.042171828,
+         "wilson_lo": 0.041848667,
+         "wilson_hi": 0.042497373,
+         "boot_lo": 0.040155344,
+         "boot_hi": 0.044547693
+        },
+        "11": {
+         "k": 380,
+         "n": 1474942,
+         "share": 0.00025763725,
+         "wilson_lo": 0.00023300562,
+         "wilson_hi": 0.00028487202,
+         "boot_lo": 0.0001227449,
+         "boot_hi": 0.0004219465
+        }
+       },
+       "n_nacp_missing": 12408
+      },
+      "update_interval_and_dropout": {
+       "n_intervals": 5865291,
+       "n_aircraft_days": 24349,
+       "status": "ok",
+       "update_interval_s": {
+        "q50": {
+         "value": 12.450419,
+         "boot_lo": 12.24275,
+         "boot_hi": 12.657484
+        },
+        "q90": {
+         "value": 19.814546,
+         "boot_lo": 19.811852,
+         "boot_hi": 19.817153
+        },
+        "q95": {
+         "value": 19.931151,
+         "boot_lo": 19.929864,
+         "boot_hi": 19.932413
+        },
+        "q99": {
+         "value": 29.565833,
+         "boot_lo": 29.150261,
+         "boot_hi": 29.941953
+        }
+       },
+       "dropout": {
+        "share_gt_20s": {
+         "k": 104859,
+         "n": 5865291,
+         "share": 0.017877885,
+         "wilson_lo": 0.017770964,
+         "wilson_hi": 0.017985438,
+         "boot_lo": 0.017551386,
+         "boot_hi": 0.018206674
+        },
+        "share_gt_60s": {
+         "k": 20705,
+         "n": 5865291,
+         "share": 0.0035300891,
+         "wilson_lo": 0.0034824146,
+         "wilson_hi": 0.0035784139,
+         "boot_lo": 0.0034556347,
+         "boot_hi": 0.0036081226
+        }
+       }
+      }
+     },
+     "degraded_episode": {
+      "quality_categories": {
+       "n_quality_samples": 48914,
+       "n_aircraft_days": 2703,
+       "status": "ok",
+       "nic": {
+        "0": {
+         "k": 44583,
+         "n": 48914,
+         "share": 0.91145684,
+         "wilson_lo": 0.90890688,
+         "wilson_hi": 0.91394218,
+         "boot_lo": 0.89746492,
+         "boot_hi": 0.92394441
+        },
+        "1": {
+         "k": 217,
+         "n": 48914,
+         "share": 0.0044363577,
+         "wilson_lo": 0.0038850613,
+         "wilson_hi": 0.0050654861,
+         "boot_lo": 0.0029649822,
+         "boot_hi": 0.0060321356
+        },
+        "2": {
+         "k": 772,
+         "n": 48914,
+         "share": 0.015782802,
+         "wilson_lo": 0.014715708,
+         "wilson_hi": 0.016925947,
+         "boot_lo": 0.012408277,
+         "boot_hi": 0.02030481
+        },
+        "3": {
+         "k": 839,
+         "n": 48914,
+         "share": 0.017152553,
+         "wilson_lo": 0.016039253,
+         "wilson_hi": 0.018341689,
+         "boot_lo": 0.012512975,
+         "boot_hi": 0.022933826
+        },
+        "4": {
+         "k": 2245,
+         "n": 48914,
+         "share": 0.04589688,
+         "wilson_lo": 0.044077796,
+         "wilson_hi": 0.047787284,
+         "boot_lo": 0.037272169,
+         "boot_hi": 0.055344958
+        },
+        "5": {
+         "k": 80,
+         "n": 48914,
+         "share": 0.0016355236,
+         "wilson_lo": 0.0013144412,
+         "wilson_hi": 0.0020348779,
+         "boot_lo": 0.0011725213,
+         "boot_hi": 0.002122421
+        },
+        "6": {
+         "k": 71,
+         "n": 48914,
+         "share": 0.0014515272,
+         "wilson_lo": 0.0011510396,
+         "wilson_hi": 0.0018303156,
+         "boot_lo": 0.0010016515,
+         "boot_hi": 0.0019758297
+        },
+        "7": {
+         "k": 57,
+         "n": 48914,
+         "share": 0.0011653105,
+         "wilson_lo": 0.00089962559,
+         "wilson_hi": 0.0015093413,
+         "boot_lo": 0.00080179907,
+         "boot_hi": 0.0016007767
+        },
+        "8": {
+         "k": 50,
+         "n": 48914,
+         "share": 0.0010222022,
+         "wilson_lo": 0.00077550938,
+         "wilson_hi": 0.0013472633,
+         "boot_lo": 0.00072172803,
+         "boot_hi": 0.0013601283
+        },
+        "9": {
+         "k": 0,
+         "n": 48914,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 7.8528788e-05,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "10": {
+         "k": 0,
+         "n": 48914,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 7.8528788e-05,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "11": {
+         "k": 0,
+         "n": 48914,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 7.8528788e-05,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        }
+       },
+       "nacp": {
+        "0": {
+         "k": 36464,
+         "n": 48732,
+         "share": 0.74825577,
+         "wilson_lo": 0.74438289,
+         "wilson_hi": 0.75208951,
+         "boot_lo": 0.72616725,
+         "boot_hi": 0.76886871
+        },
+        "1": {
+         "k": 138,
+         "n": 48732,
+         "share": 0.0028318148,
+         "wilson_lo": 0.0023975969,
+         "wilson_hi": 0.0033444084,
+         "boot_lo": 0.0017052435,
+         "boot_hi": 0.0042586412
+        },
+        "2": {
+         "k": 296,
+         "n": 48732,
+         "share": 0.0060740376,
+         "wilson_lo": 0.005422046,
+         "wilson_hi": 0.0068038937,
+         "boot_lo": 0.0029463889,
+         "boot_hi": 0.010243691
+        },
+        "3": {
+         "k": 329,
+         "n": 48732,
+         "share": 0.0067512107,
+         "wilson_lo": 0.0060620352,
+         "wilson_hi": 0.007518144,
+         "boot_lo": 0.0038094756,
+         "boot_hi": 0.010437153
+        },
+        "4": {
+         "k": 2579,
+         "n": 48732,
+         "share": 0.052922105,
+         "wilson_lo": 0.050969403,
+         "wilson_hi": 0.054945285,
+         "boot_lo": 0.043293557,
+         "boot_hi": 0.063431709
+        },
+        "5": {
+         "k": 394,
+         "n": 48732,
+         "share": 0.0080850365,
+         "wilson_lo": 0.0073278014,
+         "wilson_hi": 0.0089198191,
+         "boot_lo": 0.0047440857,
+         "boot_hi": 0.0119033
+        },
+        "6": {
+         "k": 1070,
+         "n": 48732,
+         "share": 0.021956825,
+         "wilson_lo": 0.020692929,
+         "wilson_hi": 0.023296082,
+         "boot_lo": 0.01679583,
+         "boot_hi": 0.028544669
+        },
+        "7": {
+         "k": 1344,
+         "n": 48732,
+         "share": 0.027579414,
+         "wilson_lo": 0.026162245,
+         "wilson_hi": 0.029071058,
+         "boot_lo": 0.022356259,
+         "boot_hi": 0.033951248
+        },
+        "8": {
+         "k": 3895,
+         "n": 48732,
+         "share": 0.079926947,
+         "wilson_lo": 0.077552246,
+         "wilson_hi": 0.082367871,
+         "boot_lo": 0.070778149,
+         "boot_hi": 0.089671508
+        },
+        "9": {
+         "k": 2170,
+         "n": 48732,
+         "share": 0.044529262,
+         "wilson_lo": 0.042733529,
+         "wilson_hi": 0.046396797,
+         "boot_lo": 0.034047527,
+         "boot_hi": 0.057530764
+        },
+        "10": {
+         "k": 52,
+         "n": 48732,
+         "share": 0.0010670607,
+         "wilson_lo": 0.00081387302,
+         "wilson_hi": 0.0013989021,
+         "boot_lo": 1.96302e-05,
+         "boot_hi": 0.0026636583
+        },
+        "11": {
+         "k": 1,
+         "n": 48732,
+         "share": 2.0520397e-05,
+         "wilson_lo": 3.6223632e-06,
+         "wilson_hi": 0.00011623724,
+         "boot_lo": 0.0,
+         "boot_hi": 6.4153151e-05
+        }
+       },
+       "n_nacp_missing": 182
+      },
+      "update_interval_and_dropout": {
+       "n_intervals": 181667,
+       "n_aircraft_days": 2702,
+       "status": "ok",
+       "update_interval_s": {
+        "q50": {
+         "value": 4.3434694,
+         "boot_lo": 3.9445012,
+         "boot_hi": 4.773503
+        },
+        "q90": {
+         "value": 19.659791,
+         "boot_lo": 19.624567,
+         "boot_hi": 19.690041
+        },
+        "q95": {
+         "value": 19.882547,
+         "boot_lo": 19.870107,
+         "boot_hi": 19.893168
+        },
+        "q99": {
+         "value": 35.232492,
+         "boot_lo": 33.59061,
+         "boot_hi": 36.937486
+        }
+       },
+       "dropout": {
+        "share_gt_20s": {
+         "k": 4119,
+         "n": 181667,
+         "share": 0.022673353,
+         "wilson_lo": 0.021998856,
+         "wilson_hi": 0.023368036,
+         "boot_lo": 0.02120071,
+         "boot_hi": 0.024285981
+        },
+        "share_gt_60s": {
+         "k": 729,
+         "n": 181667,
+         "share": 0.0040128367,
+         "wilson_lo": 0.0037324265,
+         "wilson_hi": 0.0043142223,
+         "boot_lo": 0.0036778163,
+         "boot_hi": 0.0044202428
+        }
+       }
+      },
+      "episodes": {
+       "n_episodes": 4687,
+       "n_aircraft_days": 24456,
+       "exposure_aircraft_hours": 19311.237,
+       "rate_per_aircraft_hour": {
+        "value": 0.24270843,
+        "boot_lo": 0.2311801,
+        "boot_hi": 0.2546559,
+        "poisson_exact_lo": 0.2358092,
+        "poisson_exact_hi": 0.24975829
+       },
+       "duration_s": {
+        "status": "ok",
+        "quantiles": {
+         "q05": {
+          "value": 4.29,
+          "boot_lo": 3.8799999,
+          "boot_hi": 4.9905
+         },
+         "q25": {
+          "value": 27.2,
+          "boot_lo": 24.83,
+          "boot_hi": 29.733
+         },
+         "q50": {
+          "value": 78.63,
+          "boot_lo": 76.60725,
+          "boot_hi": 84.21
+         },
+         "q75": {
+          "value": 236.95,
+          "boot_lo": 221.5095,
+          "boot_hi": 259.48
+         },
+         "q95": {
+          "value": 2625.72,
+          "boot_lo": 2482.04,
+          "boot_hi": 2786.65
+         }
+        }
+       },
+       "status": "ok"
+      }
+     },
+     "transitions": {
+      "n_aircraft_days": 24456,
+      "status": "ok",
+      "p_next_degraded_given_current_degraded": {
+       "k": 44607,
+       "n": 48265,
+       "share": 0.92421009,
+       "wilson_lo": 0.92181504,
+       "wilson_hi": 0.92653762,
+       "boot_lo": 0.91789643,
+       "boot_hi": 0.92950067
+      },
+      "p_next_degraded_given_current_nominal": {
+       "k": 4316,
+       "n": 1443597,
+       "share": 0.0029897541,
+       "wilson_lo": 0.0029020049,
+       "wilson_hi": 0.0030801484,
+       "boot_lo": 0.0028303774,
+       "boot_hi": 0.0031636514
+      }
+     }
+    },
+    "mid": {
+     "n": {
+      "position_samples": 3810355,
+      "quality_samples": 952666,
+      "isolated_degraded_samples": 1150,
+      "intervals_used": 3800301,
+      "intervals_over_horizon": 6441,
+      "samples_flag_no_position_20s": 43526,
+      "single_sample_runs": 1150,
+      "aircraft": 4132,
+      "aircraft_days": 21288
+     },
+     "baseline": {
+      "quality_categories": {
+       "n_quality_samples": 919081,
+       "n_aircraft_days": 20372,
+       "status": "ok",
+       "nic": {
+        "0": {
+         "k": 0,
+         "n": 919081,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 4.1796564e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "1": {
+         "k": 0,
+         "n": 919081,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 4.1796564e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "2": {
+         "k": 0,
+         "n": 919081,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 4.1796564e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "3": {
+         "k": 0,
+         "n": 919081,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 4.1796564e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "4": {
+         "k": 584,
+         "n": 919081,
+         "share": 0.00063541734,
+         "wilson_lo": 0.00058594391,
+         "wilson_hi": 0.0006890651,
+         "boot_lo": 0.00048104889,
+         "boot_hi": 0.00080776641
+        },
+        "5": {
+         "k": 2072,
+         "n": 919081,
+         "share": 0.0022544259,
+         "wilson_lo": 0.0021595227,
+         "wilson_hi": 0.0023534899,
+         "boot_lo": 0.0018692349,
+         "boot_hi": 0.002666915
+        },
+        "6": {
+         "k": 3090,
+         "n": 919081,
+         "share": 0.0033620541,
+         "wilson_lo": 0.003245769,
+         "wilson_hi": 0.0034824907,
+         "boot_lo": 0.0028751291,
+         "boot_hi": 0.0039050008
+        },
+        "7": {
+         "k": 8811,
+         "n": 919081,
+         "share": 0.0095867502,
+         "wilson_lo": 0.009389578,
+         "wilson_hi": 0.009788022,
+         "boot_lo": 0.0087296794,
+         "boot_hi": 0.010537336
+        },
+        "8": {
+         "k": 902942,
+         "n": 919081,
+         "share": 0.98244007,
+         "wilson_lo": 0.98216952,
+         "wilson_hi": 0.98270658,
+         "boot_lo": 0.98086987,
+         "boot_hi": 0.98376687
+        },
+        "9": {
+         "k": 1381,
+         "n": 919081,
+         "share": 0.0015025879,
+         "wilson_lo": 0.0014254553,
+         "wilson_hi": 0.0015838877,
+         "boot_lo": 0.00088076761,
+         "boot_hi": 0.0023570868
+        },
+        "10": {
+         "k": 181,
+         "n": 919081,
+         "share": 0.00019693585,
+         "wilson_lo": 0.00017026158,
+         "wilson_hi": 0.00022778813,
+         "boot_lo": 3.6882671e-05,
+         "boot_hi": 0.00041302667
+        },
+        "11": {
+         "k": 20,
+         "n": 919081,
+         "share": 2.1760868e-05,
+         "wilson_lo": 1.4087513e-05,
+         "wilson_hi": 3.3613697e-05,
+         "boot_lo": 0.0,
+         "boot_hi": 6.5108412e-05
+        }
+       },
+       "nacp": {
+        "0": {
+         "k": 0,
+         "n": 917040,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 4.1889587e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "1": {
+         "k": 0,
+         "n": 917040,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 4.1889587e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "2": {
+         "k": 0,
+         "n": 917040,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 4.1889587e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "3": {
+         "k": 0,
+         "n": 917040,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 4.1889587e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "4": {
+         "k": 0,
+         "n": 917040,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 4.1889587e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "5": {
+         "k": 1684,
+         "n": 917040,
+         "share": 0.001836343,
+         "wilson_lo": 0.0017507794,
+         "wilson_hi": 0.0019260802,
+         "boot_lo": 0.001503019,
+         "boot_hi": 0.0021898852
+        },
+        "6": {
+         "k": 707,
+         "n": 917040,
+         "share": 0.00077095874,
+         "wilson_lo": 0.0007162046,
+         "wilson_hi": 0.00082989537,
+         "boot_lo": 0.00058158232,
+         "boot_hi": 0.0010050925
+        },
+        "7": {
+         "k": 1534,
+         "n": 917040,
+         "share": 0.0016727733,
+         "wilson_lo": 0.0015911958,
+         "wilson_hi": 0.0017585256,
+         "boot_lo": 0.0013107073,
+         "boot_hi": 0.0020732107
+        },
+        "8": {
+         "k": 74084,
+         "n": 917040,
+         "share": 0.080786007,
+         "wilson_lo": 0.080230023,
+         "wilson_hi": 0.081345503,
+         "boot_lo": 0.075086877,
+         "boot_hi": 0.086467868
+        },
+        "9": {
+         "k": 783401,
+         "n": 917040,
+         "share": 0.85427135,
+         "wilson_lo": 0.85354772,
+         "wilson_hi": 0.85499201,
+         "boot_lo": 0.84778808,
+         "boot_hi": 0.8609042
+        },
+        "10": {
+         "k": 55018,
+         "n": 917040,
+         "share": 0.059995202,
+         "wilson_lo": 0.059510997,
+         "wilson_hi": 0.060483093,
+         "boot_lo": 0.056140734,
+         "boot_hi": 0.064116015
+        },
+        "11": {
+         "k": 612,
+         "n": 917040,
+         "share": 0.00066736456,
+         "wilson_lo": 0.00061655944,
+         "wilson_hi": 0.00072235305,
+         "boot_lo": 0.00038420962,
+         "boot_hi": 0.0010284394
+        }
+       },
+       "n_nacp_missing": 2041
+      },
+      "update_interval_and_dropout": {
+       "n_intervals": 3650622,
+       "n_aircraft_days": 20352,
+       "status": "ok",
+       "update_interval_s": {
+        "q50": {
+         "value": 5.4807036,
+         "boot_lo": 5.4096101,
+         "boot_hi": 5.5439077
+        },
+        "q90": {
+         "value": 14.654695,
+         "boot_lo": 14.602378,
+         "boot_hi": 14.706345
+        },
+        "q95": {
+         "value": 17.535326,
+         "boot_lo": 17.377677,
+         "boot_hi": 17.696296
+        },
+        "q99": {
+         "value": 19.906081,
+         "boot_lo": 19.900536,
+         "boot_hi": 19.911203
+        }
+       },
+       "dropout": {
+        "share_gt_20s": {
+         "k": 19348,
+         "n": 3650622,
+         "share": 0.0052999188,
+         "wilson_lo": 0.0052259566,
+         "wilson_hi": 0.0053749221,
+         "boot_lo": 0.0051031443,
+         "boot_hi": 0.0054883997
+        },
+        "share_gt_60s": {
+         "k": 5040,
+         "n": 3650622,
+         "share": 0.0013805867,
+         "wilson_lo": 0.001343019,
+         "wilson_hi": 0.0014192037,
+         "boot_lo": 0.0013223904,
+         "boot_hi": 0.0014395753
+        }
+       }
+      }
+     },
+     "degraded_episode": {
+      "quality_categories": {
+       "n_quality_samples": 32435,
+       "n_aircraft_days": 1436,
+       "status": "ok",
+       "nic": {
+        "0": {
+         "k": 23384,
+         "n": 32435,
+         "share": 0.72094959,
+         "wilson_lo": 0.71604235,
+         "wilson_hi": 0.7258045,
+         "boot_lo": 0.67084463,
+         "boot_hi": 0.76713288
+        },
+        "1": {
+         "k": 412,
+         "n": 32435,
+         "share": 0.012702328,
+         "wilson_lo": 0.011540013,
+         "wilson_hi": 0.013980056,
+         "boot_lo": 0.004598935,
+         "boot_hi": 0.022796801
+        },
+        "2": {
+         "k": 516,
+         "n": 32435,
+         "share": 0.015908741,
+         "wilson_lo": 0.014603257,
+         "wilson_hi": 0.017328878,
+         "boot_lo": 0.0095896052,
+         "boot_hi": 0.024189094
+        },
+        "3": {
+         "k": 2273,
+         "n": 32435,
+         "share": 0.070078619,
+         "wilson_lo": 0.06735107,
+         "wilson_hi": 0.072907991,
+         "boot_lo": 0.045040833,
+         "boot_hi": 0.10330333
+        },
+        "4": {
+         "k": 5749,
+         "n": 32435,
+         "share": 0.1772468,
+         "wilson_lo": 0.17312919,
+         "wilson_hi": 0.18144085,
+         "boot_lo": 0.1471476,
+         "boot_hi": 0.20895299
+        },
+        "5": {
+         "k": 55,
+         "n": 32435,
+         "share": 0.0016956991,
+         "wilson_lo": 0.0013031019,
+         "wilson_hi": 0.0022063162,
+         "boot_lo": 0.0010330749,
+         "boot_hi": 0.0024761855
+        },
+        "6": {
+         "k": 15,
+         "n": 32435,
+         "share": 0.00046246339,
+         "wilson_lo": 0.00028029027,
+         "wilson_hi": 0.00076294855,
+         "boot_lo": 0.00021527688,
+         "boot_hi": 0.00075036572
+        },
+        "7": {
+         "k": 15,
+         "n": 32435,
+         "share": 0.00046246339,
+         "wilson_lo": 0.00028029027,
+         "wilson_hi": 0.00076294855,
+         "boot_lo": 0.0002466512,
+         "boot_hi": 0.00072709061
+        },
+        "8": {
+         "k": 16,
+         "n": 32435,
+         "share": 0.00049329428,
+         "wilson_lo": 0.00030367593,
+         "wilson_hi": 0.00080121738,
+         "boot_lo": 0.00022316836,
+         "boot_hi": 0.00085026309
+        },
+        "9": {
+         "k": 0,
+         "n": 32435,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 0.00011842158,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "10": {
+         "k": 0,
+         "n": 32435,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 0.00011842158,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "11": {
+         "k": 0,
+         "n": 32435,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 0.00011842158,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        }
+       },
+       "nacp": {
+        "0": {
+         "k": 20401,
+         "n": 32366,
+         "share": 0.63032194,
+         "wilson_lo": 0.62504785,
+         "wilson_hi": 0.63556511,
+         "boot_lo": 0.57676482,
+         "boot_hi": 0.68299546
+        },
+        "1": {
+         "k": 369,
+         "n": 32366,
+         "share": 0.011400853,
+         "wilson_lo": 0.010300855,
+         "wilson_hi": 0.012616819,
+         "boot_lo": 0.0032917288,
+         "boot_hi": 0.02110566
+        },
+        "2": {
+         "k": 342,
+         "n": 32366,
+         "share": 0.010566644,
+         "wilson_lo": 0.0095093306,
+         "wilson_hi": 0.011740123,
+         "boot_lo": 0.0051388344,
+         "boot_hi": 0.017127974
+        },
+        "3": {
+         "k": 1911,
+         "n": 32366,
+         "share": 0.059043441,
+         "wilson_lo": 0.056527513,
+         "wilson_hi": 0.061664028,
+         "boot_lo": 0.034803108,
+         "boot_hi": 0.093099321
+        },
+        "4": {
+         "k": 6107,
+         "n": 32366,
+         "share": 0.18868566,
+         "wilson_lo": 0.18446016,
+         "wilson_hi": 0.19298504,
+         "boot_lo": 0.15728455,
+         "boot_hi": 0.22117949
+        },
+        "5": {
+         "k": 67,
+         "n": 32366,
+         "share": 0.0020700735,
+         "wilson_lo": 0.0016305195,
+         "wilson_hi": 0.0026278102,
+         "boot_lo": 0.00072774261,
+         "boot_hi": 0.0037437275
+        },
+        "6": {
+         "k": 185,
+         "n": 32366,
+         "share": 0.0057158747,
+         "wilson_lo": 0.004951193,
+         "wilson_hi": 0.0065978737,
+         "boot_lo": 0.0033121501,
+         "boot_hi": 0.008465206
+        },
+        "7": {
+         "k": 306,
+         "n": 32366,
+         "share": 0.0094543657,
+         "wilson_lo": 0.0084567546,
+         "wilson_hi": 0.010568407,
+         "boot_lo": 0.006174631,
+         "boot_hi": 0.013970777
+        },
+        "8": {
+         "k": 1103,
+         "n": 32366,
+         "share": 0.034078972,
+         "wilson_lo": 0.032157014,
+         "wilson_hi": 0.036111515,
+         "boot_lo": 0.026211061,
+         "boot_hi": 0.04318677
+        },
+        "9": {
+         "k": 1527,
+         "n": 32366,
+         "share": 0.047179139,
+         "wilson_lo": 0.044922536,
+         "wilson_hi": 0.049543217,
+         "boot_lo": 0.032699724,
+         "boot_hi": 0.063952624
+        },
+        "10": {
+         "k": 48,
+         "n": 32366,
+         "share": 0.0014830378,
+         "wilson_lo": 0.0011188348,
+         "wilson_hi": 0.0019655627,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0046259319
+        },
+        "11": {
+         "k": 0,
+         "n": 32366,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 0.00011867401,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        }
+       },
+       "n_nacp_missing": 69
+      },
+      "update_interval_and_dropout": {
+       "n_intervals": 125885,
+       "n_aircraft_days": 1437,
+       "status": "ok",
+       "update_interval_s": {
+        "q50": {
+         "value": 3.9465764,
+         "boot_lo": 3.8297555,
+         "boot_hi": 4.056955
+        },
+        "q90": {
+         "value": 13.528356,
+         "boot_lo": 13.203479,
+         "boot_hi": 13.905714
+        },
+        "q95": {
+         "value": 17.289286,
+         "boot_lo": 16.719018,
+         "boot_hi": 17.978231
+        },
+        "q99": {
+         "value": 22.328636,
+         "boot_lo": 20.157683,
+         "boot_hi": 24.656662
+        }
+       },
+       "dropout": {
+        "share_gt_20s": {
+         "k": 1440,
+         "n": 125885,
+         "share": 0.011439012,
+         "wilson_lo": 0.010866309,
+         "wilson_hi": 0.012041532,
+         "boot_lo": 0.01007014,
+         "boot_hi": 0.013085877
+        },
+        "share_gt_60s": {
+         "k": 271,
+         "n": 125885,
+         "share": 0.0021527585,
+         "wilson_lo": 0.0019114738,
+         "wilson_hi": 0.0024244265,
+         "boot_lo": 0.0018305249,
+         "boot_hi": 0.0025361946
+        }
+       }
+      },
+      "episodes": {
+       "n_episodes": 1245,
+       "n_aircraft_days": 20541,
+       "exposure_aircraft_hours": 7465.2517,
+       "rate_per_aircraft_hour": {
+        "value": 0.16677268,
+        "boot_lo": 0.15348808,
+        "boot_hi": 0.17927756,
+        "poisson_exact_lo": 0.15763641,
+        "poisson_exact_hi": 0.17630035
+       },
+       "duration_s": {
+        "status": "ok",
+        "quantiles": {
+         "q05": {
+          "value": 4.26,
+          "boot_lo": 3.6500001,
+          "boot_hi": 5.95
+         },
+         "q25": {
+          "value": 25.27,
+          "boot_lo": 21.9,
+          "boot_hi": 28.5305
+         },
+         "q50": {
+          "value": 75.13,
+          "boot_lo": 65.21,
+          "boot_hi": 87.84825
+         },
+         "q75": {
+          "value": 270.23,
+          "boot_lo": 226.45975,
+          "boot_hi": 335.92
+         },
+         "q95": {
+          "value": 1194.87,
+          "boot_lo": 1046.26,
+          "boot_hi": 1346.492
+         }
+        }
+       },
+       "status": "ok"
+      }
+     },
+     "transitions": {
+      "n_aircraft_days": 20541,
+      "status": "ok",
+      "p_next_degraded_given_current_degraded": {
+       "k": 31229,
+       "n": 32464,
+       "share": 0.96195786,
+       "wilson_lo": 0.95982168,
+       "wilson_hi": 0.96398473,
+       "boot_lo": 0.95623138,
+       "boot_hi": 0.96770163
+      },
+      "p_next_degraded_given_current_nominal": {
+       "k": 1358,
+       "n": 907027,
+       "share": 0.0014971991,
+       "wilson_lo": 0.001419712,
+       "wilson_hi": 0.0015789087,
+       "boot_lo": 0.0013558239,
+       "boot_hi": 0.0016450202
+      }
+     }
+    },
+    "low": {
+     "n": {
+      "position_samples": 8055766,
+      "quality_samples": 2014484,
+      "isolated_degraded_samples": 1659,
+      "intervals_used": 8026881,
+      "intervals_over_horizon": 21563,
+      "samples_flag_no_position_20s": 79259,
+      "single_sample_runs": 1659,
+      "aircraft": 4286,
+      "aircraft_days": 21412
+     },
+     "baseline": {
+      "quality_categories": {
+       "n_quality_samples": 1945479,
+       "n_aircraft_days": 20535,
+       "status": "ok",
+       "nic": {
+        "0": {
+         "k": 0,
+         "n": 1945479,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 1.9745529e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "1": {
+         "k": 0,
+         "n": 1945479,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 1.9745529e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "2": {
+         "k": 0,
+         "n": 1945479,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 1.9745529e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "3": {
+         "k": 0,
+         "n": 1945479,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 1.9745529e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "4": {
+         "k": 571,
+         "n": 1945479,
+         "share": 0.00029350098,
+         "wilson_lo": 0.0002703975,
+         "wilson_hi": 0.00031857786,
+         "boot_lo": 0.00023436697,
+         "boot_hi": 0.00035844059
+        },
+        "5": {
+         "k": 1290,
+         "n": 1945479,
+         "share": 0.00066307578,
+         "wilson_lo": 0.00062787636,
+         "wilson_hi": 0.00070024713,
+         "boot_lo": 0.0005255052,
+         "boot_hi": 0.00080914841
+        },
+        "6": {
+         "k": 6311,
+         "n": 1945479,
+         "share": 0.0032439312,
+         "wilson_lo": 0.0031650027,
+         "wilson_hi": 0.0033248214,
+         "boot_lo": 0.0026876486,
+         "boot_hi": 0.0039222692
+        },
+        "7": {
+         "k": 20014,
+         "n": 1945479,
+         "share": 0.010287441,
+         "wilson_lo": 0.010146615,
+         "wilson_hi": 0.0104302,
+         "boot_lo": 0.0094331404,
+         "boot_hi": 0.01125522
+        },
+        "8": {
+         "k": 1890900,
+         "n": 1945479,
+         "share": 0.97194573,
+         "wilson_lo": 0.97171276,
+         "wilson_hi": 0.97217683,
+         "boot_lo": 0.96946613,
+         "boot_hi": 0.97402036
+        },
+        "9": {
+         "k": 24873,
+         "n": 1945479,
+         "share": 0.012785026,
+         "wilson_lo": 0.012628118,
+         "wilson_hi": 0.012943858,
+         "boot_lo": 0.010828885,
+         "boot_hi": 0.01476506
+        },
+        "10": {
+         "k": 1520,
+         "n": 1945479,
+         "share": 0.00078129859,
+         "wilson_lo": 0.00074300988,
+         "wilson_hi": 0.00082155877,
+         "boot_lo": 0.00022058164,
+         "boot_hi": 0.0015651264
+        },
+        "11": {
+         "k": 0,
+         "n": 1945479,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 1.9745529e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        }
+       },
+       "nacp": {
+        "0": {
+         "k": 0,
+         "n": 1939901,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 1.9802305e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "1": {
+         "k": 0,
+         "n": 1939901,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 1.9802305e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "2": {
+         "k": 0,
+         "n": 1939901,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 1.9802305e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "3": {
+         "k": 0,
+         "n": 1939901,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 1.9802305e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "4": {
+         "k": 0,
+         "n": 1939901,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 1.9802305e-06,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "5": {
+         "k": 879,
+         "n": 1939901,
+         "share": 0.00045311591,
+         "wilson_lo": 0.00042414105,
+         "wilson_hi": 0.0004840692,
+         "boot_lo": 0.00031600226,
+         "boot_hi": 0.00060472198
+        },
+        "6": {
+         "k": 1062,
+         "n": 1939901,
+         "share": 0.00054745062,
+         "wilson_lo": 0.00051550846,
+         "wilson_hi": 0.00058137084,
+         "boot_lo": 0.00038573059,
+         "boot_hi": 0.00073401406
+        },
+        "7": {
+         "k": 3428,
+         "n": 1939901,
+         "share": 0.0017671005,
+         "wilson_lo": 0.0017089766,
+         "wilson_hi": 0.0018271976,
+         "boot_lo": 0.0013782965,
+         "boot_hi": 0.0022469608
+        },
+        "8": {
+         "k": 167914,
+         "n": 1939901,
+         "share": 0.086558025,
+         "wilson_lo": 0.086163156,
+         "wilson_hi": 0.086954532,
+         "boot_lo": 0.082279479,
+         "boot_hi": 0.090893777
+        },
+        "9": {
+         "k": 1668382,
+         "n": 1939901,
+         "share": 0.86003461,
+         "wilson_lo": 0.85954566,
+         "wilson_hi": 0.86052213,
+         "boot_lo": 0.85513683,
+         "boot_hi": 0.86524046
+        },
+        "10": {
+         "k": 96573,
+         "n": 1939901,
+         "share": 0.049782437,
+         "wilson_lo": 0.049477267,
+         "wilson_hi": 0.050089391,
+         "boot_lo": 0.046483941,
+         "boot_hi": 0.053106792
+        },
+        "11": {
+         "k": 1663,
+         "n": 1939901,
+         "share": 0.00085726024,
+         "wilson_lo": 0.00081705285,
+         "wilson_hi": 0.00089944447,
+         "boot_lo": 0.00049857425,
+         "boot_hi": 0.0012928321
+        }
+       },
+       "n_nacp_missing": 5578
+      },
+      "update_interval_and_dropout": {
+       "n_intervals": 7724099,
+       "n_aircraft_days": 20487,
+       "status": "ok",
+       "update_interval_s": {
+        "q50": {
+         "value": 2.4278712,
+         "boot_lo": 2.4171263,
+         "boot_hi": 2.4381256
+        },
+        "q90": {
+         "value": 7.2920227,
+         "boot_lo": 7.2322968,
+         "boot_hi": 7.3540266
+        },
+        "q95": {
+         "value": 10.139856,
+         "boot_lo": 10.041446,
+         "boot_hi": 10.251357
+        },
+        "q99": {
+         "value": 19.680835,
+         "boot_lo": 19.659901,
+         "boot_hi": 19.701352
+        }
+       },
+       "dropout": {
+        "share_gt_20s": {
+         "k": 34383,
+         "n": 7724099,
+         "share": 0.004451393,
+         "wilson_lo": 0.0044046923,
+         "wilson_hi": 0.0044985866,
+         "boot_lo": 0.0042465058,
+         "boot_hi": 0.0046527643
+        },
+        "share_gt_60s": {
+         "k": 9494,
+         "n": 7724099,
+         "share": 0.0012291401,
+         "wilson_lo": 0.0012046778,
+         "wilson_hi": 0.0012540986,
+         "boot_lo": 0.0011608661,
+         "boot_hi": 0.0013032554
+        }
+       }
+      }
+     },
+     "degraded_episode": {
+      "quality_categories": {
+       "n_quality_samples": 67346,
+       "n_aircraft_days": 1570,
+       "status": "ok",
+       "nic": {
+        "0": {
+         "k": 49511,
+         "n": 67346,
+         "share": 0.73517358,
+         "wilson_lo": 0.73182775,
+         "wilson_hi": 0.73849258,
+         "boot_lo": 0.700347,
+         "boot_hi": 0.76567047
+        },
+        "1": {
+         "k": 445,
+         "n": 67346,
+         "share": 0.0066076679,
+         "wilson_lo": 0.0060232856,
+         "wilson_hi": 0.0072483337,
+         "boot_lo": 0.0029249897,
+         "boot_hi": 0.012014241
+        },
+        "2": {
+         "k": 1503,
+         "n": 67346,
+         "share": 0.022317584,
+         "wilson_lo": 0.021228913,
+         "wilson_hi": 0.023460746,
+         "boot_lo": 0.012767382,
+         "boot_hi": 0.032839147
+        },
+        "3": {
+         "k": 4412,
+         "n": 67346,
+         "share": 0.065512428,
+         "wilson_lo": 0.063668394,
+         "wilson_hi": 0.067406027,
+         "boot_lo": 0.052197862,
+         "boot_hi": 0.080634197
+        },
+        "4": {
+         "k": 11334,
+         "n": 67346,
+         "share": 0.16829507,
+         "wilson_lo": 0.1654884,
+         "wilson_hi": 0.17113959,
+         "boot_lo": 0.14505345,
+         "boot_hi": 0.19201635
+        },
+        "5": {
+         "k": 39,
+         "n": 67346,
+         "share": 0.00057909898,
+         "wilson_lo": 0.00042367544,
+         "wilson_hi": 0.00079149385,
+         "boot_lo": 0.00033504665,
+         "boot_hi": 0.0008651231
+        },
+        "6": {
+         "k": 48,
+         "n": 67346,
+         "share": 0.00071273721,
+         "wilson_lo": 0.00053766012,
+         "wilson_hi": 0.00094477038,
+         "boot_lo": 0.00033442193,
+         "boot_hi": 0.0011954574
+        },
+        "7": {
+         "k": 14,
+         "n": 67346,
+         "share": 0.00020788169,
+         "wilson_lo": 0.00012383985,
+         "wilson_hi": 0.00034893719,
+         "boot_lo": 0.00010125137,
+         "boot_hi": 0.00034785448
+        },
+        "8": {
+         "k": 39,
+         "n": 67346,
+         "share": 0.00057909898,
+         "wilson_lo": 0.00042367544,
+         "wilson_hi": 0.00079149385,
+         "boot_lo": 0.00039055922,
+         "boot_hi": 0.00078716949
+        },
+        "9": {
+         "k": 0,
+         "n": 67346,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 5.7037385e-05,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        },
+        "10": {
+         "k": 1,
+         "n": 67346,
+         "share": 1.4848692e-05,
+         "wilson_lo": 2.6211635e-06,
+         "wilson_hi": 8.4111911e-05,
+         "boot_lo": 0.0,
+         "boot_hi": 4.5648115e-05
+        },
+        "11": {
+         "k": 0,
+         "n": 67346,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 5.7037385e-05,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        }
+       },
+       "nacp": {
+        "0": {
+         "k": 33207,
+         "n": 66958,
+         "share": 0.49593775,
+         "wilson_lo": 0.49215103,
+         "wilson_hi": 0.49972494,
+         "boot_lo": 0.45213793,
+         "boot_hi": 0.54287446
+        },
+        "1": {
+         "k": 377,
+         "n": 66958,
+         "share": 0.0056303952,
+         "wilson_lo": 0.0050913149,
+         "wilson_hi": 0.0062261973,
+         "boot_lo": 0.0019720632,
+         "boot_hi": 0.010781354
+        },
+        "2": {
+         "k": 1433,
+         "n": 66958,
+         "share": 0.021401476,
+         "wilson_lo": 0.020332467,
+         "wilson_hi": 0.022525397,
+         "boot_lo": 0.011474888,
+         "boot_hi": 0.031919977
+        },
+        "3": {
+         "k": 3158,
+         "n": 66958,
+         "share": 0.047163894,
+         "wilson_lo": 0.045584021,
+         "wilson_hi": 0.048795723,
+         "boot_lo": 0.035160127,
+         "boot_hi": 0.059863321
+        },
+        "4": {
+         "k": 12395,
+         "n": 66958,
+         "share": 0.18511604,
+         "wilson_lo": 0.18219231,
+         "wilson_hi": 0.1880759,
+         "boot_lo": 0.1613895,
+         "boot_hi": 0.21028906
+        },
+        "5": {
+         "k": 48,
+         "n": 66958,
+         "share": 0.00071686729,
+         "wilson_lo": 0.00054077592,
+         "wilson_hi": 0.00095024429,
+         "boot_lo": 0.00026249005,
+         "boot_hi": 0.0014124902
+        },
+        "6": {
+         "k": 259,
+         "n": 66958,
+         "share": 0.0038680964,
+         "wilson_lo": 0.0034255423,
+         "wilson_hi": 0.0043675746,
+         "boot_lo": 0.0023831414,
+         "boot_hi": 0.0056330884
+        },
+        "7": {
+         "k": 334,
+         "n": 66958,
+         "share": 0.0049882016,
+         "wilson_lo": 0.0044822385,
+         "wilson_hi": 0.0055509602,
+         "boot_lo": 0.003532328,
+         "boot_hi": 0.0066452831
+        },
+        "8": {
+         "k": 1120,
+         "n": 66958,
+         "share": 0.016726903,
+         "wilson_lo": 0.015782874,
+         "wilson_hi": 0.017726381,
+         "boot_lo": 0.013140772,
+         "boot_hi": 0.020947955
+        },
+        "9": {
+         "k": 4533,
+         "n": 66958,
+         "share": 0.067699155,
+         "wilson_lo": 0.065820945,
+         "wilson_hi": 0.069626964,
+         "boot_lo": 0.052454863,
+         "boot_hi": 0.082967244
+        },
+        "10": {
+         "k": 10094,
+         "n": 66958,
+         "share": 0.15075122,
+         "wilson_lo": 0.1480611,
+         "wilson_hi": 0.15348141,
+         "boot_lo": 0.104028,
+         "boot_hi": 0.19357967
+        },
+        "11": {
+         "k": 0,
+         "n": 66958,
+         "share": 0.0,
+         "wilson_lo": 0.0,
+         "wilson_hi": 5.7367879e-05,
+         "boot_lo": 0.0,
+         "boot_hi": 0.0
+        }
+       },
+       "n_nacp_missing": 388
+      },
+      "update_interval_and_dropout": {
+       "n_intervals": 261866,
+       "n_aircraft_days": 1570,
+       "status": "ok",
+       "update_interval_s": {
+        "q50": {
+         "value": 2.6377475,
+         "boot_lo": 2.5292722,
+         "boot_hi": 2.7598899
+        },
+        "q90": {
+         "value": 8.0786627,
+         "boot_lo": 7.7805534,
+         "boot_hi": 8.4021872
+        },
+        "q95": {
+         "value": 11.207171,
+         "boot_lo": 10.506431,
+         "boot_hi": 12.004868
+        },
+        "q99": {
+         "value": 20.075333,
+         "boot_lo": 19.92201,
+         "boot_hi": 21.82976
+        }
+       },
+       "dropout": {
+        "share_gt_20s": {
+         "k": 2621,
+         "n": 261866,
+         "share": 0.010008936,
+         "wilson_lo": 0.0096348015,
+         "wilson_hi": 0.010397446,
+         "boot_lo": 0.0087472625,
+         "boot_hi": 0.011360269
+        },
+        "share_gt_60s": {
+         "k": 426,
+         "n": 261866,
+         "share": 0.0016267862,
+         "wilson_lo": 0.0014795703,
+         "wilson_hi": 0.0017886238,
+         "boot_lo": 0.0013734245,
+         "boot_hi": 0.0019107016
+        }
+       }
+      },
+      "episodes": {
+       "n_episodes": 2172,
+       "n_aircraft_days": 20847,
+       "exposure_aircraft_hours": 7592.0711,
+       "rate_per_aircraft_hour": {
+        "value": 0.28608794,
+        "boot_lo": 0.2648246,
+        "boot_hi": 0.30842564,
+        "poisson_exact_lo": 0.27418174,
+        "poisson_exact_hi": 0.29837814
+       },
+       "duration_s": {
+        "status": "ok",
+        "quantiles": {
+         "q05": {
+          "value": 4.3799999,
+          "boot_lo": 3.8299999,
+          "boot_hi": 5.3
+         },
+         "q25": {
+          "value": 19.98,
+          "boot_lo": 17.27,
+          "boot_hi": 22.53175
+         },
+         "q50": {
+          "value": 68.64,
+          "boot_lo": 59.66,
+          "boot_hi": 78.21
+         },
+         "q75": {
+          "value": 261.33,
+          "boot_lo": 226.56,
+          "boot_hi": 317.46825
+         },
+         "q95": {
+          "value": 2101.55,
+          "boot_lo": 1896.91,
+          "boot_hi": 2345.1
+         }
+        }
+       },
+       "status": "ok"
+      }
+     },
+     "transitions": {
+      "n_aircraft_days": 20847,
+      "status": "ok",
+      "p_next_degraded_given_current_degraded": {
+       "k": 64755,
+       "n": 66754,
+       "share": 0.97005423,
+       "wilson_lo": 0.968734,
+       "wilson_hi": 0.97132036,
+       "boot_lo": 0.96581715,
+       "boot_hi": 0.97362187
+      },
+      "p_next_degraded_given_current_nominal": {
+       "k": 1947,
+       "n": 1912120,
+       "share": 0.0010182415,
+       "wilson_lo": 0.00097402706,
+       "wilson_hi": 0.0010644609,
+       "boot_lo": 0.00092949823,
+       "boot_hi": 0.0011295367
+      }
+     }
+    }
+   }
+  }
+ }
+}

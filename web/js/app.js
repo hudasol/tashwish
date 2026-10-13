@@ -252,6 +252,31 @@ function renderCellsTable() {
 }
 
 /* ---------- events ---------- */
+const SMALL_CLUSTER = 3; // a position jump cluster of this many aircraft or fewer is the minimum size and the weakest evidence
+function spoofAircraft(e) {
+  const n = e.evidence && e.evidence.n_spoof_aircraft;
+  return typeof n === "number" && (e.kind === "spoofing_like" || e.kind === "both") ? n : null;
+}
+const smallCluster = (e) => { const n = spoofAircraft(e); return n !== null && n <= SMALL_CLUSTER; };
+
+// A readable label for an event, so that the table does not show an opaque identifier.
+function eventLabel(e) {
+  const start = fmtStamp(e.start);
+  const kindText = t("kind." + e.kind);
+  const n = spoofAircraft(e);
+  return n !== null ? t("event.label_aircraft", { kind: kindText, n, start }) : t("event.label_cells", { kind: kindText, n: e.n_cells, start });
+}
+
+function chip(cls, text) { return el("span", { class: "chip " + cls, text }); }
+function certaintyChips(e) {
+  const box = el("span", {});
+  let any = false;
+  if (e.label_uncertain) { box.append(chip("warn", t("events.chip_uncertain")), " "); any = true; }
+  if (smallCluster(e)) { box.append(chip("warn", t("events.chip_small", { n: spoofAircraft(e) }))); any = true; }
+  if (!any) box.append(chip("plain", t("events.chip_none")));
+  return box;
+}
+
 function renderEvents() {
   const wrap = document.getElementById("events-table");
   wrap.textContent = "";
@@ -259,8 +284,9 @@ function renderEvents() {
   if (!evs.length) { wrap.append(el("p", { class: "empty", text: t("events.none") })); renderEvidence(null); return; }
   const kind = (e) => t("kind." + e.kind);
   const cols = [
-    { id: "id", label: t("events.col_id"), value: (e) => e.event_id, cell: (e) => el("button", { type: "button", class: "linkbtn", "aria-pressed": String(S.selEvent === e.event_id), onclick: () => selectEvent(e.event_id, true), text: e.event_id }) },
-    { id: "kind", label: methodLabel("kind"), methodKey: "kind", value: kind, cell: (e) => kind(e) + (e.label_uncertain ? " (" + t("events.uncertain_short") + ")" : "") },
+    { id: "id", label: t("events.col_id"), value: (e) => eventLabel(e), cell: (e) => el("button", { type: "button", class: "linkbtn", "aria-pressed": String(S.selEvent === e.event_id), "data-event": e.event_id, onclick: () => selectEvent(e.event_id, true), text: eventLabel(e) }) },
+    { id: "kind", label: methodLabel("kind"), methodKey: "kind", value: kind, cell: (e) => kind(e) },
+    { id: "cert", label: t("events.col_cert"), value: (e) => (e.label_uncertain ? 1 : 0) + (smallCluster(e) ? 1 : 0), cell: (e) => certaintyChips(e) },
     { id: "conf", label: methodLabel("confidence"), methodKey: "confidence", value: (e) => ({ low: 0, medium: 1, high: 2 }[e.confidence]), cell: (e) => t("confidence." + e.confidence) },
     { id: "start", label: t("events.col_start"), value: (e) => e.start, cell: (e) => el("span", { class: "nowrap", dir: "ltr", text: fmtStamp(e.start) }) },
     { id: "end", label: t("events.col_end"), value: (e) => e.end, cell: (e) => el("span", { class: "nowrap", dir: "ltr", text: fmtStamp(e.end) }) },
@@ -274,7 +300,7 @@ function renderEvents() {
 
 function renderEventsHighlight() {
   document.querySelectorAll("#events-table tbody tr").forEach((tr) => {
-    const id = tr.querySelector("button") && tr.querySelector("button").textContent;
+    const id = tr.querySelector("button") && tr.querySelector("button").dataset.event;
     tr.classList.toggle("sel", id === S.selEvent);
     const b = tr.querySelector("button");
     if (b) b.setAttribute("aria-pressed", String(id === S.selEvent));
@@ -296,7 +322,8 @@ function renderEvidence(ev) {
   const box = document.getElementById("evidence-body");
   box.textContent = "";
   if (!ev) { box.append(el("p", { class: "help", text: t("evidence.none") })); return; }
-  box.append(el("h4", { class: "ev-id", text: ev.event_id }));
+  box.append(el("h4", { class: "ev-id", text: eventLabel(ev) }));
+  if (ev.label_uncertain || smallCluster(ev)) box.append(el("p", { class: "help strong", role: "note", text: t("evidence.caution") }));
   const dl = el("dl", { class: "kv" });
   const add = (key, val) => dl.append(el("dt", {}, el("a", { href: methodHref(key), text: methodLabel(key) })), el("dd", {}, val));
   add("kind", t("kind." + ev.kind));
@@ -312,6 +339,7 @@ function renderEvidence(ev) {
   add("min_p", num(fmtP(ev.min_p), "min_p"));
   add("lat", num(fmtDec(ev.lat, 3), "lat"));
   add("lon", num(fmtDec(ev.lon, 3), "lon"));
+  dl.append(el("dt", { text: t("evidence.ref") }), el("dd", {}, el("code", { text: ev.event_id })));
   box.append(dl);
   const evd = ev.evidence || {};
   const keys = Object.keys(evd);
@@ -322,7 +350,10 @@ function renderEvidence(ev) {
       const key = "evidence." + k;
       const v = evd[k];
       const shown = typeof v === "number" ? (Number.isInteger(v) ? fmtInt(v) : (Math.abs(v) < 1 ? fmtPct(v) : fmtDec(v, 2))) : String(v);
-      d2.append(el("dt", {}, el("a", { href: methodHref(key), text: methodLabel(key) })), el("dd", {}, typeof v === "number" ? num(shown, key) : shown));
+      const implied = k === "median_implied_kt";
+      d2.append(el("dt", {}, el("a", { href: methodHref(key), text: methodLabel(key) })),
+        el("dd", {}, typeof v === "number" ? num(shown, key) : shown,
+          implied && typeof v === "number" ? " " + t("evidence.n_aircraft_unit") + " (" + t("evidence.implied_note") + ")" : null));
     });
     box.append(d2);
   }
@@ -330,6 +361,73 @@ function renderEvidence(ev) {
   (ev.methods || []).forEach((a) => ml.append(el("li", {}, el("a", { href: "methods.html#" + a, text: a }))));
   box.append(el("h5", { text: t("evidence.methods") }), ml);
   box.append(el("button", { type: "button", class: "btn", text: t("evidence.show_on_map"), onclick: () => selectEvent(ev.event_id, true) }));
+}
+
+/* ---------- regime panel: what happened to the data around 2 March ---------- */
+const median = (a) => { const b = a.slice().sort((x, y) => x - y); const m = b.length >> 1; return b.length ? (b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2) : null; };
+const SVGNS = "http://www.w3.org/2000/svg";
+function svg(tag, attrs, text) {
+  const n = document.createElementNS(SVGNS, tag);
+  for (const [k, v] of Object.entries(attrs || {})) n.setAttribute(k, String(v));
+  if (text !== undefined) n.textContent = text;
+  return n;
+}
+
+// Bar chart of one value per day. breakIdx marks the first day of the changed period.
+function barChart(rows, key, fmt, label, breakIdx, ariaKey) {
+  const W = 360, H = 150, L = 38, R = 6, T = 8, B = 22;
+  const max = Math.max(...rows.map((r) => r[key])) || 1;
+  const bw = (W - L - R) / rows.length;
+  const g = svg("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": t(ariaKey) });
+  [0, 0.5, 1].forEach((f) => {
+    const y = T + (H - T - B) * (1 - f);
+    g.append(svg("line", { x1: L, x2: W - R, y1: y, y2: y, class: "axis" }));
+    g.append(svg("text", { x: L - 4, y: y + 3, "text-anchor": "end", class: "tick" }, fmt(max * f)));
+  });
+  rows.forEach((r, i) => {
+    const h = (H - T - B) * (r[key] / max);
+    g.append(svg("rect", { x: L + i * bw + 0.8, y: H - B - h, width: Math.max(1, bw - 1.6), height: h, class: "bar" + (breakIdx >= 0 && i >= breakIdx ? " after" : "") }));
+  });
+  if (breakIdx > 0) g.append(svg("line", { x1: L + breakIdx * bw, x2: L + breakIdx * bw, y1: T, y2: H - B, class: "mark" }));
+  [0, breakIdx > 0 ? breakIdx : null, rows.length - 1].forEach((i) => {
+    if (i === null) return;
+    const anchor = i === 0 ? "start" : i === rows.length - 1 ? "end" : "middle";
+    g.append(svg("text", { x: L + i * bw + (i === 0 ? 0 : i === rows.length - 1 ? bw : bw / 2), y: H - 6, "text-anchor": anchor, class: "tick" }, rows[i].day.slice(5)));
+  });
+  return el("figure", { class: "chart" }, el("figcaption", { text: label }), g);
+}
+
+function renderRegime() {
+  const sec = document.getElementById("regime");
+  const body = document.getElementById("regime-body");
+  body.textContent = "";
+  const daily = D().daily && D().daily.days;
+  if (!daily || daily.length < 4 || D().synthetic) { sec.hidden = true; return; }
+  const air = new Map((D().manifest.days || []).map((x) => [x.day, x.aircraft]));
+  const rows = daily.map((r) => ({ day: r.day, share: r.share, aircraft: air.get(r.day) })).filter((r) => typeof r.share === "number" && typeof r.aircraft === "number");
+  if (rows.length < 4) { sec.hidden = true; return; }
+  sec.hidden = false;
+  rows.sort((a, b) => a.day.localeCompare(b.day));
+  const brk = rows.findIndex((r) => r.share >= 0.05); // the regime threshold of docs/METHODOLOGY.md, a display choice here
+  if (brk > 0) {
+    const before = rows.slice(0, brk), after = rows.slice(brk);
+    const round10 = (x) => fmtInt(Math.round(x / 10) * 10);
+    body.append(el("p", { text: t("regime.body", {
+      n_before: before.length, air_before: round10(median(before.map((r) => r.aircraft))), sh_before: fmtPct(median(before.map((r) => r.share))),
+      break_day: after[0].day, air_after: round10(median(after.map((r) => r.aircraft))), sh_after: fmtPct(median(after.map((r) => r.share))),
+    }) }));
+  }
+  body.append(el("p", { class: "help strong", role: "note", text: t("regime.nocause") }));
+  body.append(el("div", { class: "charts" },
+    barChart(rows, "share", (v) => (v * 100).toFixed(0) + "%", t("regime.chart_share"), brk, "regime.chart_aria_share"),
+    barChart(rows, "aircraft", (v) => fmtInt(Math.round(v)), t("regime.chart_air"), brk, "regime.chart_aria_air")));
+  const tb = el("table", { class: "data" }, el("caption", { class: "sr-only", text: t("regime.caption") }),
+    el("thead", {}, el("tr", {}, el("th", { scope: "col", text: t("regime.col_day") }), el("th", { scope: "col", class: "n", text: t("regime.col_share") }), el("th", { scope: "col", class: "n", text: t("regime.col_air") }))),
+    el("tbody"));
+  rows.forEach((r, i) => tb.tBodies[0].append(el("tr", {},
+    el("th", { scope: "row" }, el("span", { dir: "ltr", text: r.day }), i === brk ? el("span", { class: "cell-sub", text: t("regime.break_mark") }) : null),
+    el("td", { class: "n" }, num(fmtPct(r.share), "daily_degraded_share")), el("td", { class: "n" }, num(fmtInt(r.aircraft), "aircraft")))));
+  body.append(el("details", {}, el("summary", { text: t("regime.table_summary") }), el("div", { class: "table-wrap", tabindex: "0", role: "region", "aria-label": t("regime.caption") }, tb)));
 }
 
 /* ---------- downloads ---------- */
@@ -340,7 +438,8 @@ function renderDownloads() {
   const syn = d.synthetic;
   body.append(el("p", { text: t(syn ? "dl.intro_syn" : "dl.intro") }));
   const base = state.base;
-  const files = [["manifest.json", "dl.f_manifest"], ["events.json", "dl.f_events"], ["coverage.json", "dl.f_coverage"], ["validation.json", "dl.f_validation"], ["methods.json", "dl.f_methods"]];
+  const files = [["manifest.json", "dl.f_manifest"], ["events.json", "dl.f_events"], ["coverage.json", "dl.f_coverage"], ["validation.json", "dl.f_validation"], ["methods.json", "dl.f_methods"]]
+    .concat(d.daily ? [["daily.json", "dl.f_daily"]] : []);
   const ul = el("ul", { class: "dl-list" });
   files.forEach(([f, k]) => ul.append(el("li", {}, el("a", { href: base + f, download: "", text: (syn ? "SYNTHETIC " : "") + f }), " - " + t(k))));
   d.manifest.days.forEach((x) => ul.append(el("li", {}, el("a", { href: base + "days/" + x.day + ".json", download: "", text: (syn ? "SYNTHETIC " : "") + "days/" + x.day + ".json" }), " - " + t("dl.f_day"))));
@@ -474,6 +573,7 @@ async function render(isRerender) {
   const sd = document.getElementById("slider-days"); if (sd) sd.remove();
   renderLegend();
   renderDownloads();
+  renderRegime();
   renderEvents();
   renderCellDetail(S.lastPick && S.lastPick);
   bindControls();
