@@ -13,7 +13,7 @@ Contains information from adsb.lol, which is made available here under the Open 
 - The ODbL is applied conservatively: we treat the aggregates as a Derivative Database. Whether that is legally required is
   uncertain; see `docs/LICENSING.md`.
 - ODbL 4.6: the full dataset and the build method are offered free of charge as machine readable files.
-- Build commit: `94eafcd`. Source: adsb.lol globe_history daily releases (the release kind and tag are in the ingest manifest).
+- Build commit: `262684a`. Source: adsb.lol globe_history daily releases (the release kind and tag are in the ingest manifest).
 
 ## What it is
 
@@ -31,7 +31,7 @@ jamming-like and spoofing-like anomalies. No raw traces, no aircraft identifiers
 
 ## Files, schema, coverage, validation numbers, known biases
 
-Generated 2026-10-12T06:41:02Z from processed result files. Latest day: 2026-03-13. Days: 35 (dev 21, held_out 14).
+Generated 2026-10-13T12:56:19Z from processed result files. Latest day: 2026-03-13. Days: 35 (dev 21, held_out 14).
 
 - `cell_buckets.parquet` and `.csv.gz`: h3, bucket_start, slot, stratum, n_aircraft, k_strong, share, ci_lo, ci_hi, status, coverage_class, data_class.
   `share`, `ci_lo`, `ci_hi` are empty unless status is `ok`.

@@ -154,14 +154,15 @@ export async function loadData() {
   let manifest = await tryJson(base + "manifest.json");
   if (!manifest) { base = SAMPLE_ROOT; manifest = await tryJson(base + "manifest.json"); }
   if (!manifest) throw new Error(t("error.no_data"));
-  const names = ["events", "coverage", "validation", "methods"];
+  const names = ["events", "coverage", "validation", "methods", "daily"];
   const files = await Promise.all(names.map((n) => tryJson(base + n + ".json")));
-  const data = { base, manifest, events: files[0], coverage: files[1], validation: files[2], methods: files[3], missing: [] };
+  const data = { base, manifest, events: files[0], coverage: files[1], validation: files[2], methods: files[3], daily: files[4], missing: [] };
   names.forEach((n, i) => { if (!files[i]) data.missing.push(n); });
   // contract checks: schema, one data class everywhere (never mix synthetic and observed)
   const dc = manifest.data_class;
   if (manifest.schema !== SCHEMA) throw new Error(t("error.schema", { schema: String(manifest.schema) }));
   if (dc !== "synthetic" && dc !== "observed") throw new Error(t("error.data_class"));
+  // validation.json keeps the file level class of the release; each of its rows states its own class (see validation.js)
   for (const n of names) {
     const f = data[n];
     if (f && f.data_class !== dc) throw new Error(t("error.mixed"));
@@ -199,6 +200,8 @@ export function freshness() {
   const age = Math.max(genAge, dayAge);
   let level = age > 7 * 24 ? "red" : age > 48 ? "amber" : "ok";
   if (m.data_class === "synthetic") level = "synthetic"; // a synthetic sample has no freshness to report
+  // A fixed study dataset is not a live feed: it gets a snapshot label, never a staleness warning. Live mode keeps the logic above.
+  else if (m.mode === "study_snapshot") level = "snapshot";
   return { level, genAge, dayAge, age };
 }
 
@@ -284,11 +287,21 @@ function renderFreshness() {
   const m = d.manifest;
   const wrap = el("section", { class: "freshness", "data-level": f.level, "aria-labelledby": "fresh-h" });
   wrap.append(el("h2", { id: "fresh-h", class: "fresh-h", text: t("fresh.title") }));
-  const stateWord = t("fresh.state_" + f.level);
+  const stateWord = f.level === "snapshot" ? "" : t("fresh.state_" + f.level);
   const line = el("p", { class: "fresh-line" });
   line.append(el("strong", { text: stateWord + (f.level === "synthetic" ? "" : ". ") }));
   if (f.level === "synthetic") {
     line.append(". ", t("fresh.class") + " ", el("strong", { text: t("class." + d.dataClass) }), ".");
+    wrap.append(line);
+    return wrap;
+  }
+  if (f.level === "snapshot") {
+    const w = m.study_window || {};
+    const first = w.start || (m.days && m.days.length ? m.days[0].day : m.latest_day);
+    const last = w.end || m.latest_day;
+    line.textContent = "";
+    line.append(el("strong", { text: t("fresh.state_snapshot", { start: first, end: last }) }), ". ", t("fresh.snapshot_note") + " ",
+      t("fresh.class") + " ", el("strong", { text: t("class." + d.dataClass) }), ".");
     wrap.append(line);
     return wrap;
   }
