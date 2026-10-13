@@ -308,8 +308,11 @@ def data_card(template: Path, metas: list[dict], cb: pd.DataFrame, ev: pd.DataFr
               commit: str, validation_note: str) -> str:  # fmt: skip
     head = template.read_text(encoding="utf-8").split("## Files, schema")[0]
     head = head.replace(
-        "**Status: DRAFT template. No dataset has been released.**", "**Status: generated for a release candidate.**"
+        "**Status: release candidate, study snapshot", "**Status: generated for a release candidate, study snapshot"
     )
+    days = sorted(m["day"] for m in metas)
+    window = f"{days[0]} to {days[-1]}, {len(days)} UTC days" if days else "none"
+    head = head.replace("- Study window: `FROM RESULTS`.", f"- Study window: {window}.")
     head = head.replace("- Source release tags and build commit: `FROM RESULTS`.", f"- Build commit: `{commit}`. Source: adsb.lol globe_history daily releases (the release kind and tag are in the ingest manifest).")  # fmt: skip
     n_by_split = pd.Series([m["split"] for m in metas]).value_counts().to_dict()
     st = cb["status"].value_counts().to_dict()
@@ -328,7 +331,7 @@ def data_card(template: Path, metas: list[dict], cb: pd.DataFrame, ev: pd.DataFr
         f"- {ROUNDING_SENTENCE}",
         "- `validation.json`, `freshness.json`, `manifest.json`, `checksums.sha256`, `NOTICE`, `ODbL-1.0.txt`.",
         "",
-        f"Cell-bucket rows by status: {', '.join(f'{k} {v}' for k, v in sorted(st.items()))}.",
+        f"Cell bucket rows by status: {', '.join(f'{k} {v}' for k, v in sorted(st.items()))}.",
         f"Events by kind: {', '.join(f'{k} {v}' for k, v in sorted(kinds.items())) or 'none'}; marked uncertain: {unc}.",
         "",
         validation_note,

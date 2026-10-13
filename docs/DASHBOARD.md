@@ -42,8 +42,8 @@ Attribution control text on the map: "Natural Earth (public domain)".
 
 ## Contract shapes the contract text left open (please reconcile with `tashwish.release.web`)
 
-- `manifest.bbox`: object `{south, west, north, east}` (an array `[west, south, east, north]` is also accepted). The sample
-  uses the sample data extent (22 to 31 N, 46 to 60 E) so the map opens on the data.
+- `manifest.bbox`: object `{south, west, north, east}` (an array `[west, south, east, north]` is also accepted). The released
+  manifest carries the study box (22 to 31 N, 46 to 62 E) so the map opens on the data.
 - `events.json`: object with an `events` array (a bare array is also accepted).
 - `coverage.json`: `cells`: array of `{h3, slot, presence, class}`.
 - `validation.json`: `results`: array of `{metric, scenario, value, ci_lo, ci_hi, n}`; an empty array shows "no results yet".

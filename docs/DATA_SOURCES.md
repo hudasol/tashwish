@@ -7,9 +7,9 @@ access method are recorded here. We respect each source's terms and rate limits 
 
 | Role | Source | Why |
 |---|---|---|
-| **Primary** | **adsb.lol `globe_history_YYYY` archives** (GitHub Releases) | Open licence (ODbL 1.0), no account, reachable from our build environment, carries the quality fields in the trace format, full-day archives so runs are reproducible |
-| **Fallback** | **OpenSky Network historical database** (research access) | Server-side spatial filtering and a longer history, but needs an approved research application, is blocked from our build environment, and its terms for releasing derived data are unverified |
-| Not used | ADS-B Exchange, Flightradar24, FlightAware, Planespotters, Wingbits | Paid, commercial-use restricted, or redistribution prohibited without consent (see below) |
+| **Primary** | **adsb.lol `globe_history_YYYY` archives** (GitHub Releases) | Open licence (ODbL 1.0), no account, reachable from our build environment, carries the quality fields in the trace format, full day archives so runs are reproducible |
+| **Fallback** | **OpenSky Network historical database** (research access) | Server side spatial filtering and a longer history, but needs an approved research application, is blocked from our build environment, and its terms for releasing derived data are unverified |
+| Not used | ADS-B Exchange, Flightradar24, FlightAware, Planespotters, Wingbits | Paid, commercial use restricted, or redistribution prohibited without consent (see below) |
 | Out of scope (v1) | AIS | No free historical Gulf archive identified (see RESEARCH.md 1.3) |
 
 ## 1. adsb.lol globe_history (primary)
@@ -25,17 +25,17 @@ access method are recorded here. We respect each source's terms and rate limits 
 - **Size:** about 2.3 GiB (Jan 2026) to about 4.0 GiB (Oct 2026) per day for the prod release; the 2026 repository is
   1816 GiB in total.
 - **Time range:** repositories for 2023, 2024, 2025 and 2026 exist. The **2026 repository's release index starts at
-  2025-12-14** (verified from RELEASES.md). Earlier coverage in the 2023-2025 repositories was not verified by us.
+  2025-12-14** (verified from RELEASES.md). Earlier coverage in the 2023 to 2025 repositories was not verified by us.
 - **Fields:** the readsb trace format can carry `nic`, `rc`, `nic_baro`, `nac_p`, `nac_v`, `sil`, `sil_type`, `sda`, `gva`
-  in an optional per-point aircraft object; "not all fields are present" (readsb README-json). **How densely they are
+  in an optional per point aircraft object; "not all fields are present" (readsb README-json). **How densely they are
   populated is measured by our probe and reported in docs/DATA_QUALITY.md.**
 - **Coverage caveat:** the data is the union of adsb.lol's feeders and partner feeds. It is **not** a uniform receiver
   network, and the receiver set changes over time. This is the central confounder and is why M3 exists.
 - **Attribution:** "Contains information from adsb.lol, which is made available here under the Open Database License (ODbL)." (ODbL 4.3.a wording; single source in `src/tashwish/attribution.py`) We cite the project and the
   repository in the README, the data card and the dashboard footer.
 - **Full analysis:** docs/LICENSING.md (what is verified, what is not, questions for the maintainers).
-- **Share-alike caveat (our reading, not legal advice):** the ODbL generally requires derived databases to be shared
-  under the ODbL with attribution. Our released dataset is an aggregated derivative (cell-hour counts and event
+- **Share alike caveat (our reading, not legal advice):** the ODbL generally requires derived databases to be shared
+  under the ODbL with attribution. Our released dataset is an aggregated derivative (cell hour counts and event
   tables), not the raw traces. **We release it under ODbL 1.0 to be safe; code is Apache-2.0.** A university IP office or
   lawyer should confirm before any commercial use. Open item in NEXT_STEPS.
 
@@ -50,7 +50,7 @@ access method are recorded here. We respect each source's terms and rate limits 
 - **REST API:** state vectors have 18 fields with **no** NACp, NIC, SIL or SDA (verified). Authenticated state vectors reach
   back only about an hour. Not usable for history.
 - **Terms on redistribution, citation, commercial use:** **unverified** (terms page blocked to our fetcher).
-- **From our build environment:** main site and API unreachable or rate-limited; SSH port 2230 is not reachable through the
+- **From our build environment:** main site and API unreachable or rate limited; SSH port 2230 is not reachable through the
   HTTP(S)-only proxy. **Any OpenSky run must happen on the owner's own machine.**
 - **What the owner must do if this fallback is wanted:** register an OpenSky account; apply for research access with the
   an institutional affiliation (if any) and a non commercial research statement; ask OpenSky in writing whether a released
@@ -60,13 +60,13 @@ access method are recorded here. We respect each source's terms and rate limits 
 
 | Source | Finding | Verdict |
 |---|---|---|
-| ADS-B Exchange | Free samples only for the 1st of each month; full history is a paid subscription; commercial use (including non-profit) needs written authorisation; bulk redistribution is prohibited without consent | Not usable for a released derived dataset |
+| ADS-B Exchange | Free samples only for the 1st of each month; full history is a paid subscription; commercial use (including non profit) needs written authorisation; bulk redistribution is prohibited without consent | Not usable for a released derived dataset |
 | Flightradar24 / FlightAware / Planespotters | Terms not retrieved; site returned 403 to automated fetch; likely paid or restricted | Not used |
-| Wingbits | Sales-gated; no licence stated | Not used |
+| Wingbits | Sales gated; no licence stated | Not used |
 | airplanes.live | Licence and access method **unverified**; site returned 403 to our fetcher | Not used |
-| OpenSky pre-packaged datasets | Mostly licence not stated; none mention NACp or NIC | Not used |
-| Zenodo / Kaggle / Hugging Face | Limited search found no ready-made Gulf ADS-B dataset with NACp or NIC (absence of evidence, not proof). A Zenodo "Geospatial Dataset of GNSS Anomalies and Political Violence Events" (CC-BY-4.0, 2025) exists; content not verified | Possible comparison data; not used in v1 |
-| aisstream.io / AISHub | WebSocket with API key / terms unverified; looks live-only | Out of scope v1 |
+| OpenSky pre packaged datasets | Mostly licence not stated; none mention NACp or NIC | Not used |
+| Zenodo / Kaggle / Hugging Face | Limited search found no ready made Gulf ADS-B dataset with NACp or NIC (absence of evidence, not proof). A Zenodo "Geospatial Dataset of GNSS Anomalies and Political Violence Events" (CC-BY-4.0, 2025) exists; content not verified | Possible comparison data; not used in v1 |
+| aisstream.io / AISHub | WebSocket with API key / terms unverified; looks live only | Out of scope v1 |
 
 ## 4. Receiver coverage
 
@@ -83,10 +83,10 @@ an open style). **No basemap tile service with restrictive terms will be used.**
 ## 6. Synthetic data
 
 Any synthetic data (test fixtures, injected scenarios) is labelled synthetic in filenames (`*_synthetic_*`), in schemas
-(`data_class = "synthetic"`), in the UI and in the docs, and is never written into the real-data tables. See
+(`data_class = "synthetic"`), in the UI and in the docs, and is never written into the real data tables. See
 docs/METHODOLOGY.md and the data card.
 
-## 7. Study window and split (decided 2026-10-12, reversible until the held-out run)
+## 7. Study window and split (decided 2026-10-12, reversible until the held out run)
 
 - **Window:** 2026-02-07 to 2026-03-13 inclusive, 35 UTC days, all from the `globe_history_2026` repository (prod or staging,
   the larger release per day). It covers the cited 2026 incident dates 28 Feb, 2 Mar, 7 Mar and 13 Mar (docs/RESEARCH.md section 3).
@@ -94,5 +94,5 @@ docs/METHODOLOGY.md and the data card.
   environment, and at least 14 days are needed for baselines. Pre-2025-12 events are out of reach of this archive.
 - **Resumable ingest:** `scripts/run_study_ingest.sh` skips complete days (manifest), writes each day atomically, retries a day up
   to 4 times, and can be restarted at any time; a crash loses at most the day in progress. Raw archives are streamed from a spool
-  and deleted after each day; `data/raw` and `data/interim` are git-ignored, and only derived aggregates are ever released.
-- **Split:** `src/tashwish/split.py` and docs/PREDICTIONS.md. 21 DEV days, 14 HELD-OUT days, fixed by a hash of the date.
+  and deleted after each day; `data/raw` and `data/interim` are git ignored, and only derived aggregates are ever released.
+- **Split:** `src/tashwish/split.py` and docs/PREDICTIONS.md. 21 DEV days, 14 HELD OUT days, fixed by a hash of the date.

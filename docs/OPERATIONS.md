@@ -66,8 +66,8 @@ What the workflow additionally requires from the parent implementation (it calls
    `processed/`. `--start-day D` means "begin the search at D".
 2. Exit code 0 when it processed the days it found **or there was nothing to do** (the next archive day is not published yet is
    not an error; it must exit 0 and say so). Non zero for download failure, parse failure or a baseline mismatch.
-3. Each day is appended atomically (temp file then rename), so a crash never leaves `processed/` half written. A re-run of a
-   finished day is a no-op (this already holds for `tashwish.ingest`).
+3. Each day is appended atomically (temp file then rename), so a crash never leaves `processed/` half written. A re run of a
+   finished day is a no op (this already holds for `tashwish.ingest`).
 4. It writes `processed/freshness.json` on success (below). On its own failure it should set `last_run_status=failed` and
    `fallback_active=true` before exiting non zero; if it cannot, the workflow does that anyway through
    `check_freshness.py --mark-failed`.
@@ -139,7 +139,7 @@ Arithmetic, with the stated assumptions (illustrative, not measured on GitHub):
 1. **Keeping pace needs 7 days of processing per week.** The archive adds 7 days a week. The previous design (weekly cron, at
    most 3 days per run) processed at most 3 days a week, so the backlog grew by 4 days a week and `latest_day` lagged: the dashboard
    turned amber (over 48 h) and then red (over 7 days) even when every run succeeded. Recommended: **one run per day at an
-   off-peak minute, at most 1 day per run** (cron `23 4 * * *`, as configured). That is 7 days a week, uses about 1 hour of runner
+   off peak minute, at most 1 day per run** (cron `23 4 * * *`, as configured). That is 7 days a week, uses about 1 hour of runner
    time a day at the measured speeds, and a single failed run costs one day that the next run resumes at, because the CLI resumes at
    the first missing day. Three runs a week of 3 days each would also cover 7 days, but delays freshness by up to 2 days; it is not
    recommended. Whether daily downloads of about 4 GiB are polite use of adsb.lol's GitHub releases is
@@ -149,13 +149,13 @@ Arithmetic, with the stated assumptions (illustrative, not measured on GitHub):
    backfill is bounded by one to three days per dispatch and each dispatch is a separate run. Backfilling N days needs about N
    divided by `max_days` dispatches, and a `start_day` that leaves a gap after the last processed day is refused. Days inside the
    study window are not backfilled through this workflow at all (they are refused, see section 3 item 5).
-2. **The job time limit bounds catch-up.** If the 6 hour limit is right (UNVERIFIED), a single run cannot clear a long
+2. **The job time limit bounds catch up.** If the 6 hour limit is right (UNVERIFIED), a single run cannot clear a long
    backlog. Even ignoring the polite cap of 3, about 12 days at best is the ceiling for one run. A long backlog after the study window is
    cleared by repeated dispatches, not in one run (section 6).
 3. **Public repository is required.** The free minutes claim is for public repositories (UNVERIFIED). A private repository changes
    the arithmetic.
 4. **Scheduled workflows may be paused** after a long period without repository activity (recalled, UNVERIFIED). Data commits
-   to the `data` branch may or may not count as activity (UNVERIFIED); re-enable the workflow by hand in the Actions tab if
+   to the `data` branch may or may not count as activity (UNVERIFIED); re enable the workflow by hand in the Actions tab if
    the scheduled runs stop.
 5. **Storage growth.** The `data` branch grows with every commit. Repository size and file size limits on GitHub are
    UNVERIFIED, and the size of one day's parquet and of the released dataset has not been measured. If it grows too large,
@@ -229,7 +229,7 @@ piece of work.
 
 If the release naming changes: the URL pattern is the single `_URL` in `src/tashwish/ingest/source.py`
 (`v{YYYY.MM.DD}-planes-readsb-{prod|staging}-0.tar.{aa,ab,...}`, repository `globe_history_{year}`). A naming change shows up as
-`DayNotAvailable` for days that exist in the browser. Fix `_URL`/`KINDS`, update `tests/test_source.py`, and re-run. Compare the
+`DayNotAvailable` for days that exist in the browser. Fix `_URL`/`KINDS`, update `tests/test_source.py`, and re run. Compare the
 result with an already ingested day before trusting it (row counts per cell).
 
 User agent: `HttpxFetcher` previously sent httpx's default agent. It now sends
@@ -239,7 +239,7 @@ User agent: `HttpxFetcher` previously sent httpx's default agent. It now sends
 ## 7. Baseline refit policy
 
 The baseline in `state/` is frozen: scoring a new day never changes it, which keeps the dataset comparable over time and the
-held-out evaluation honest. Refit manually, on a branch of `main`, when either:
+held out evaluation honest. Refit manually, on a branch of `main`, when either:
 
 - every N weeks (suggested N = 12, a project choice, not derived), or
 - after a coverage step change: the receiver network visibly changed (a drop or jump in `coverage.json` presence, a new feeder
