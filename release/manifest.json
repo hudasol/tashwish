@@ -1,0 +1,438 @@
+{
+ "schema": "tashwish.release.v1",
+ "dataset_version": "observed-2026-03-13-73ebe3c6",
+ "generated_at": "2026-10-13T13:07:00Z",
+ "code_commit": "e61fbc3",
+ "data_class": "observed",
+ "attribution": "Contains information from adsb.lol, which is made available here under the Open Database License (ODbL). This derived database (Tashwish aggregates) is also made available under the ODbL 1.0.",
+ "grid": {
+  "h3_res": 4,
+  "bucket_hours": 3
+ },
+ "bbox": {
+  "south": 22.0,
+  "west": 46.0,
+  "north": 31.0,
+  "east": 62.0
+ },
+ "days": [
+  {
+   "aircraft": 2056,
+   "data_class": "observed",
+   "day": "2026-02-07",
+   "ingested_at": "2026-10-12T03:54:54Z",
+   "mode": "frozen_baseline",
+   "n_events": 0,
+   "rows": 1747563,
+   "split": "held_out"
+  },
+  {
+   "aircraft": 2111,
+   "data_class": "observed",
+   "day": "2026-02-08",
+   "ingested_at": "2026-10-12T01:36:25Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 2,
+   "rows": 1678759,
+   "split": "dev"
+  },
+  {
+   "aircraft": 2066,
+   "data_class": "observed",
+   "day": "2026-02-09",
+   "ingested_at": "2026-10-12T01:43:33Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 0,
+   "rows": 1748228,
+   "split": "dev"
+  },
+  {
+   "aircraft": 2105,
+   "data_class": "observed",
+   "day": "2026-02-10",
+   "ingested_at": "2026-10-12T04:05:58Z",
+   "mode": "frozen_baseline",
+   "n_events": 0,
+   "rows": 1789001,
+   "split": "held_out"
+  },
+  {
+   "aircraft": 2152,
+   "data_class": "observed",
+   "day": "2026-02-11",
+   "ingested_at": "2026-10-12T04:17:54Z",
+   "mode": "frozen_baseline",
+   "n_events": 0,
+   "rows": 1817726,
+   "split": "held_out"
+  },
+  {
+   "aircraft": 2166,
+   "data_class": "observed",
+   "day": "2026-02-12",
+   "ingested_at": "2026-10-12T04:29:47Z",
+   "mode": "frozen_baseline",
+   "n_events": 0,
+   "rows": 1795054,
+   "split": "held_out"
+  },
+  {
+   "aircraft": 2146,
+   "data_class": "observed",
+   "day": "2026-02-13",
+   "ingested_at": "2026-10-12T01:52:12Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 0,
+   "rows": 1816188,
+   "split": "dev"
+  },
+  {
+   "aircraft": 2138,
+   "data_class": "observed",
+   "day": "2026-02-14",
+   "ingested_at": "2026-10-11T02:56:20Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 0,
+   "rows": 1793546,
+   "split": "dev"
+  },
+  {
+   "aircraft": 2129,
+   "data_class": "observed",
+   "day": "2026-02-15",
+   "ingested_at": "2026-10-11T03:01:30Z",
+   "mode": "frozen_baseline",
+   "n_events": 0,
+   "rows": 1745629,
+   "split": "held_out"
+  },
+  {
+   "aircraft": 2051,
+   "data_class": "observed",
+   "day": "2026-02-16",
+   "ingested_at": "2026-10-12T01:57:21Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 0,
+   "rows": 1643083,
+   "split": "dev"
+  },
+  {
+   "aircraft": 2052,
+   "data_class": "observed",
+   "day": "2026-02-17",
+   "ingested_at": "2026-10-12T02:02:53Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 1,
+   "rows": 1664449,
+   "split": "dev"
+  },
+  {
+   "aircraft": 2041,
+   "data_class": "observed",
+   "day": "2026-02-18",
+   "ingested_at": "2026-10-12T04:39:56Z",
+   "mode": "frozen_baseline",
+   "n_events": 0,
+   "rows": 1655933,
+   "split": "held_out"
+  },
+  {
+   "aircraft": 2041,
+   "data_class": "observed",
+   "day": "2026-02-19",
+   "ingested_at": "2026-10-12T02:12:47Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 1,
+   "rows": 1741242,
+   "split": "dev"
+  },
+  {
+   "aircraft": 2021,
+   "data_class": "observed",
+   "day": "2026-02-20",
+   "ingested_at": "2026-10-12T02:21:36Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 0,
+   "rows": 1715407,
+   "split": "dev"
+  },
+  {
+   "aircraft": 1955,
+   "data_class": "observed",
+   "day": "2026-02-21",
+   "ingested_at": "2026-10-12T02:28:57Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 0,
+   "rows": 1652045,
+   "split": "dev"
+  },
+  {
+   "aircraft": 2019,
+   "data_class": "observed",
+   "day": "2026-02-22",
+   "ingested_at": "2026-10-12T02:37:23Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 0,
+   "rows": 1649467,
+   "split": "dev"
+  },
+  {
+   "aircraft": 1994,
+   "data_class": "observed",
+   "day": "2026-02-23",
+   "ingested_at": "2026-10-12T02:45:23Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 0,
+   "rows": 1797065,
+   "split": "dev"
+  },
+  {
+   "aircraft": 1988,
+   "data_class": "observed",
+   "day": "2026-02-24",
+   "ingested_at": "2026-10-12T04:51:06Z",
+   "mode": "frozen_baseline",
+   "n_events": 0,
+   "rows": 1733842,
+   "split": "held_out"
+  },
+  {
+   "aircraft": 1985,
+   "data_class": "observed",
+   "day": "2026-02-25",
+   "ingested_at": "2026-10-12T02:52:35Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 0,
+   "rows": 1681313,
+   "split": "dev"
+  },
+  {
+   "aircraft": 1966,
+   "data_class": "observed",
+   "day": "2026-02-26",
+   "ingested_at": "2026-10-12T04:59:42Z",
+   "mode": "frozen_baseline",
+   "n_events": 0,
+   "rows": 1716739,
+   "split": "held_out"
+  },
+  {
+   "aircraft": 1969,
+   "data_class": "observed",
+   "day": "2026-02-27",
+   "ingested_at": "2026-10-12T02:58:43Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 0,
+   "rows": 1652576,
+   "split": "dev"
+  },
+  {
+   "aircraft": 1288,
+   "data_class": "observed",
+   "day": "2026-02-28",
+   "ingested_at": "2026-10-12T05:08:27Z",
+   "mode": "frozen_baseline",
+   "n_events": 5,
+   "rows": 871125,
+   "split": "held_out"
+  },
+  {
+   "aircraft": 442,
+   "data_class": "observed",
+   "day": "2026-03-01",
+   "ingested_at": "2026-10-12T05:18:07Z",
+   "mode": "frozen_baseline",
+   "n_events": 1,
+   "rows": 398501,
+   "split": "held_out"
+  },
+  {
+   "aircraft": 549,
+   "data_class": "observed",
+   "day": "2026-03-02",
+   "ingested_at": "2026-10-11T02:49:11Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 1,
+   "rows": 528142,
+   "split": "dev"
+  },
+  {
+   "aircraft": 601,
+   "data_class": "observed",
+   "day": "2026-03-03",
+   "ingested_at": "2026-10-12T05:25:34Z",
+   "mode": "frozen_baseline",
+   "n_events": 0,
+   "rows": 446996,
+   "split": "held_out"
+  },
+  {
+   "aircraft": 688,
+   "data_class": "observed",
+   "day": "2026-03-04",
+   "ingested_at": "2026-10-12T03:06:08Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 1,
+   "rows": 486915,
+   "split": "dev"
+  },
+  {
+   "aircraft": 732,
+   "data_class": "observed",
+   "day": "2026-03-05",
+   "ingested_at": "2026-10-12T03:11:58Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 2,
+   "rows": 447185,
+   "split": "dev"
+  },
+  {
+   "aircraft": 756,
+   "data_class": "observed",
+   "day": "2026-03-06",
+   "ingested_at": "2026-10-12T03:18:58Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 4,
+   "rows": 376544,
+   "split": "dev"
+  },
+  {
+   "aircraft": 675,
+   "data_class": "observed",
+   "day": "2026-03-07",
+   "ingested_at": "2026-10-12T03:25:03Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 1,
+   "rows": 357260,
+   "split": "dev"
+  },
+  {
+   "aircraft": 667,
+   "data_class": "observed",
+   "day": "2026-03-08",
+   "ingested_at": "2026-10-12T05:37:21Z",
+   "mode": "frozen_baseline",
+   "n_events": 2,
+   "rows": 352159,
+   "split": "held_out"
+  },
+  {
+   "aircraft": 747,
+   "data_class": "observed",
+   "day": "2026-03-09",
+   "ingested_at": "2026-10-12T03:30:57Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 1,
+   "rows": 380287,
+   "split": "dev"
+  },
+  {
+   "aircraft": 717,
+   "data_class": "observed",
+   "day": "2026-03-10",
+   "ingested_at": "2026-10-12T05:48:40Z",
+   "mode": "frozen_baseline",
+   "n_events": 1,
+   "rows": 366101,
+   "split": "held_out"
+  },
+  {
+   "aircraft": 787,
+   "data_class": "observed",
+   "day": "2026-03-11",
+   "ingested_at": "2026-10-12T03:36:36Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 1,
+   "rows": 382707,
+   "split": "dev"
+  },
+  {
+   "aircraft": 744,
+   "data_class": "observed",
+   "day": "2026-03-12",
+   "ingested_at": "2026-10-12T03:44:59Z",
+   "mode": "dev_leave_one_day_out",
+   "n_events": 2,
+   "rows": 345554,
+   "split": "dev"
+  },
+  {
+   "aircraft": 737,
+   "data_class": "observed",
+   "day": "2026-03-13",
+   "ingested_at": "2026-10-12T06:01:14Z",
+   "mode": "frozen_baseline",
+   "n_events": 1,
+   "rows": 323222,
+   "split": "held_out"
+  }
+ ],
+ "latest_day": "2026-03-13",
+ "files": {
+  "DATA_CARD.md": {
+   "path": "DATA_CARD.md",
+   "sha256": "784f552c60cab6635f81a46735bba374da2f0aeff05bd7c5f1b59ec1858b9c96",
+   "bytes": 4720
+  },
+  "NOTICE": {
+   "path": "NOTICE",
+   "sha256": "9fcfdcada48f67e53811e7cd7fd7da0cb63c8c6e19fde39fb25a3ca458dc44d8",
+   "bytes": 872
+  },
+  "ODbL-1.0.txt": {
+   "path": "ODbL-1.0.txt",
+   "sha256": "d93f996262c15e7cf9d6b54f9f48e3f9d8b9c3a47fa2308dc8ef1f0f5cb88611",
+   "bytes": 25241
+  },
+  "cell_buckets.csv.gz": {
+   "path": "cell_buckets.csv.gz",
+   "sha256": "8274ae35ecb1ea92708a02c0b97f49c9baa402c0d5c5c4508a1aaaed89eee4b7",
+   "bytes": 1450997
+  },
+  "cell_buckets.parquet": {
+   "path": "cell_buckets.parquet",
+   "sha256": "5356f931343179e914d22878bbfd83cca781c89bbbc078163d717e522c048abb",
+   "bytes": 584622
+  },
+  "coverage.parquet": {
+   "path": "coverage.parquet",
+   "sha256": "a08fb89d548df0367543a2e262d74189bee62602214538485bbb3cbdf0abd702",
+   "bytes": 48240
+  },
+  "daily_region.csv": {
+   "path": "daily_region.csv",
+   "sha256": "3bb415f172b172121941c37b9d68dbde795ee1266f80072df7eb6e56837bf6eb",
+   "bytes": 3104
+  },
+  "events.csv.gz": {
+   "path": "events.csv.gz",
+   "sha256": "213bae5e6bace257f3114248fec5ae996174f32bdfe328755268c6bd79201b30",
+   "bytes": 2125
+  },
+  "events.parquet": {
+   "path": "events.parquet",
+   "sha256": "eade5d34536ead1afa642b716deb3ba979e3c028572d19877bcc747cae22aa33",
+   "bytes": 16058
+  },
+  "freshness.json": {
+   "path": "freshness.json",
+   "sha256": "42ad543159a23a3d46dd510fa2fc377ec5ea3d6e3be129c456a864eda73f27e3",
+   "bytes": 72
+  },
+  "validation.json": {
+   "path": "validation.json",
+   "sha256": "30d6c3db91889a6f42d6474f9ad653b6bf45d47bcbe6a527f3ef15c1b1545d59",
+   "bytes": 4940
+  },
+  "checksums.sha256": {
+   "path": "checksums.sha256",
+   "sha256": "b547c7e057465989c12c130423be4b5a6ff69ab4841f1d79db12d10f566340f5",
+   "bytes": 894
+  }
+ },
+ "mode": "study_snapshot",
+ "study_window": {
+  "start": "2026-02-07",
+  "end": "2026-03-13"
+ }
+}

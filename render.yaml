@@ -1,0 +1,33 @@
+# Render blueprint for the read only Tashwish release API (free web service).
+#
+# Free plan facts that matter (see docs/API.md, "What the free tier does not guarantee"):
+#   * the service sleeps after about 15 minutes without traffic; the first request afterwards waits for a cold start
+#     (roughly a minute: container start, then Python imports and opening the release), so clients should retry;
+#   * 512 MB RAM and a shared CPU: DuckDB is limited to one thread and 256 MB by the settings below;
+#   * the disk is ephemeral and there is no persistent volume, so the release directory is read from the deployed
+#     repository (release/) and a new release goes live with a new deploy;
+#   * the platform health check hits /health, which only reads small cached JSON and never the Parquet files.
+services:
+  - type: web
+    name: tashwish-api
+    runtime: python
+    plan: free
+    region: frankfurt
+    buildCommand: pip install --upgrade pip && pip install '.[api]'
+    startCommand: uvicorn tashwish.api.app:create_app_from_env --factory --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: TASHWISH_RELEASE_DIR
+        value: release
+      - key: TASHWISH_DUCKDB_THREADS
+        value: "1"
+      - key: TASHWISH_DUCKDB_MEMORY
+        value: 256MB
+      # TASHWISH_TRUSTED_PROXY_HOPS is deliberately unset: without it the limiter keys on the peer address and ignores
+      # X-Forwarded-For. Behind Render's proxy that makes every client share one bucket; set the hop count only after
+      # checking how many proxies append to the header (UNVERIFIED, not checked here).
+      - key: TASHWISH_RATE_LIMIT_PER_MIN
+        value: "120"

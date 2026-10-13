@@ -37,6 +37,7 @@ QUALITY_MAX_AGE_S = 120.0
 # Source/type value for non-transponder emitters (e.g. airport ground vehicles). Excluded from aircraft metrics,
 # but kept in the ingested table so the exclusion is auditable.
 SRC_NON_TRANSPONDER = "adsb_icao_nt"
+SRC_ADSB = "adsb_icao"  # position broadcast by the aircraft itself (readsb source tag)
 
 H3_RES_MAIN = 5
 H3_RES_FINE = 6
@@ -93,3 +94,17 @@ DETECT_MIN_LOWER_BOUND = 0.20  # Wilson lower bound of the degraded share must e
 DETECT_P0_FLOOR = 0.02  # baseline degraded share never assumed below this
 DETECT_HIGH_LOWER_BOUND = 0.40
 DETECT_MERGE_GAP_BUCKETS = 1  # events merge across at most this many empty buckets
+
+# --- spoofing-like detection (design choices; frozen before the held-out run) ---
+SPOOF_JUMP_MIN_KT = 650.0  # implied ground speed between consecutive fixes
+SPOOF_JUMP_MIN_KM = 5.0
+SPOOF_JUMP_SPEED_RATIO = 2.5  # implied speed must also exceed this multiple of the reported speed (floor 100 kt)
+SPOOF_DT_FLOOR_S = (
+    1.0  # implied speed is computed over at least this many seconds (median fix gap is about 4 s; 54% are < 5 s)
+)
+SPOOF_DT_MAX_S = 120.0
+SPOOF_CLUSTER_KM = 20.0  # jump destinations within this distance...
+SPOOF_CLUSTER_MIN = 30 * 60  # ...and this many seconds are the same cluster
+SPOOF_MIN_AIRCRAFT = 3  # distinct aircraft needed for a spoofing-like event
+SPOOF_HIGH_AIRCRAFT = 5
+SPOOF_HIGH_SPREAD_KM = 10.0

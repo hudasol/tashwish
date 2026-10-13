@@ -276,8 +276,7 @@ excerpt). Transitive dependencies were not enumerated.
 8. The OSMF subpages specific to Produced Work and Substantial (for example the Produced Work and Substantial guideline
    subpages) were not fetched, only the Community Guidelines landing page and the Attribution Guidelines page.
 9. Whether publishing a dashboard in the UAE under a studio or university name changes any contractual position. Not
-   researched. Note the project does not want public material tied to the University of Stirling; the licensor is
-   the individual author unless the owner decides otherwise.
+   researched. The licensor is the individual author unless the owner decides otherwise.
 
 Owner must fetch (pages that errored in this session, no workaround attempted):
 

@@ -1,0 +1,10 @@
+{
+ "aircraft": 2051,
+ "data_class": "observed",
+ "day": "2026-02-16",
+ "ingested_at": "2026-10-12T01:57:21Z",
+ "mode": "dev_leave_one_day_out",
+ "n_events": 0,
+ "rows": 1643083,
+ "split": "dev"
+}

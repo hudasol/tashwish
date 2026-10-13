@@ -22,8 +22,9 @@ from ..metrics.stats import benjamini_hochberg, binom_sf_pvalue, fit_beta_prior,
 def baseline_p0(cb: pd.DataFrame, baseline_days: list[str], tier: str = "strong") -> pd.DataFrame:
     """Per (cell, stratum) degraded share over baseline days, leave-one-day-out, shrunk and floored.
 
-    Returns one row per (cell, stratum, day) in `cb` with columns p0 and n_base. Contamination of the baseline by past
-    events can only raise p0, which makes the detector more conservative.
+    Returns one row per (cell, stratum, day) in `cb` with columns p0 and n_base. Contamination by past events raises p0 and so makes
+    the detector more conservative ONLY IF the baseline days resemble the scored day. Across a regime change that is false: baselines
+    are therefore fitted per regime (see `tashwish.regime`).
     """
     kcol = "k_strong" if tier == "strong" else "k_gpsjam"
     d = cb.assign(day=cb["bucket"].dt.tz_convert("UTC").dt.strftime("%Y-%m-%d"))
@@ -41,16 +42,38 @@ def baseline_p0(cb: pd.DataFrame, baseline_days: list[str], tier: str = "strong"
     return m[["cell", "stratum", "day", "p0", "n_base"]]
 
 
+def fit_p0(cb: pd.DataFrame, baseline_days: list[str], tier: str = "strong") -> pd.DataFrame:
+    """Pooled (not leave-one-out) per (cell, stratum) baseline p0 for scoring days that are NOT baseline days."""
+    kcol = "k_strong" if tier == "strong" else "k_gpsjam"
+    d = cb.assign(day=cb["bucket"].dt.tz_convert("UTC").dt.strftime("%Y-%m-%d"))
+    base = d[d["day"].isin(set(baseline_days))]
+    tot = base.groupby(["cell", "stratum"], as_index=False).agg(K=(kcol, "sum"), N=("n_aircraft", "sum"))
+    a, b = fit_beta_prior(tot["K"].to_numpy(), tot["N"].to_numpy())
+    tot["p0"] = np.maximum((tot["K"] + a) / (tot["N"] + a + b), cfg.DETECT_P0_FLOOR)
+    return tot[["cell", "stratum", "p0"]]
+
+
 def flag_buckets(
-    cb: pd.DataFrame, baseline_days: list[str], tier: str = "strong", stratum: str = "enroute"
+    cb: pd.DataFrame,
+    baseline_days: list[str],
+    tier: str = "strong",
+    stratum: str = "enroute",
+    p0: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
-    """Return the tested cell-buckets of one stratum with p-values and a boolean `flag`."""
+    """Return the tested cell-buckets of one stratum with p-values and a boolean `flag`.
+
+    `p0`: optional precomputed table from fit_p0 (for scoring days that are not baseline days); otherwise
+    leave-one-day-out baselines.
+    """
     kcol = "k_strong" if tier == "strong" else "k_gpsjam"
     t = cb[(cb["stratum"] == stratum) & (cb["status"] == "ok")].copy()
     if t.empty:
         return t.assign(p0=[], p_value=[], p_adj_ok=[], ci_lo=[], ci_hi=[], k=[], flag=[])
     t["day"] = t["bucket"].dt.tz_convert("UTC").dt.strftime("%Y-%m-%d")
-    t = t.merge(baseline_p0(cb, baseline_days, tier), on=["cell", "stratum", "day"], how="left")
+    if p0 is None:
+        t = t.merge(baseline_p0(cb, baseline_days, tier), on=["cell", "stratum", "day"], how="left")
+    else:
+        t = t.merge(p0, on=["cell", "stratum"], how="left")
     t["p0"] = t["p0"].fillna(cfg.DETECT_P0_FLOOR)
     t["k"] = t[kcol].astype(int)
     t["p_value"] = binom_sf_pvalue(t["k"], t["n_aircraft"], t["p0"])
@@ -113,6 +136,6 @@ def build_events(flags: pd.DataFrame, grid: cfg.Grid, tier: str = "strong") -> p
     return pd.DataFrame(out, columns=cols).sort_values(["start", "event_id"]).reset_index(drop=True)
 
 
-def detect_jamming(cb, baseline_days, grid, tier="strong", stratum="enroute"):
-    flags = flag_buckets(cb, baseline_days, tier, stratum)
+def detect_jamming(cb, baseline_days, grid, tier="strong", stratum="enroute", p0=None):
+    flags = flag_buckets(cb, baseline_days, tier, stratum, p0)
     return flags, build_events(flags, grid, tier)
