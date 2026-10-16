@@ -4,8 +4,10 @@ Research and monitoring tool. Not for navigation or safety of life. Nothing here
 
 This file is committed BEFORE any day after 2026-03-13 was downloaded, parsed or scored. Its git history, and the commit time of
 this file compared with the `ingested_at` time in each forward day's `day.json`, are the evidence for that order. The machine
-readable copy that the scorer reads is `results/forward/predictions_forward.json`; a test checks that the two agree. Editing
-either file after the first forward day is processed invalidates the evaluation, and git history would show it.
+readable copy that the scorer reads is `results/forward/predictions_forward.json`; a test checks that every prediction row,
+pass criterion, probability, daily check and evaluability rule in this file agrees with it. Editing either file after the first
+forward day is processed invalidates the evaluation, and git history would show it. Section 7 lists the amendments made before
+any forward day was downloaded.
 
 ## 1. Why a forward evaluation
 
@@ -19,13 +21,16 @@ learned in February and March still describes the data afterwards.
 - **Block.** The 30 UTC days 2026-03-14 to 2026-04-12. These are exactly the first 30 days the incremental pipeline processes
   when it starts from an empty processed folder, because it resumes after `baseline_end` (2026-03-13) in `state/state.json`.
 - **System.** Unchanged. Each day is scored by `python -m tashwish.operate.incremental` with the frozen state in `state/`
-  (fitted on development days only). No refit, no threshold change, no change to the detectors. The scorer accepts only days
-  whose `day.json` says `mode` `frozen_baseline` and whose recorded `state_sha256` equals the SHA-256 of the committed
-  `state/state.json`; other days are listed as rejected, not scored.
-- **Scorer.** `scripts/score_forward.py score`, committed with this file and tested on synthetic days only. It reads processed
-  outputs and the frozen state, recomputes the two regime labels with the frozen rules of `src/tashwish/regime.py`, and writes
-  `results/forward/forward_scored.json` and `docs/FORWARD_RESULTS.md`. It refuses any day inside the study window, so it cannot
-  score a held out day.
+  (fitted on development days only). No refit, no threshold change, no change to the detectors. The spec pins the SHA-256 of
+  the committed `state/state.json`; the scorer refuses to run with any other state, so a refit cannot be scored as this
+  evaluation. It accepts only days whose `day.json` says `mode` `frozen_baseline`, `data_class` `observed`, a recorded
+  `state_sha256` equal to the pinned one, and an `ingested_at` later than the commit time of this preregistration
+  (`registered_at` in the spec); other days are listed as rejected with the reason, not scored.
+- **Scorer.** `scripts/score_forward.py score`, committed in the commit after this file (also before any forward day was
+  downloaded) and tested on synthetic days only. It reads processed outputs and the frozen state, recomputes the two regime
+  labels with the frozen rules of `src/tashwish/regime.py`, and writes `results/forward/forward_scored.json` and
+  `docs/FORWARD_RESULTS.md`, recording its own SHA-256 and that of the spec. It refuses a block that touches the study window, so
+  it cannot score a held out day.
 - **Data class.** Every measure is OBSERVED: real days, nothing injected.
 - **Missing days.** A day that is not published, fails to process or is rejected is listed, never imputed. The incremental run
   processes days in order, so the scored days are a contiguous run from 2026-03-14.
@@ -38,8 +43,9 @@ learned in February and March still describes the data afterwards.
 - **Brier score.** The mean of (stated probability minus outcome) squared over evaluable predictions, outcome 1 for HIT and 0 for
   MISS. A constant forecast of 0.5 scores 0.25. The predictions are correlated (F1, F3, F4 and F10 move together), so the Brier
   score is not an average over independent events.
-- **Run once.** The scorer is run on the first complete processing of the block and its output is committed whatever it says.
-  Misses are reported before hits.
+- **Run once.** The scorer refuses to run until 2026-04-12 is processed. If a day of the block can never be processed (a
+  permanent archive gap that stops the incremental run), it is run once with `--incomplete-reason` stating the gap, and the reason
+  is written into the output. Its first output is committed whatever it says. Misses are reported before hits.
 
 ## 3. What the predictions were anchored on
 
@@ -56,7 +62,7 @@ construction (`docs/METHODOLOGY.md`, Regimes).
 
 ## 4. Predictions
 
-Probability is my stated probability that the prediction is a HIT. The threshold columns are design choices written before the
+Probability is the stated probability that the prediction is a HIT. The threshold columns are design choices written before the
 data, not estimates.
 
 | ID | Prediction | Measure | Days | Pass criterion | Probability |
@@ -88,6 +94,8 @@ Besides the block level verdicts, the scorer reports, in date order, the first s
 | false_coverage | the day's false coverage rate is at most 0.55 on a reduced traffic day, or at most 0.10 on a normal traffic day |
 | events | the day has at most 4 events (the largest daily count on development days) |
 
+A day with no covered en route unit fails the false_coverage check. The counts of failing days are counts, without an interval.
+
 ## 6. How to run it (needs the maintainer)
 
 The incremental run needs the `TASHWISH_STATE_KEY` secret, which is not available to the session that wrote this file.
@@ -101,3 +109,15 @@ python scripts/score_forward.py score --processed <processed folder>
 
 Commit `results/forward/forward_scored.json` and `docs/FORWARD_RESULTS.md` as produced, together with the per day rows,
 aircraft and run time recorded by the run.
+
+## 7. Amendments before any forward data
+
+Made on 2026-10-16 after an independent review, before any day after 2026-03-13 was downloaded. No prediction, pass criterion,
+probability, block, evaluability rule or daily check threshold was changed. The changes are visible in git history.
+
+1. The spec gained `registered_at` (the commit time of this file), `registered_commit` and `state_sha256`, and the scorer now
+   refuses another state, rejects days ingested before `registered_at` or not labelled observed, and refuses an incomplete block
+   unless a permanent gap is recorded (sections 2 and 6).
+2. A day with no covered unit now fails the false_coverage daily check instead of passing it (section 5).
+3. The development day anchors in `results/forward/dev_calibration.json` gained day bootstrap intervals.
+4. Wording: the scorer is described as committed in the next commit, and the agreement test as covering every row.
