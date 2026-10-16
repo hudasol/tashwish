@@ -11,6 +11,9 @@ from pathlib import Path
 
 import pandas as pd
 
+from tashwish import config as cfg
+from tashwish.split import split
+
 ROOT = Path(__file__).resolve().parents[1]
 DOC = ROOT / "docs" / "SECONDARY_ANALYSES.md"
 
@@ -30,10 +33,11 @@ SOURCES = [
         "https://www.ch-aviation.com/news/164379-gulf-iran-iraq-syria-israel-close-to-all-traffic",
     ),
     (
-        "OCCRP news item, dated 5 March 2026",
-        "Reports widespread GNSS and AIS interference affecting ships in Gulf waters from 28 February 2026, citing analyses by "
-        "Windward (published 1 March) and Lloyd's List (2 March). It does not mention aircraft.",
-        "https://www.occrp.org/en/news/more-than-1100-ships-hit-by-widespread-gps-disruption-after-iran-strikes",
+        "Windward, maritime analytics report, dated 18 June 2026",
+        "Reports GPS jamming affecting vessels concentrated in the Middle East Gulf in the first quarter of 2026, accelerating "
+        "sharply over two weeks in early 2026 (Strait of Hormuz, Persian Gulf, Gulf of Oman). Its Gulf sections do not mention "
+        "aircraft.",
+        "https://windward.ai/blog/what-is-gps-jamming-and-why-are-we-seeing-so-much-of-it/",
     ),
     (
         "Radionavigation Laboratory, University of Texas at Austin, post dated March 2026",
@@ -59,7 +63,7 @@ def beta_binomial_section() -> list[str]:
         "Question: the detector tests each cell bucket against a binomial distribution, which treats the baseline share as known",
         "and every aircraft as independent. How many flags survive if degraded reports are allowed to cluster within a cell",
         "bucket (a beta binomial tail with the same mean and an intra cell bucket correlation rho)? Every other rule is unchanged.",
-        "Held out days are not read.",
+        "This section reads development days only.",
         "",
         f"Reproduction check: rebuilding the binomial flags from the processed cell buckets gives {rep['rebuilt_jamming_events']} "
         f"jamming-like events on the {r['n_days']} development days; the committed events contain "
@@ -71,36 +75,44 @@ def beta_binomial_section() -> list[str]:
     ]
     for name, g in r["by_degraded_regime"].items():
         c = g["counts"]
+        rho = (
+            "not estimable (underdispersed, set to 0)"
+            if g["mean_dispersion_ratio"] < 1
+            else f"{f3(g['rho'])} ({f3(g['rho_ci'][0])} to {f3(g['rho_ci'][1])})"
+        )
         lines.append(
-            f"| {name} | {g['n_days']} | {g['n_tested_units']} | {f3(g['mean_dispersion_ratio'])} | {f3(g['rho'])} "
-            f"({f3(g['rho_ci'][0])} to {f3(g['rho_ci'][1])}) | {c['binomial']['flags']} | "
-            f"{c['rho_low']['flags']}, {c['rho_point']['flags']}, {c['rho_high']['flags']} |"
+            f"| {name} | {g['n_days']} | {g['n_tested_units']} | {f3(g['mean_dispersion_ratio'])} | {rho} | "
+            f"{c['binomial']['flags']} | {c['rho_low']['flags']}, {c['rho_point']['flags']}, {c['rho_high']['flags']} |"
         )
     lines += ["", "Flags remaining at fixed values of rho:", "", "| Degraded regime | " +
               " | ".join(f"rho {k}" for k in next(iter(r["by_degraded_regime"].values()))["flags_by_rho_grid"]) + " |"]  # fmt: skip
     lines.append("|---|" + "---|" * len(next(iter(r["by_degraded_regime"].values()))["flags_by_rho_grid"]))
     for name, g in r["by_degraded_regime"].items():
         lines.append(f"| {name} | " + " | ".join(str(v) for v in g["flags_by_rho_grid"].values()) + " |")
-    el, bl = r["by_degraded_regime"].get("elevated"), r["by_degraded_regime"].get("baseline")
-    lines += ["", "Reading:", ""]
-    if el:
-        lines.append(
-            f"- Elevated days: the unflagged units vary more than a binomial allows (mean dispersion ratio "
-            f"{f3(el['mean_dispersion_ratio'])}, where 1 means binomial). With rho anywhere in its interval, none of the "
-            f"{el['counts']['binomial']['flags']} binomial flags survives. These flags are not robust to overdispersion."
-        )
-    if bl:
-        lines.append(
-            f"- Baseline days: the dispersion ratio is {f3(bl['mean_dispersion_ratio'])}, below 1, so the moment estimate of "
-            f"rho is {f3(bl['rho'])} and the {bl['counts']['binomial']['flags']} binomial flag stays. A ratio below 1 is "
-            "expected here because the baseline share is floored at 0.02, above the typical observed share, which makes the "
-            "binomial test conservative on these days."
-        )
+    lines += ["", "Reading (derived from the result file):", ""]
+    for name, g in r["by_degraded_regime"].items():
+        c, n = g["counts"], g["counts"]["binomial"]["flags"]
+        kept = sorted({c[k]["flags"] for k in ("rho_low", "rho_point", "rho_high")})
+        drop = [k for k, v in g["flags_by_rho_grid"].items() if v < n]
+        first_drop = f"; on the fixed grid, fewer flags remain from rho {drop[0]}" if drop else ""
+        if g["mean_dispersion_ratio"] < 1:
+            lines.append(
+                f"- {name.capitalize()} days: the dispersion ratio is {f3(g['mean_dispersion_ratio'])}, below 1, so rho cannot "
+                f"be estimated by moments and is set to 0; {kept[-1]} of {n} binomial flags remain{first_drop}. A ratio below 1 "
+                f"is consistent with the floor of {cfg.DETECT_P0_FLOOR} on the baseline share when typical shares are lower, "
+                "which makes the binomial test conservative."
+            )
+        else:
+            survive = f"{kept[0]}" if len(kept) == 1 else f"{kept[0]} to {kept[-1]}"
+            lines.append(
+                f"- {name.capitalize()} days: the dispersion ratio is {f3(g['mean_dispersion_ratio'])} (1 means binomial); "
+                f"with rho anywhere in its interval, {survive} of the {n} binomial flags remain{first_drop}."
+            )
     lines += [
-        "- The extra variation on elevated days may be clustering within cell buckets or a baseline share that does not fit"
-        " individual cells; the moment estimate cannot tell these apart. Either way the binomial p values on elevated days"
-        " are too small.",
-        "- Limits: 21 development days and a handful of flags; one moment estimator; the units used to estimate rho exclude"
+        "- The extra variation on elevated days may be clustering within cell buckets, a shift of the degraded share from day"
+        " to day, or a baseline share that does not fit individual cells; the moment estimate cannot tell these apart. The"
+        " binomial p values on those days are miscalibrated, in either direction for a given unit.",
+        f"- Limits: {r['n_days']} development days and few flags; one moment estimator; the units used to estimate rho exclude"
         " the binomial flags. This is a sensitivity analysis, not a change to the detector.",
         "",
     ]
@@ -126,16 +138,20 @@ def regime_section() -> list[str]:
     first_red = reg.loc[reg["traffic"] == "reduced", "day"].min()
     first_el = reg.loc[reg["degraded"] == "elevated", "day"].min()
     gap = (pd.Timestamp(first_el) - pd.Timestamp(first_red)).days
+    held = {d.isoformat() for d in split()[1]}
+    kind = {d: "a held out day" if d in held else "a development day" for d in (first_red, first_el)}
     lines = [
         "## 3. The regime change and public sources",
         "",
         "No cause is identified and none is asserted. Nothing here attributes interference to any state or actor. Several of",
         "the sources below discuss who may be responsible; this repository does not repeat or adopt any such attribution.",
         "",
-        "What the data show (`results/regimes.csv`, all study days, labels computed before any detection): the first day",
-        f"labelled traffic reduced is {first_red} and the first day labelled degraded elevated is {first_el}.",
+        "What the data show, quoted from results already published (`results/regimes.csv`, the README status block and",
+        f"`docs/VALIDATION.md`): the first day labelled traffic reduced is {first_red} ({kind[first_red]}) and the first day",
+        f"labelled degraded elevated is {first_el} ({kind[first_el]}). These published labels are quoted, not recomputed, and",
+        "no held out day is analysed further here.",
         "",
-        "What public sources state (fetched 2026-10-16; paraphrased; the sources' own wording and claims are theirs):",
+        "What public sources state (fetched 2026-10-16; paraphrased; no copy is stored; the sources' claims are theirs):",
         "",
         "| Source | What it states | Link |",
         "|---|---|---|",
@@ -143,14 +159,14 @@ def regime_section() -> list[str]:
     lines += [f"| {a} | {b} | {c} |" for a, b, c in SOURCES]
     lines += [
         "",
-        "What is established, and what is not:",
+        "What is reported, and what is not established:",
         "",
-        "- Established by the sources: from 28 February 2026 several airspaces in the study box were closed to commercial",
-        "  traffic, and a European regulator advised against or cautioned on operating there.",
-        "- Established by the sources: widespread GNSS interference affecting ships in Gulf waters was reported from the same",
-        "  date. None of the fetched sources gives an aviation measurement.",
-        f"- Consistent, not established: the traffic drop in the data starts on {first_red}, the date of the reported closures,",
-        f"  and the rise in degraded reports starts on {first_el}, {gap} day(s) later. Timing alone does not establish cause.",
+        "- Reported by the sources (reports, not ground truth): from 28 February 2026 several airspaces in the study box were",
+        "  closed to commercial traffic, and a European regulator advised against or cautioned on operating there.",
+        "- Reported by the sources: widespread GPS jamming affecting ships in Gulf waters in early 2026. None of the fetched",
+        "  sources gives an aviation measurement.",
+        f"- Consistent timing, not an established cause: the traffic drop in the data starts on {first_red}, the date of the",
+        f"  reported closures, and the rise in degraded reports starts on {first_el}, {gap} day(s) later.",
         "- Not established: that the rise in degraded ADS-B reports is caused by interference rather than by other changes",
         "  (which aircraft still fly, routing, avionics, receiver coverage). The rise also holds for the same aircraft seen before",
         "  and after (`results/dev/regime_check.json`), which argues against a pure change of aircraft mix but does not prove",
