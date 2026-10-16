@@ -266,9 +266,8 @@ card. Do not refit from the scheduled workflow.
 ## 8. CI and the README badge
 
 `ci.yml` runs ruff (check and format) and pytest with coverage on Python 3.11 and 3.13, with read only permissions, a 20 minute
-timeout and cancellation of superseded runs. At the time of writing, `ruff check .` and `ruff format --check .` report errors
-in `web/scripts/*.py`, `src/tashwish/api/app.py` and `tests/test_api.py`, so CI would fail until `ruff check . --fix` and
-`ruff format .` are run and the remaining findings fixed. This was not touched here to avoid editing files other work is changing.
+timeout and cancellation of superseded runs. When this file was first written, `ruff check .` and `ruff format --check .`
+reported errors; on 2026-10-16 both pass, and the CI runs of the pull requests opened that day passed on Python 3.11 and 3.13.
 
 Badge snippets to paste into the README when the owner wants them (replace nothing; the owner and repo are `hudasol/tashwish`):
 
