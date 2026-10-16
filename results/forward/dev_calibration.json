@@ -3,8 +3,16 @@
   "normal": {
    "events_day_max": 2,
    "events_per_day": 0.3076923076923077,
+   "events_per_day_ci": [
+    0.0,
+    0.6923076923076923
+   ],
    "false_coverage_day_max": 0.07692307692307693,
    "false_coverage_pooled": 0.06411666462992383,
+   "false_coverage_pooled_ci": [
+    0.060945273567438424,
+    0.06756417873647315
+   ],
    "jamming_like_events_per_day": 0.15384615384615385,
    "n_days": 13,
    "share_max": 0.0184929103630472,
@@ -13,8 +21,16 @@
   "reduced": {
    "events_day_max": 4,
    "events_per_day": 1.625,
+   "events_per_day_ci": [
+    1.125,
+    2.375
+   ],
    "false_coverage_day_max": 0.4977168949771689,
    "false_coverage_pooled": 0.37222222222222223,
+   "false_coverage_pooled_ci": [
+    0.3053564322162269,
+    0.4383003492433062
+   ],
    "jamming_like_events_per_day": 0.375,
    "n_days": 8,
    "share_max": 0.29728317659352144,
@@ -23,6 +39,7 @@
  },
  "data_class": "OBSERVED",
  "days": "development days only (held out days not read)",
+ "intervals": "day bootstrap 95%, 2000 resamples of whole days within the traffic regime, seed 20260314",
  "per_day": [
   {
    "day": "2026-02-08",
