@@ -32,3 +32,21 @@ Consequences:
   persistent emitter list another way would be a workaround of the secret, so it was not done. What was done instead is to make
   D ready to run: the forward preregistration (item B) and the forward scorer are committed before any new day was downloaded,
   so the maintainer can run C and D as soon as the key is set (see item D below).
+
+## B. Forward preregistration
+
+Done, before any new data was looked at.
+
+- `docs/PREDICTIONS_FORWARD.md` and its machine readable copy `results/forward/predictions_forward.json` (commit `7deb3f8`)
+  preregister twelve predictions for the 30 days 2026-03-14 to 2026-04-12: regime persistence (F1 to F6), false coverage by
+  traffic regime (F7, F8) and events per day (F9 to F12), each with a numeric pass criterion and a stated probability, plus three
+  daily checks that locate where the forward run fails first.
+- `scripts/score_forward.py` (commit `8ddabc6`) is the scorer, written before the data. It refuses study window days, rejects
+  days not scored with the committed frozen state, and writes HIT or MISS with intervals, the Brier score and the first failing day.
+  Its `calibrate` command wrote `results/forward/dev_calibration.json` from the 21 development days only. As a check of the
+  scorer, its recomputed regime labels, en route units and tested degraded shares equal `results/regimes.csv` on all 21
+  development days, and its per day false coverage equals the per day values in `results/dev/observed_coverage_summary.json`.
+- Tests: 300 passed (`PYTHONUTF8=1`), including 3 new tests in `tests/test_score_forward.py` on synthetic days. `ruff check`
+  and `ruff format --check` pass.
+- Limitation: the predictions were written after the held out summaries of the study window were published in this repository,
+  so they are informed by all 35 study days, not only by the development days. They are blind to every day after 2026-03-13.
