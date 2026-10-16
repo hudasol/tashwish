@@ -1,0 +1,30 @@
+{
+ "schema": "tashwish.forward_predictions.v1",
+ "written": "2026-10-16, before any day after 2026-03-13 was downloaded, parsed or scored",
+ "document": "docs/PREDICTIONS_FORWARD.md",
+ "block": {"first": "2026-03-14", "last": "2026-04-12"},
+ "first_week_end": "2026-03-20",
+ "min_days": 20,
+ "min_subset_days": 3,
+ "first_week_min_days": 5,
+ "bootstrap": {"reps": 2000, "seed": 20260314},
+ "daily_checks": {
+  "label_pair": ["reduced", "elevated"],
+  "false_coverage_max": {"reduced": 0.55, "normal": 0.10},
+  "events_max": 4
+ },
+ "predictions": [
+  {"id": "F1", "text": "The elevated degraded regime persists", "metric": "share_days_elevated", "subset": "all", "op": ">=", "threshold": 0.80, "p": 0.55},
+  {"id": "F2", "text": "No return to the baseline regime in the first week", "metric": "share_days_elevated", "subset": "first_week", "op": ">=", "threshold": 1.0, "p": 0.75},
+  {"id": "F3", "text": "The reduced traffic regime persists", "metric": "share_days_reduced", "subset": "all", "op": ">=", "threshold": 0.80, "p": 0.55},
+  {"id": "F4", "text": "The two regime labels stay coupled", "metric": "share_days_coupled", "subset": "all", "op": ">=", "threshold": 0.90, "p": 0.65},
+  {"id": "F5", "text": "The tested degraded share stays in the March range", "metric": "median_share", "subset": "elevated", "op": "between", "threshold": [0.10, 0.45], "p": 0.60},
+  {"id": "F6", "text": "The degraded label rarely switches", "metric": "label_switches", "subset": "all", "op": "<=", "threshold": 2, "p": 0.60},
+  {"id": "F7", "text": "False coverage on reduced traffic days stays high but bounded", "metric": "false_coverage_pooled", "subset": "reduced", "op": "between", "threshold": [0.20, 0.55], "p": 0.55},
+  {"id": "F8", "text": "False coverage on normal traffic days stays low", "metric": "false_coverage_pooled", "subset": "normal", "op": "<=", "threshold": 0.10, "p": 0.70},
+  {"id": "F9", "text": "Few events per day", "metric": "events_per_day", "subset": "all", "op": "<=", "threshold": 2.0, "p": 0.60},
+  {"id": "F10", "text": "Few jamming-like events on elevated days", "metric": "jamming_like_events_per_day", "subset": "elevated", "op": "<=", "threshold": 0.5, "p": 0.65},
+  {"id": "F11", "text": "Few events on baseline days", "metric": "events_per_day", "subset": "baseline", "op": "<=", "threshold": 0.5, "p": 0.60},
+  {"id": "F12", "text": "Most spoofing-like events carry an uncertain label", "metric": "spoofing_like_uncertain_share", "subset": "all", "op": ">=", "threshold": 0.50, "p": 0.75, "min_spoofing_like_events": 5}
+ ]
+}
