@@ -31,7 +31,7 @@ import pandas as pd
 from tashwish import config as cfg
 from tashwish import regime as rg
 from tashwish.metrics.stats import wilson_interval
-from tashwish.split import STUDY_END, STUDY_START, split
+from tashwish.split import STUDY_END, split
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = ROOT / "results" / "forward" / "predictions_forward.json"
@@ -166,8 +166,9 @@ def first_failures(t: pd.DataFrame, spec: dict) -> dict:
     dc = spec["daily_checks"]
     checks = {
         "label_pair": lambda r: (r["traffic"], r["degraded"]) == tuple(dc["label_pair"]),
+        # a day with no covered unit cannot show the coverage model working, so it fails the check
         "false_coverage": lambda r: (
-            np.isnan(r["false_coverage"]) or r["false_coverage"] <= dc["false_coverage_max"][r["traffic"]]
+            not np.isnan(r["false_coverage"]) and r["false_coverage"] <= dc["false_coverage_max"][r["traffic"]]
         ),
         "events": lambda r: r["events"] <= dc["events_max"],
     }
@@ -189,10 +190,13 @@ def calibrate(processed: Path, state: Path) -> dict:
     rows = [day_measures(processed, d.isoformat(), ref) for d in dev]
     t = pd.DataFrame(rows)
     by = {}
+    boot = {"reps": 2000, "seed": 20260314}
     for name, g in t.groupby("traffic"):
         by[name] = {
             "n_days": int(len(g)),
             "false_coverage_pooled": METRICS["false_coverage_pooled"](g),
+            "false_coverage_pooled_ci": day_bootstrap(g, METRICS["false_coverage_pooled"], **boot),
+            "events_per_day_ci": day_bootstrap(g, METRICS["events_per_day"], **boot),
             "false_coverage_day_max": float(g["false_coverage"].max()),
             "events_per_day": METRICS["events_per_day"](g),
             "events_day_max": int(g["events"].max()),
@@ -204,33 +208,47 @@ def calibrate(processed: Path, state: Path) -> dict:
         "schema": "tashwish.forward_calibration.v1",
         "data_class": "OBSERVED",
         "days": "development days only (held out days not read)",
+        "intervals": "day bootstrap 95%, 2000 resamples of whole days within the traffic regime, seed 20260314",
         "processed_mode": "dev_leave_one_day_out",
         "by_traffic_regime": by,
         "per_day": rows,
     }
 
 
-def score(processed: Path, state: Path, spec: dict, spec_sha256: str | None = None) -> dict:
+def score(
+    processed: Path, state: Path, spec: dict, spec_sha256: str | None = None, incomplete_reason: str | None = None
+) -> dict:
+    """Score the block. Refuses: a block touching the study window, a state other than the one pinned in the spec, and
+    (run once) a block whose last day is not processed, unless `incomplete_reason` records why it never will be."""
     meta = json.loads((state / "state.json").read_text(encoding="utf-8"))
     state_sha = sha256_file(state / "state.json")
+    if state_sha != spec["state_sha256"]:
+        raise SystemExit(f"refused: state/state.json sha256 {state_sha} is not the frozen state pinned in the spec")
     first, last = date.fromisoformat(spec["block"]["first"]), date.fromisoformat(spec["block"]["last"])
     if first <= STUDY_END or last < first:
         raise SystemExit("refused: the forward block must lie after the study window")
+    if not (processed / "days" / last.isoformat() / "day.json").exists() and not incomplete_reason:
+        raise SystemExit(f"refused: {last.isoformat()} is not processed; score once, when the block is complete")
     block = [(first + timedelta(days=i)).isoformat() for i in range((last - first).days + 1)]
     rows, missing, rejected = [], [], []
     for day in block:
         d = processed / "days" / day
-        if STUDY_START <= date.fromisoformat(day) <= STUDY_END:
-            raise SystemExit(f"refused: {day} is inside the study window")
         if not (d / "day.json").exists():
             missing.append(day)
             continue
         m = json.loads((d / "day.json").read_text(encoding="utf-8"))
         prov = m.get("provenance") or {}
-        if m.get("mode") != "frozen_baseline" or prov.get("state_sha256") != state_sha:
-            rejected.append({"day": day, "mode": m.get("mode"), "state_sha256": prov.get("state_sha256")})
+        why = [
+            *(["mode is not frozen_baseline"] if m.get("mode") != "frozen_baseline" else []),
+            *(["scored with another state"] if prov.get("state_sha256") != state_sha else []),
+            *(["data_class is not observed"] if m.get("data_class") != "observed" else []),
+            *(["ingested before the preregistration"] if (m.get("ingested_at") or "") <= spec["registered_at"] else []),
+        ]
+        if why:
+            rejected.append({"day": day, "reasons": why})
             continue
-        rows.append({**day_measures(processed, day, float(meta["ref_units"])), "code_commit": prov.get("code_commit")})
+        rows.append({**day_measures(processed, day, float(meta["ref_units"])), "code_commit": prov.get("code_commit"),
+                     "ingested_at": m["ingested_at"]})  # fmt: skip
     t = pd.DataFrame(rows)
     preds = [score_prediction(p, t, spec) if len(t) else
              {"id": p["id"], "p": p["p"], "verdict": "NOT EVALUABLE", "reason": "no scored days", "data_class": "OBSERVED"}
@@ -241,6 +259,8 @@ def score(processed: Path, state: Path, spec: dict, spec_sha256: str | None = No
         "schema": "tashwish.forward_scored.v1",
         "data_class": "OBSERVED",
         "spec_sha256": spec_sha256,
+        "scorer_sha256": sha256_file(Path(__file__)),
+        "incomplete_reason": incomplete_reason,
         "state_sha256": state_sha,
         "block": spec["block"],
         "n_days_scored": len(rows),
@@ -308,12 +328,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--state", type=Path, default=ROOT / "state")
     ap.add_argument("--out", type=Path)
     ap.add_argument("--doc", type=Path, default=DOC)
+    ap.add_argument("--incomplete-reason", help="score a block whose last day will never be processed, and record why")
     a = ap.parse_args(argv)
     if a.command == "calibrate":
         res, out = calibrate(a.processed, a.state), a.out or CALIB
     else:
         spec = json.loads(SPEC.read_text(encoding="utf-8"))
-        res, out = score(a.processed, a.state, spec, sha256_file(SPEC)), a.out or SCORED
+        res, out = score(a.processed, a.state, spec, sha256_file(SPEC), a.incomplete_reason), a.out or SCORED
         a.doc.write_text(render(res, spec), encoding="utf-8")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(res, indent=1, sort_keys=True, default=float) + "\n", encoding="utf-8")

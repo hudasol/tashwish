@@ -736,7 +736,7 @@ def validation_md(
         ]
     L += [
         "- Forward chained check: not done. It would fit on days up to 2026-03-02 and score 2026-03-08 to 2026-03-13. It needs a refit and a second run of the system, "
-        "and the held out run is single use, so no such number exists in this repository.",
+        "and the held out run is single use, so no such number exists in this repository. A forward evaluation on days after the study window is preregistered in `docs/PREDICTIONS_FORWARD.md` and has not been run.",
         "",
         "## 2. Jamming-like detector on synthetic injection (SYNTHETIC)",
         "",

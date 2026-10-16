@@ -109,7 +109,8 @@ time; days are not independent samples; precision and detection delay are not me
 - Whether any real event is interference. There is no ground truth in public ADS-B data. Replay of documented incident windows is
   weak evidence only.
 - Behaviour on other seasons, other regions, or a longer window. Not tested.
-- Free tier limits of GitHub Actions and Render for continuous operation (UNVERIFIED, see [NEXT_STEPS.md](NEXT_STEPS.md)).
+- Continuous operation within the free tiers of GitHub Actions and Render: the documented limits are cited in
+  [OPERATIONS.md](OPERATIONS.md); operation in practice is UNVERIFIED (see [NEXT_STEPS.md](NEXT_STEPS.md)).
 - The legal reading of the ODbL for derived aggregates is conservative and is not legal advice ([LICENSING.md](LICENSING.md)).
 
 ## 8. Ethics and use
