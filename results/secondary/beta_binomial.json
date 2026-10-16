@@ -1,0 +1,95 @@
+{
+ "by_degraded_regime": {
+  "baseline": {
+   "counts": {
+    "binomial": {
+     "events": 1,
+     "flags": 1,
+     "rho": 0.0
+    },
+    "rho_high": {
+     "events": 1,
+     "flags": 1,
+     "rho": 0.0
+    },
+    "rho_low": {
+     "events": 1,
+     "flags": 1,
+     "rho": 0.0
+    },
+    "rho_point": {
+     "events": 1,
+     "flags": 1,
+     "rho": 0.0
+    }
+   },
+   "flags_by_rho_grid": {
+    "0.001": 1,
+    "0.002": 1,
+    "0.005": 1,
+    "0.01": 1,
+    "0.02": 0,
+    "0.05": 0
+   },
+   "mean_dispersion_ratio": 0.7370400887656486,
+   "n_days": 13,
+   "n_tested_units": 23984,
+   "rho": 0.0,
+   "rho_ci": [
+    0.0,
+    0.0
+   ],
+   "rho_interval": "day bootstrap 95%, 2000 resamples, units not flagged by the binomial test"
+  },
+  "elevated": {
+   "counts": {
+    "binomial": {
+     "events": 3,
+     "flags": 3,
+     "rho": 0.0
+    },
+    "rho_high": {
+     "events": 0,
+     "flags": 0,
+     "rho": 0.13143609998479255
+    },
+    "rho_low": {
+     "events": 0,
+     "flags": 0,
+     "rho": 0.06059152405148411
+    },
+    "rho_point": {
+     "events": 0,
+     "flags": 0,
+     "rho": 0.09549193272151321
+    }
+   },
+   "flags_by_rho_grid": {
+    "0.001": 2,
+    "0.002": 2,
+    "0.005": 0,
+    "0.01": 0,
+    "0.02": 0,
+    "0.05": 0
+   },
+   "mean_dispersion_ratio": 2.0091761071705374,
+   "n_days": 8,
+   "n_tested_units": 2027,
+   "rho": 0.09549193272151321,
+   "rho_ci": [
+    0.06059152405148411,
+    0.13143609998479255
+   ],
+   "rho_interval": "day bootstrap 95%, 2000 resamples, units not flagged by the binomial test"
+  }
+ },
+ "data_class": "OBSERVED",
+ "days": "development days only",
+ "n_days": 21,
+ "reproduction": {
+  "committed_distinct_jamming_components": 4,
+  "days_differing": [],
+  "rebuilt_jamming_events": 4
+ },
+ "schema": "tashwish.beta_binomial.v1"
+}
