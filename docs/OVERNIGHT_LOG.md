@@ -141,3 +141,47 @@ under git), each with the problem in the reader's terms, what exists (citing rep
 labelled), what is proposed, what is not claimed, a free tier cost line, risks and one decision asked. No organisation is named in
 this repository. Public statements were used only where the page was fetched; one organisation's page refused access (HTTP 403)
 and was not retried another way, so that draft uses no mission statement. No draft claims contact, partnership, endorsement or use.
+
+## I. Final report
+
+What changed (all on feature branches, stacked on pull request 2; nothing merged, no tag pushed):
+
+| Pull request | Branch | Contents |
+|---|---|---|
+| https://github.com/hudasol/tashwish/pull/3 | `overnight/forward-prereg` | forward preregistration, scorer, development day calibration |
+| https://github.com/hudasol/tashwish/pull/4 | `overnight/science-extras` | beta binomial sensitivity, secondary analyses page, regime change sources |
+| https://github.com/hudasol/tashwish/pull/5 | `overnight/verification` | free tier limits from official pages, ODbL comparison, next steps |
+| https://github.com/hudasol/tashwish/pull/6 | `overnight/regenerate-review` | fixes from the adversarial review, stale statements, reading list, this report |
+
+Merge order: 2, then 3, 4, 5 and 6, each with its branch deleted on merge so that GitHub moves the next one onto `main`.
+
+Results, misses and failures first:
+
+- Not done: no day after the study window was ingested or scored (items C and D), because `TASHWISH_STATE_KEY` was not
+  available. No forward number exists.
+- Not done: the more realistic injection variants (item E2), for data volume and time.
+- OBSERVED, secondary, development days only: the jamming-like flags on elevated days do not survive the measured overdispersion,
+  the flag on baseline days does (`docs/SECONDARY_ANALYSES.md`, section 1, with intervals from `results/secondary/beta_binomial.json`).
+- Source review: the published regime dates coincide with publicly reported airspace closures and maritime GPS jamming at the end
+  of February and early March 2026; recorded as consistent timing only, no cause asserted, no attribution
+  (`docs/SECONDARY_ANALYSES.md`, section 3).
+- Verified: the free tier limits documented by GitHub, Render and Vercel (`docs/OPERATIONS.md`, section 9). The ODbL copy differs
+  from the official text in one cross reference (`licenses/README.md`).
+- Still UNVERIFIED: free disk and download speed on a real runner, adsb.lol fair use, archive publication lag, whether data
+  branch pushes count as activity, receiver network changes in early March 2026, and any aviation specific interference report.
+- Regeneration of every generated output reproduced the committed content exactly apart from build time, commit stamp and line
+  endings; nothing was committed from it.
+- Tests: 303 passed with `PYTHONUTF8=1`; `ruff check` and `ruff format --check` pass. Without UTF-8 mode, 6 release builder tests
+  fail on Windows because of a default encoding (item A). On Windows the generators also write CRLF line endings.
+
+Suggested tags (not pushed; the maintainer decides): `forward-prereg-v1` on `7deb3f8` (the preregistration as first committed)
+and `forward-prereg-v1.1` on `1af7194` (with the amendments made before any forward data). A tag for the end of the session
+belongs on the merge commit of pull request 6 once it is on `main`.
+
+Needs the maintainer: the `TASHWISH_STATE_KEY` repository secret, the merges, the ODbL file decision, the history rewrite
+decision, the adsb.lol maintainer questions, Zenodo, and the private proposal drafts (outside the repository).
+
+Single best next step: set `TASHWISH_STATE_KEY`, process 2026-03-14 to 2026-04-12 with the incremental run, and run
+`python scripts/score_forward.py score` once (`docs/PREDICTIONS_FORWARD.md`, section 6). It is the only test in this repository
+of whether the system describes days it has never seen.
+
