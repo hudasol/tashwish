@@ -11,13 +11,13 @@ Source: `results/secondary/beta_binomial.json`, written by `scripts/beta_binomia
 Question: the detector tests each cell bucket against a binomial distribution, which treats the baseline share as known
 and every aircraft as independent. How many flags survive if degraded reports are allowed to cluster within a cell
 bucket (a beta binomial tail with the same mean and an intra cell bucket correlation rho)? Every other rule is unchanged.
-Held out days are not read.
+This section reads development days only.
 
 Reproduction check: rebuilding the binomial flags from the processed cell buckets gives 4 jamming-like events on the 21 development days; the committed events contain 4 distinct jamming components; days that differ: none.
 
 | Degraded regime | Days | Tested units | Mean dispersion ratio | rho (day bootstrap 95%) | Flags, binomial | Flags at rho low, point, high |
 |---|---|---|---|---|---|---|
-| baseline | 13 | 23984 | 0.737 | 0.000 (0.000 to 0.000) | 1 | 1, 1, 1 |
+| baseline | 13 | 23984 | 0.737 | not estimable (underdispersed, set to 0) | 1 | 1, 1, 1 |
 | elevated | 8 | 2027 | 2.009 | 0.095 (0.061 to 0.131) | 3 | 0, 0, 0 |
 
 Flags remaining at fixed values of rho:
@@ -27,12 +27,12 @@ Flags remaining at fixed values of rho:
 | baseline | 1 | 1 | 1 | 1 | 0 | 0 |
 | elevated | 2 | 2 | 0 | 0 | 0 | 0 |
 
-Reading:
+Reading (derived from the result file):
 
-- Elevated days: the unflagged units vary more than a binomial allows (mean dispersion ratio 2.009, where 1 means binomial). With rho anywhere in its interval, none of the 3 binomial flags survives. These flags are not robust to overdispersion.
-- Baseline days: the dispersion ratio is 0.737, below 1, so the moment estimate of rho is 0.000 and the 1 binomial flag stays. A ratio below 1 is expected here because the baseline share is floored at 0.02, above the typical observed share, which makes the binomial test conservative on these days.
-- The extra variation on elevated days may be clustering within cell buckets or a baseline share that does not fit individual cells; the moment estimate cannot tell these apart. Either way the binomial p values on elevated days are too small.
-- Limits: 21 development days and a handful of flags; one moment estimator; the units used to estimate rho exclude the binomial flags. This is a sensitivity analysis, not a change to the detector.
+- Baseline days: the dispersion ratio is 0.737, below 1, so rho cannot be estimated by moments and is set to 0; 1 of 1 binomial flags remain; on the fixed grid, fewer flags remain from rho 0.02. A ratio below 1 is consistent with the floor of 0.02 on the baseline share when typical shares are lower, which makes the binomial test conservative.
+- Elevated days: the dispersion ratio is 2.009 (1 means binomial); with rho anywhere in its interval, 0 of the 3 binomial flags remain; on the fixed grid, fewer flags remain from rho 0.001.
+- The extra variation on elevated days may be clustering within cell buckets, a shift of the degraded share from day to day, or a baseline share that does not fit individual cells; the moment estimate cannot tell these apart. The binomial p values on those days are miscalibrated, in either direction for a given unit.
+- Limits: 21 development days and few flags; one moment estimator; the units used to estimate rho exclude the binomial flags. This is a sensitivity analysis, not a change to the detector.
 
 ## 2. More realistic injection variants (not done)
 
@@ -48,26 +48,28 @@ so it was not started. No number exists for it.
 No cause is identified and none is asserted. Nothing here attributes interference to any state or actor. Several of
 the sources below discuss who may be responsible; this repository does not repeat or adopt any such attribution.
 
-What the data show (`results/regimes.csv`, all study days, labels computed before any detection): the first day
-labelled traffic reduced is 2026-02-28 and the first day labelled degraded elevated is 2026-03-01.
+What the data show, quoted from results already published (`results/regimes.csv`, the README status block and
+`docs/VALIDATION.md`): the first day labelled traffic reduced is 2026-02-28 (a held out day) and the first day
+labelled degraded elevated is 2026-03-01 (a held out day). These published labels are quoted, not recomputed, and
+no held out day is analysed further here.
 
-What public sources state (fetched 2026-10-16; paraphrased; the sources' own wording and claims are theirs):
+What public sources state (fetched 2026-10-16; paraphrased; no copy is stored; the sources' claims are theirs):
 
 | Source | What it states | Link |
 |---|---|---|
 | EASA, Conflict Zone Information Bulletin 2026-03 (revision R14 page) | Original bulletin issued 28/02/2026 for the airspace of Bahrain, Iran, Iraq, Israel, Jordan, Kuwait, Lebanon, Oman, Qatar, the United Arab Emirates and Saudi Arabia; recommends not operating in part of it and caution in the rest. The page text retrieved does not mention GNSS, jamming or spoofing. | https://www.easa.europa.eu/en/domains/air-operations/czibs/2026-03-r14 |
 | Aviation trade news item, dated 2 March 2026 | States that the airspace of several countries in the region, including Bahrain, Kuwait, Qatar and the United Arab Emirates, was closed to all commercial traffic on 28 February 2026. | https://www.ch-aviation.com/news/164379-gulf-iran-iraq-syria-israel-close-to-all-traffic |
-| OCCRP news item, dated 5 March 2026 | Reports widespread GNSS and AIS interference affecting ships in Gulf waters from 28 February 2026, citing analyses by Windward (published 1 March) and Lloyd's List (2 March). It does not mention aircraft. | https://www.occrp.org/en/news/more-than-1100-ships-hit-by-widespread-gps-disruption-after-iran-strikes |
+| Windward, maritime analytics report, dated 18 June 2026 | Reports GPS jamming affecting vessels concentrated in the Middle East Gulf in the first quarter of 2026, accelerating sharply over two weeks in early 2026 (Strait of Hormuz, Persian Gulf, Gulf of Oman). Its Gulf sections do not mention aircraft. | https://windward.ai/blog/what-is-gps-jamming-and-why-are-we-seeing-so-much-of-it/ |
 | Radionavigation Laboratory, University of Texas at Austin, post dated March 2026 | Reports navigation disruption for ships in the Persian Gulf and the Gulf of Oman and notes that aircraft GNSS receivers use the same civil signal. It names no dataset or measurement method. | https://radionavlab.ae.utexas.edu/?p=5268 |
 
-What is established, and what is not:
+What is reported, and what is not established:
 
-- Established by the sources: from 28 February 2026 several airspaces in the study box were closed to commercial
-  traffic, and a European regulator advised against or cautioned on operating there.
-- Established by the sources: widespread GNSS interference affecting ships in Gulf waters was reported from the same
-  date. None of the fetched sources gives an aviation measurement.
-- Consistent, not established: the traffic drop in the data starts on 2026-02-28, the date of the reported closures,
-  and the rise in degraded reports starts on 2026-03-01, 1 day(s) later. Timing alone does not establish cause.
+- Reported by the sources (reports, not ground truth): from 28 February 2026 several airspaces in the study box were
+  closed to commercial traffic, and a European regulator advised against or cautioned on operating there.
+- Reported by the sources: widespread GPS jamming affecting ships in Gulf waters in early 2026. None of the fetched
+  sources gives an aviation measurement.
+- Consistent timing, not an established cause: the traffic drop in the data starts on 2026-02-28, the date of the
+  reported closures, and the rise in degraded reports starts on 2026-03-01, 1 day(s) later.
 - Not established: that the rise in degraded ADS-B reports is caused by interference rather than by other changes
   (which aircraft still fly, routing, avionics, receiver coverage). The rise also holds for the same aircraft seen before
   and after (`results/dev/regime_check.json`), which argues against a pure change of aircraft mix but does not prove
