@@ -7,10 +7,9 @@ Rules used in this file:
 
 - "Measured here" means measured by this project in its own build environment (2 cores). **GitHub runners were NOT tested
   by us.** Nothing below about runner speed, runner disk or download speed on GitHub is measured.
-- **No GitHub documentation page could be retrieved in the session that wrote this file** (the fetch tool's permission
-  request was not answered, four attempts on four URLs, no workaround attempted). Therefore **every GitHub limit below is
-  UNVERIFIED**. Figures marked "recalled" come from the author's memory and must not be relied on. Section 9 lists the pages
-  the owner must read before depending on any of them.
+- No documentation page could be retrieved when this file was first written (2026-10-12). On 2026-10-16 the official pages
+  listed in section 9 were retrieved; every limit marked "retrieved 2026-10-16" below is the figure stated on that page on that
+  date, with its URL in section 9. Providers change these figures; check the page again before depending on one.
 - Anything we could not determine is marked UNVERIFIED.
 
 ## 1. Pieces
@@ -114,25 +113,29 @@ Measured here (this project's environment, 2 cores, not GitHub runners):
   including download for the study window; the parent's later figure is 6 to 9 minutes of parsing).
 - Download is by 64 MiB byte ranges with resume (`src/tashwish/ingest/source.py`), so a cut connection loses at most one range.
 
-Not measured, UNVERIFIED (read the pages in section 9): runner CPU count and RAM, free disk, the job time limit, the
-monthly minutes policy, download speed from GitHub Releases to a GitHub runner.
+Retrieved 2026-10-16 from the GitHub documentation (URLs in section 9):
 
-Recalled, not retrieved, so UNVERIFIED: standard Linux runners on public repositories have 4 vCPU, 16 GB RAM and about 14 GB
-of free disk (the figure the task brief also used); the job limit is 6 hours; Actions minutes on standard runners are free
-for public repositories; scheduled workflows in a public repository can be disabled by GitHub after 60 days without
-repository activity.
+- Standard GitHub hosted Linux x64 runner for public repositories: 4 CPU, 16 GB RAM, 14 GB SSD (private repositories: 2 CPU,
+  8 GB RAM, 14 GB SSD). The 14 GB is the stated SSD size, not measured free space after the runner image.
+- Job execution time on GitHub hosted runners: up to 6 hours per job. Workflow run time: up to 35 days.
+- Concurrent jobs on the Free plan: 20 on standard GitHub hosted runners.
+- Billing: Actions usage is free for public repositories that use standard GitHub hosted runners (GitHub Free includes 2,000
+  minutes a month for private repositories).
+- In a public repository, scheduled workflows are disabled automatically when no repository activity has occurred in 60 days.
+
+Not measured, UNVERIFIED: free disk actually left on a runner, and download speed from GitHub Releases to a GitHub runner.
 
 Arithmetic, with the stated assumptions (illustrative, not measured on GitHub):
 
 - Disk: one day's spool is at most about 4 GiB, emptied after each day, plus `processed/` parquet and the dataset. Against
-  about 14 GB free that is a margin of about 3x, if the free disk figure holds. Only one day is ever on disk, which is why
+  the stated 14 GB SSD that is a margin of about 3x, if most of that SSD is free (free space after the runner image is UNVERIFIED). Only one day is ever on disk, which is why
   days run one at a time.
 - Time per day = download (4 GiB / speed) + parse (9 min worst) . At 10 MiB/s: 6.8 + 9 = about 16 min. At 2 MiB/s: 34 + 9 = about
   43 min. Three days plus two 2 min pauses: about 52 min at 10 MiB/s, about 133 min at 2 MiB/s, both under the 200 minute step
   timeout. Break even speed for three days in 200 minutes: (200 - 4) / 3 = 65 min per day, so about 56 min of download, so
   about 1.2 MiB/s. Below that the step times out and the days finished so far are kept.
-- Minutes: a 3 day run is about 1 hour, so a daily run of 1 day (about 20 to 45 minutes at the speeds above) is about 10 to 22 hours a month. Free for public repositories if the recalled
-  policy holds (UNVERIFIED); on a private repository these minutes would count against a quota.
+- Minutes: a 3 day run is about 1 hour, so a daily run of 1 day (about 20 to 45 minutes at the speeds above) is about 10 to 22 hours a month. Free for public repositories on standard
+  runners (retrieved 2026-10-16); on a private repository these minutes would count against the 2,000 minute monthly quota.
 
 ### What does not fit, exactly
 
@@ -143,29 +146,34 @@ Arithmetic, with the stated assumptions (illustrative, not measured on GitHub):
    time a day at the measured speeds, and a single failed run costs one day that the next run resumes at, because the CLI resumes at
    the first missing day. Three runs a week of 3 days each would also cover 7 days, but delays freshness by up to 2 days; it is not
    recommended. Whether daily downloads of about 4 GiB are polite use of adsb.lol's GitHub releases is
-   UNVERIFIED: no retrieved page states a rate limit or fair use rule for `globe_history` downloads. The owner should decide, and
-   ideally ask the maintainers (docs/LICENSING.md section 6 lists the questions).
+   UNVERIFIED: the adsb.lol historical data page (retrieved 2026-10-16) states no rate limit or fair use rule for `globe_history`
+   downloads. The owner should decide, and ideally ask the maintainers (docs/LICENSING.md section 6 lists the questions).
    Backfill limit: each dispatch processes at most `max_days` days (cap 3) and `start_day` applies to the first slot only, so
    backfill is bounded by one to three days per dispatch and each dispatch is a separate run. Backfilling N days needs about N
    divided by `max_days` dispatches, and a `start_day` that leaves a gap after the last processed day is refused. Days inside the
    study window are not backfilled through this workflow at all (they are refused, see section 3 item 5).
-2. **The job time limit bounds catch up.** If the 6 hour limit is right (UNVERIFIED), a single run cannot clear a long
+2. **The job time limit bounds catch up.** With the 6 hour job limit (retrieved 2026-10-16), a single run cannot clear a long
    backlog. Even ignoring the polite cap of 3, about 12 days at best is the ceiling for one run. A long backlog after the study window is
    cleared by repeated dispatches, not in one run (section 6).
-3. **Public repository is required.** The free minutes claim is for public repositories (UNVERIFIED). A private repository changes
-   the arithmetic.
-4. **Scheduled workflows may be paused** after a long period without repository activity (recalled, UNVERIFIED). Data commits
-   to the `data` branch may or may not count as activity (UNVERIFIED); re enable the workflow by hand in the Actions tab if
-   the scheduled runs stop.
-5. **Storage growth.** The `data` branch grows with every commit. Repository size and file size limits on GitHub are
-   UNVERIFIED, and the size of one day's parquet and of the released dataset has not been measured. If it grows too large,
+3. **Public repository is required.** Free Actions usage applies to public repositories on standard runners (retrieved
+   2026-10-16). A private repository changes the arithmetic.
+4. **Scheduled workflows are paused** in a public repository after 60 days without repository activity (retrieved 2026-10-16).
+   Whether data commits to the `data` branch count as activity is UNVERIFIED (the page does not say); re enable the workflow by
+   hand in the Actions tab if the scheduled runs stop.
+5. **Storage growth.** The `data` branch grows with every commit. GitHub warns on files above 50 MiB, blocks files above
+   100 MiB, and recommends repositories ideally below 1 GB and strongly below 5 GB (retrieved 2026-10-16). The size of one
+   day's parquet and of the released dataset growth over many days has not been measured. If it grows too large,
    attach the versioned dataset to a GitHub Release instead of committing it (still free) and keep only `web/data` on the branch.
 6. **Hosting the dashboard.** The dashboard is static (`web/`). Options and what we know:
-   - GitHub Pages: free for public repositories, but its terms, size limits and any restriction on commercial use are
-     UNVERIFIED (not retrieved).
-   - Vercel Hobby: recalled to be restricted to non commercial use, UNVERIFIED. Do not use it if the project becomes commercial.
-   - Render free web service (only needed for the optional `src/tashwish/api`): recalled to sleep after inactivity (slow first
-     request) and to have a monthly instance hour allowance, UNVERIFIED. The static JSON dashboard does not need it.
+   - GitHub Pages (retrieved 2026-10-16): published sites at most 1 GB, source repositories recommended at most 1 GB, a soft
+     bandwidth limit of 100 GB a month, a soft limit of 10 builds an hour (not applied to custom Actions workflows), a 10 minute
+     deployment timeout, and Pages is not to be used as free hosting for an online business.
+   - Vercel Hobby (retrieved 2026-10-16): restricted to non commercial, personal use. Do not use it if the project becomes
+     commercial.
+   - Render (retrieved 2026-10-16): static sites are free to deploy. A free web service (only needed for the optional
+     `src/tashwish/api`) spins down after 15 minutes without inbound traffic and takes about one minute to spin up; each
+     workspace gets 750 free instance hours a calendar month. Free services count against the workspace's included outbound
+     bandwidth, whose size the page does not state (UNVERIFIED). The static JSON dashboard does not need the API.
    - A static site needs no API process at all, which is the free tier recommendation.
 7. **Publication lag of the archive was not characterised.** We do not know how long after a UTC day ends adsb.lol publishes its
    release. Nothing in `src/tashwish/ingest/source.py`, its tests or the docs measures it (UNVERIFIED). Until measured, a run
@@ -269,26 +277,30 @@ Badge snippets to paste into the README when the owner wants them (replace nothi
 [![Incremental run](https://github.com/hudasol/tashwish/actions/workflows/incremental.yml/badge.svg)](https://github.com/hudasol/tashwish/actions/workflows/incremental.yml)
 ```
 
-## 9. Owner must fetch (UNVERIFIED items and the page to read)
+## 9. Sources for the limits (retrieved 2026-10-16)
 
-None of these could be retrieved when this file was written. Read them, then replace "UNVERIFIED" here with the quote and date.
+Each page below was retrieved on 2026-10-16 and the figures in sections 4 and 6 come from it. "Not retrieved" means the page was
+not read in that session and anything that depends on it stays UNVERIFIED.
 
-| Claim | Page to read |
-|---|---|
-| Job and workflow time limits, concurrency, scheduled workflow disabling | https://docs.github.com/en/actions/reference/limits and https://docs.github.com/en/actions/administering-github-actions/usage-limits-billing-and-administration |
-| Runner CPU, RAM, free disk, free minutes for public repositories | https://docs.github.com/en/actions/reference/runners/github-hosted-runners and https://docs.github.com/en/billing/managing-billing-for-your-products/managing-billing-for-github-actions/about-billing-for-github-actions |
-| Disabling of scheduled workflows after inactivity | https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/disabling-and-enabling-a-workflow |
-| Repository and file size limits for the `data` branch | https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github |
-| GitHub Pages limits and acceptable use | https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits and https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features |
-| Vercel Hobby non commercial restriction | https://vercel.com/docs/plans/hobby |
-| Render free web service sleep and monthly hours | https://render.com/docs/free |
-| adsb.lol fair use or rate guidance for the archive | https://www.adsb.lol/docs/open-data/historical/ and https://github.com/adsblol/globe_history_2026 (ask the maintainers if silent) |
-| Archive publication lag after a UTC day ends | Not documented anywhere we read; measure it from release creation times |
+| Claim | Page | Status |
+|---|---|---|
+| Job and workflow time limits, concurrency | https://docs.github.com/en/actions/reference/limits | retrieved 2026-10-16 |
+| Runner CPU, RAM, SSD | https://docs.github.com/en/actions/reference/runners/github-hosted-runners | retrieved 2026-10-16 |
+| Free minutes for public repositories | https://docs.github.com/en/billing/managing-billing-for-your-products/managing-billing-for-github-actions/about-billing-for-github-actions | retrieved 2026-10-16 |
+| Disabling of scheduled workflows after inactivity | https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/disabling-and-enabling-a-workflow | retrieved 2026-10-16 |
+| Repository and file size limits for the `data` branch | https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github | retrieved 2026-10-16 |
+| GitHub Pages limits and acceptable use | https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits | retrieved 2026-10-16 |
+| GitHub terms for additional products | https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features | not retrieved, UNVERIFIED |
+| Usage limits, billing and administration | https://docs.github.com/en/actions/administering-github-actions/usage-limits-billing-and-administration | not retrieved, UNVERIFIED |
+| Vercel Hobby non commercial restriction | https://vercel.com/docs/plans/hobby | retrieved 2026-10-16 |
+| Render free web service sleep, spin up and monthly hours | https://render.com/docs/free | retrieved 2026-10-16 |
+| adsb.lol fair use or rate guidance for the archive | https://www.adsb.lol/docs/open-data/historical/ | retrieved 2026-10-16; states no rule, so fair use stays UNVERIFIED (ask the maintainers) |
+| Archive publication lag after a UTC day ends | not documented anywhere we read | UNVERIFIED; measure it from release creation times |
 
 ### Additional UNVERIFIED items on this free tier (kept unverified)
 
-- Whether GitHub Actions free minutes, the 6 hour job limit, runner RAM and disk, and the scheduled workflow disabling after
-  60 days without activity apply as recalled in section 4. None was retrieved or tested.
+- None of the retrieved limits was tested on a real runner; free disk after the runner image and download speed to a runner are
+  not measured.
 - Whether a workflow that only pushes to the `data` branch counts as repository activity for the scheduling rule.
 - Whether `GITHUB_TOKEN` pushes to `data` are allowed by the repository's default workflow permission setting (it can be set to
   read only at repository level; the owner must check Settings, Actions, General).
