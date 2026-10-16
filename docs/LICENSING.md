@@ -56,8 +56,9 @@ licence, our attribution would still be good practice. Cost of being wrong in th
 ### 2.1a Resolved from primary text (revision)
 
 The adsb.lol repository ships its own copy of the ODbL (`LICENSE-ODbL.txt`, 25,241 bytes, sha256 `d93f9962...b88611`),
-retrieved in full by direct download. It is now vendored at `licenses/ODbL-1.0.txt`. It was not compared line by line with the
-opendatacommons.org page, but the same clauses were also retrieved there. Verbatim clauses from it:
+retrieved in full by direct download. It is now vendored at `licenses/ODbL-1.0.txt`. On 2026-10-16 it was compared line by line
+with the official plain text on opendatacommons.org (`licenses/README.md`): apart from trailing spaces, one cross reference
+differs (Section 4.74 a. in this copy, 4.7 a. officially). Verbatim clauses from it:
 
 - 1.0 "Publicly" - "means to Persons other than You or under Your control by either more than 50% ownership or by the power to direct their activities (such as contracting with an independent consultant)."
 - 1.0 "Substantial" - "Means substantial in terms of quantity or quality or a combination of both. The repeated and systematic Extraction or Re-utilisation of insubstantial parts of the Contents may amount to the Extraction or Re-utilisation of a Substantial part of the Contents."
@@ -271,7 +272,8 @@ excerpt). Transitive dependencies were not enumerated.
 5. Whether database right or copyright subsists in adsb.lol's compilation in the jurisdictions that matter (UAE, UK, EU). Not
    researched, UNVERIFIED.
 6. RESOLVED in revision: the full wording of 4.3, "Publicly", "Convey", "Substantial" and 4.4.a was retrieved (2.1a).
-   Still unchecked: a line by line comparison of the vendored licence copy with the opendatacommons.org page.
+   The line by line comparison of the vendored licence copy with the official text was done on 2026-10-16
+   (`licenses/README.md`).
 7. Licence terms of FlyItalyADSB and TheAirTraffic.com data beyond what adsb.lol's partners page says.
 8. The OSMF subpages specific to Produced Work and Substantial (for example the Produced Work and Substantial guideline
    subpages) were not fetched, only the Community Guidelines landing page and the Attribution Guidelines page.

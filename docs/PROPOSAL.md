@@ -42,7 +42,8 @@ events found are minimum size spoofing like clusters that may be data errors.
 
 The proposal needs no purchase. It uses free tiers only: public data (adsb.lol archives, ODbL 1.0), free GitHub hosting and scheduled
 workflows, a free static site and free web service tier for the dashboard and read only API, free Zenodo for the dataset. The limits
-of those free tiers are **UNVERIFIED** and are the first thing to check. If a free tier cannot carry the daily volume (about 3 GiB
+of those free tiers as documented were retrieved from the official pages on 2026-10-16 (`docs/OPERATIONS.md`, section 9);
+whether they carry continuous operation in practice is **UNVERIFIED** and is the first thing to check. If a free tier cannot carry the daily volume (about 3 GiB
 per day to download and filter), the answer is to slow the backfill or to stop, not to buy capacity. Time is the real cost, and it is
 the author's own.
 
