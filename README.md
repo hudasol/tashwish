@@ -28,7 +28,10 @@ Repository: https://github.com/hudasol/tashwish
 6. [docs/REPORT.md](docs/REPORT.md), a technical report generated from the result files.
 7. [docs/REVIEW_ROUNDS.md](docs/REVIEW_ROUNDS.md), five review rounds, what was fixed and what was not.
 8. [docs/NEXT_STEPS.md](docs/NEXT_STEPS.md) and [docs/PROPOSAL.md](docs/PROPOSAL.md), what is unfinished and what is proposed.
-9. Everything else: [docs/RESEARCH.md](docs/RESEARCH.md), [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md),
+9. [docs/PREDICTIONS_FORWARD.md](docs/PREDICTIONS_FORWARD.md), the preregistered forward evaluation on days after the study
+   window (not yet run), and [docs/SECONDARY_ANALYSES.md](docs/SECONDARY_ANALYSES.md), analyses outside the preregistration.
+10. [docs/OVERNIGHT_LOG.md](docs/OVERNIGHT_LOG.md), the log of the 2026-10-16 working session.
+11. Everything else: [docs/RESEARCH.md](docs/RESEARCH.md), [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md),
    [docs/DATA_CARD.md](docs/DATA_CARD.md), [docs/LICENSING.md](docs/LICENSING.md), [docs/OPERATIONS.md](docs/OPERATIONS.md),
    [docs/API.md](docs/API.md), [docs/DASHBOARD.md](docs/DASHBOARD.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md),
    [plan.md](plan.md).
