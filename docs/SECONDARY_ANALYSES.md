@@ -37,10 +37,11 @@ Reading:
 ## 2. More realistic injection variants (not done)
 
 Partial degradation of an aircraft's samples, drifting spoof tracks and one scenario per run need the per sample
-points of the development days. The repository stores only cell bucket aggregates, so every development day would
-have to be downloaded and parsed again, and the persistent emitter list refitted, which the frozen state stores keyed
-with a secret that was not available. This exceeded the time budget of the session and was not started. No number
-exists for it.
+points of the development days. The repository stores only cell bucket aggregates. The validation harness fits the
+persistent emitter list from the points of all development days together, so even one variant needs every development
+day downloaded and parsed again (about 2 to 4 GiB of archive per day, `docs/OPERATIONS.md` section 4). That exceeded
+the time budget of the session and would be a heavy load on a volunteer archive whose fair use terms are unverified,
+so it was not started. No number exists for it.
 
 ## 3. The regime change and public sources
 
