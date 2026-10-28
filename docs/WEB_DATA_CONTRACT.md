@@ -1,6 +1,6 @@
 # Dashboard and API data contract (`tashwish.web.v1`)
 
-Produced by `python -m tashwish.release.web` (not yet written; the dashboard is built against this contract and a labelled
+Produced by the release builder, `python -m tashwish.release.build` (the dashboard is also built against this contract and a labelled
 synthetic sample). All files are static JSON under `web/data/`. Every file carries `schema`, `data_class`
 (`observed` or `synthetic`), `generated_at` (UTC ISO), `code_commit`, and `attribution` (the exact string from
 `src/tashwish/attribution.py`). A page showing `data_class = synthetic` MUST show a persistent, unmissable SYNTHETIC banner and
