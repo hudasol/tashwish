@@ -89,7 +89,7 @@ identical on Linux and Windows. In practice:
 - Pass `newline="\n"` when writing text, and `lineterminator="\n"` to `DataFrame.to_csv`.
 - Do not rely on the default encoding of the platform.
 
-`tests/test_text_io.py` parses `src/` and `scripts/` and fails when a call lacks these arguments. `.gitattributes` sets
+`tests/test_text_io.py` parses `src/`, `scripts/` and `tests/` and fails when a call lacks these arguments. `.gitattributes` sets
 `eol=lf` and marks Parquet, gzip and image files as binary.
 
 ## Data, state and secrets

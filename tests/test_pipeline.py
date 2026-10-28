@@ -69,7 +69,7 @@ def test_end_to_end_rows_manifest_quality_and_cleanup(tmp_path):
         and man[0]["status"] == "complete"
         and man[0]["out_sha256"] == rec["out_sha256"]
     )
-    q = json.loads((tmp_path / "interim" / "quality" / f"{DAY}.json").read_text())
+    q = json.loads((tmp_path / "interim" / "quality" / f"{DAY}.json").read_text(encoding="utf-8"))
     assert q["rows"] == 6 and q["metric_population"]["excluded_non_transponder_rows"] == 1
     assert q["parse_stats"]["trace_files"] == 4
     # spool cleaned

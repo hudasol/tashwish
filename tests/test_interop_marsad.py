@@ -145,8 +145,8 @@ def test_validator_catches(fc, mutate, fragment):
 def test_geojson_file_roundtrip_and_sample_file(tmp_path, synth):
     p = tmp_path / "x_SYNTHETIC.geojson"
     fc = to_geojson(*synth, **KW, path=p)
-    assert json.loads(p.read_text()) == fc
-    sample = json.loads(SAMPLE.read_text())
+    assert json.loads(p.read_text(encoding="utf-8")) == fc
+    sample = json.loads(SAMPLE.read_text(encoding="utf-8"))
     assert "SYNTHETIC" in SAMPLE.name and sample["data_class"] == "synthetic" and "SYNTHETIC" in sample["notice"]
     assert validate_feature_collection(sample) == []
     assert sample == to_geojson(*synthetic_cells(seed=7), dataset_version="SYNTHETIC-sample-1", data_class="synthetic",

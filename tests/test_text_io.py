@@ -10,7 +10,7 @@ import ast
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SCAN = [ROOT / "src" / "tashwish", ROOT / "scripts"]
+SCAN = [ROOT / "src" / "tashwish", ROOT / "scripts", ROOT / "tests"]
 
 # Modules that are not yet covered by this check. Remove an entry once the module passes.
 PENDING = {
@@ -38,46 +38,53 @@ def _mode(call: ast.Call, position: int) -> str | None:
     return None  # not a literal, cannot judge
 
 
+def missing_arguments(call: ast.Call) -> list[tuple[str, str]]:
+    """Return (message, keyword argument) pairs for the platform dependent defaults that `call` relies on."""
+    kw = _kw(call)
+    f = call.func
+    found: list[tuple[str, str]] = []
+    is_builtin_open = isinstance(f, ast.Name) and f.id == "open"
+    is_path_open = isinstance(f, ast.Attribute) and f.attr == "open"
+    if is_path_open and isinstance(f.value, ast.Name) and f.value.id in NOT_TEXT_FILES:
+        return found
+    if is_builtin_open or is_path_open:
+        mode = _mode(call, 1 if is_builtin_open else 0)
+        if mode is None or "b" in mode:
+            return found
+        if "encoding" not in kw:
+            found.append(("open() in text mode without encoding", 'encoding="utf-8"'))
+        if any(c in mode for c in "wax+") and "newline" not in kw:
+            found.append(("open() for writing without newline", 'newline="\\n"'))
+        return found
+    if not isinstance(f, ast.Attribute):
+        return found
+    if f.attr == "read_text" and "encoding" not in kw:
+        found.append(("read_text() without encoding", 'encoding="utf-8"'))
+    elif f.attr == "write_text":
+        if "encoding" not in kw:
+            found.append(("write_text() without encoding", 'encoding="utf-8"'))
+        if "newline" not in kw:
+            found.append(("write_text() without newline", 'newline="\\n"'))
+    elif f.attr == "to_csv" and "lineterminator" not in kw:
+        found.append(("to_csv() without lineterminator", 'lineterminator="\\n"'))
+    elif (
+        f.attr == "run"
+        and isinstance(f.value, ast.Name)
+        and f.value.id == "subprocess"
+        and ("text" in kw or "universal_newlines" in kw)
+        and "encoding" not in kw
+    ):
+        found.append(("subprocess text mode without encoding", 'encoding="utf-8"'))
+    return found
+
+
 def problems(path: Path) -> list[str]:
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
     out = []
     for node in ast.walk(tree):
-        if not isinstance(node, ast.Call):
-            continue
-        kw = _kw(node)
-        f = node.func
-        where = f"{path.relative_to(ROOT).as_posix()}:{node.lineno}"
-        is_builtin_open = isinstance(f, ast.Name) and f.id == "open"
-        is_path_open = isinstance(f, ast.Attribute) and f.attr == "open"
-        if is_path_open and isinstance(f.value, ast.Name) and f.value.id in NOT_TEXT_FILES:
-            continue
-        if is_builtin_open or is_path_open:
-            mode = _mode(node, 1 if is_builtin_open else 0)
-            if mode is None or "b" in mode:
-                continue
-            if "encoding" not in kw:
-                out.append(f"{where}: open() in text mode without encoding")
-            if any(c in mode for c in "wax+") and "newline" not in kw:
-                out.append(f"{where}: open() for writing without newline")
-            continue
-        if isinstance(f, ast.Attribute):
-            if f.attr == "read_text" and "encoding" not in kw:
-                out.append(f"{where}: read_text() without encoding")
-            elif f.attr == "write_text":
-                if "encoding" not in kw:
-                    out.append(f"{where}: write_text() without encoding")
-                if "newline" not in kw:
-                    out.append(f"{where}: write_text() without newline")
-            elif f.attr == "to_csv" and "lineterminator" not in kw:
-                out.append(f"{where}: to_csv() without lineterminator")
-            elif (
-                f.attr == "run"
-                and isinstance(f.value, ast.Name)
-                and f.value.id == "subprocess"
-                and ("text" in kw or "universal_newlines" in kw)
-                and "encoding" not in kw
-            ):
-                out.append(f"{where}: subprocess text mode without encoding")
+        if isinstance(node, ast.Call):
+            where = f"{path.relative_to(ROOT).as_posix()}:{node.lineno}"
+            out += [f"{where}: {message}" for message, _ in missing_arguments(node)]
     return out
 
 

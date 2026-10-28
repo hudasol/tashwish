@@ -50,8 +50,8 @@ def test_static_i18n_keys_used_by_the_scripts_exist():
 
 
 def test_every_validation_row_has_scenario_regime_and_metric_text():
-    v = json.loads((WEB / "data" / "validation.json").read_text())
-    m = json.loads((WEB / "data" / "methods.json").read_text())["metrics"]
+    v = json.loads((WEB / "data" / "validation.json").read_text(encoding="utf-8"))
+    m = json.loads((WEB / "data" / "methods.json").read_text(encoding="utf-8"))["metrics"]
     assert v["results"]
     for r in v["results"]:
         assert r["data_class"] in ("synthetic", "observed")
@@ -64,7 +64,7 @@ def test_every_validation_row_has_scenario_regime_and_metric_text():
 
 
 def test_arabic_metric_labels_are_arabic():
-    m = json.loads((WEB / "data" / "methods.json").read_text())["metrics"]
+    m = json.loads((WEB / "data" / "methods.json").read_text(encoding="utf-8"))["metrics"]
     for k in (
         "jamming_recall_easy",
         "jamming_recall_medium",
@@ -76,7 +76,7 @@ def test_arabic_metric_labels_are_arabic():
 
 
 def test_snapshot_manifest_replaces_the_staleness_state():
-    man = json.loads((WEB / "data" / "manifest.json").read_text())
+    man = json.loads((WEB / "data" / "manifest.json").read_text(encoding="utf-8"))
     assert man["mode"] in ("live", "study_snapshot")
     if man["mode"] == "study_snapshot":
         assert man["study_window"]["start"] <= man["study_window"]["end"]

@@ -65,7 +65,7 @@ def test_build_is_idempotent_and_release_loads(tmp_path, monkeypatch):
     cbo = pd.read_parquet(tmp_path / "rel" / "cell_buckets.parquet")
     assert cbo.loc[cbo.status != "ok", ["share", "ci_lo", "ci_hi"]].isna().all().all()
     assert not any("icao" in c.lower() for c in cbo.columns)
-    day = json.loads((tmp_path / "web" / "days" / "2026-02-08.json").read_text())
+    day = json.loads((tmp_path / "web" / "days" / "2026-02-08.json").read_text(encoding="utf-8"))
     assert day["data_class"] == "observed" and len(day["cells"]) == 3
     assert [r for r in day["cells"] if r[6] != "ok"][0][4] is None
     Release(tmp_path / "rel", verify_hashes=True)  # the API accepts the builder's output and the checksums match
@@ -111,16 +111,18 @@ def test_failed_build_leaves_previous_outputs_intact_and_exits_nonzero(tmp_path,
 def test_dataset_version_changes_when_data_changes(tmp_path, monkeypatch):
     proc = _setup(tmp_path, monkeypatch)
     build.main()
-    v1 = json.loads((tmp_path / "rel" / "manifest.json").read_text())["dataset_version"]
+    v1 = json.loads((tmp_path / "rel" / "manifest.json").read_text(encoding="utf-8"))["dataset_version"]
     assert re.fullmatch(r"observed-2026-02-09-[0-9a-f]{8}", v1)
-    assert json.loads((tmp_path / "web" / "manifest.json").read_text())["dataset_version"] == v1
+    assert json.loads((tmp_path / "web" / "manifest.json").read_text(encoding="utf-8"))["dataset_version"] == v1
     build.main()
-    assert json.loads((tmp_path / "rel" / "manifest.json").read_text())["dataset_version"] == v1  # stable
+    assert (
+        json.loads((tmp_path / "rel" / "manifest.json").read_text(encoding="utf-8"))["dataset_version"] == v1
+    )  # stable
     cb = _cb("2026-02-08")
     cb.loc[0, "k_strong"] = 4  # a correction of an old day; latest_day is unchanged
     write_day(proc, "2026-02-08", cb, _ev("2026-02-08"), split="dev", mode="m", rows=10, aircraft=5, ingested_at=None)
     build.main()
-    v2 = json.loads((tmp_path / "rel" / "manifest.json").read_text())["dataset_version"]
+    v2 = json.loads((tmp_path / "rel" / "manifest.json").read_text(encoding="utf-8"))["dataset_version"]
     assert v2 != v1 and v2.startswith("observed-2026-02-09-")
 
 
@@ -148,9 +150,11 @@ def test_event_times_are_bucket_rounded_and_small_groups_lose_destination(tmp_pa
     assert small["end"] == pd.Timestamp("2026-02-08 06:00", tz="UTC")  # ceil of 04:22:21
     assert pd.isna(small["dest_lat"]) and pd.isna(small["dest_lon"])
     assert large["dest_lat"] == 25.5 and large["dest_lon"] == 56.5
-    web = json.loads((tmp_path / "web" / "events.json").read_text())["events"]
+    web = json.loads((tmp_path / "web" / "events.json").read_text(encoding="utf-8"))["events"]
     assert all(e["start"].endswith(":00:00Z") and e["end"].endswith(":00:00Z") for e in web)
-    assert "Event times are rounded to the 3 hour bucket" in (tmp_path / "rel" / "DATA_CARD.md").read_text()
+    assert "Event times are rounded to the 3 hour bucket" in (tmp_path / "rel" / "DATA_CARD.md").read_text(
+        encoding="utf-8"
+    )
 
 
 def test_non_observed_data_class_fails_the_build():
@@ -165,12 +169,12 @@ def test_mode_defaults_to_live_and_snapshot_records_window(tmp_path, monkeypatch
     monkeypatch.delenv("TASHWISH_MODE", raising=False)
     build.main()
     for p in ("web", "rel"):
-        m = json.loads((tmp_path / p / "manifest.json").read_text())
+        m = json.loads((tmp_path / p / "manifest.json").read_text(encoding="utf-8"))
         assert m["mode"] == "live" and "study_window" not in m
     monkeypatch.setattr(sys, "argv", [*sys.argv, "--mode", "study_snapshot"])
     build.main()
     for p in ("web", "rel"):
-        m = json.loads((tmp_path / p / "manifest.json").read_text())
+        m = json.loads((tmp_path / p / "manifest.json").read_text(encoding="utf-8"))
         assert m["mode"] == "study_snapshot" and m["study_window"] == {"start": "2026-02-08", "end": "2026-02-09"}
 
 
@@ -178,7 +182,7 @@ def test_mode_comes_from_environment_when_not_given(tmp_path, monkeypatch):
     _setup(tmp_path, monkeypatch)
     monkeypatch.setenv("TASHWISH_MODE", "study_snapshot")
     build.main()
-    assert json.loads((tmp_path / "web" / "manifest.json").read_text())["mode"] == "study_snapshot"
+    assert json.loads((tmp_path / "web" / "manifest.json").read_text(encoding="utf-8"))["mode"] == "study_snapshot"
     with pytest.raises(ValueError):
         build.mode_fields("nonsense", [])
 
