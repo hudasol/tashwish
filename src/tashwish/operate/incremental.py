@@ -51,14 +51,14 @@ def now_z() -> str:
 
 def read_fresh(path: Path) -> dict:
     if path.exists():
-        return json.loads(path.read_text())
+        return json.loads(path.read_text(encoding="utf-8"))
     return {"schema": FRESH_SCHEMA, "generated_at": None, "latest_day": None}
 
 
 def write_fresh(path: Path, f: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".tmp")
-    tmp.write_text(json.dumps(f, indent=1, sort_keys=True))
+    tmp.write_text(json.dumps(f, indent=1, sort_keys=True), encoding="utf-8", newline="\n")
     tmp.replace(path)
 
 
@@ -67,7 +67,9 @@ def code_commit() -> str:
     if sha:
         return sha
     try:
-        out = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, timeout=20)
+        out = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, encoding="utf-8", timeout=20
+        )
         return out.stdout.strip() or "unknown"
     except (OSError, subprocess.SubprocessError):
         return "unknown"
@@ -89,7 +91,7 @@ def ingest_manifest_sha256(work: Path, day: str) -> str | None:
     if not p.is_file():
         return None
     last = None
-    for line in p.read_text().splitlines():
+    for line in p.read_text(encoding="utf-8").splitlines():
         if line.strip():
             try:
                 if json.loads(line).get("day") == day:

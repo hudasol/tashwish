@@ -32,7 +32,7 @@ def ingested_manifest(interim: Path) -> dict[str, dict]:
     out = {}
     p = interim / "manifest.jsonl"
     if p.exists():
-        for line in p.read_text().splitlines():
+        for line in p.read_text(encoding="utf-8").splitlines():
             r = json.loads(line)
             if r.get("status") == "complete":
                 out[r["day"]] = r

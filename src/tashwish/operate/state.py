@@ -65,11 +65,11 @@ class FrozenState:
             root / "p0.parquet", index=False
         )
         meta = {**self.meta, "schema": SCHEMA, "cov_days": self.cov_days, "p0_days": self.p0_days}
-        (root / "state.json").write_text(json.dumps(meta, indent=1, sort_keys=True))
+        (root / "state.json").write_text(json.dumps(meta, indent=1, sort_keys=True), encoding="utf-8", newline="\n")
 
     @classmethod
     def load(cls, root: Path) -> FrozenState:
-        meta = json.loads((root / "state.json").read_text())
+        meta = json.loads((root / "state.json").read_text(encoding="utf-8"))
         if meta.get("schema") != SCHEMA:
             raise ValueError(f"unexpected state schema {meta.get('schema')!r}")
 

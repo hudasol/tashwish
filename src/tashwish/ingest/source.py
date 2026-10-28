@@ -141,10 +141,10 @@ def download_part(
     dest.parent.mkdir(parents=True, exist_ok=True)
     meta = dest.with_suffix(dest.suffix + ".meta")
     have = dest.stat().st_size if dest.exists() else 0
-    if have > total or (meta.exists() and json.loads(meta.read_text()).get("total") != total):
+    if have > total or (meta.exists() and json.loads(meta.read_text(encoding="utf-8")).get("total") != total):
         dest.unlink(missing_ok=True)
         have = 0
-    meta.write_text(json.dumps({"url": url, "total": total}))
+    meta.write_text(json.dumps({"url": url, "total": total}), encoding="utf-8", newline="\n")
     with open(dest, "ab") as f:
         while have < total:
             end = min(have + chunk, total) - 1
