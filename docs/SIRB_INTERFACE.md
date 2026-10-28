@@ -12,7 +12,7 @@ en route interference. They do **not** describe a drone scale receiver, low alti
 drone near the ground sees a different signal environment, a different receiver and a different failure behaviour.
 
 Use them only to shape scenarios, for example "what if reported quality drops for a few minutes and updates thin out", and to
-make stress tests honest about uncertainty. Do not use them as a measured model of a drone's GNSS behaviour, as certification
+make stress tests reflect uncertainty. Do not use them as a measured model of a drone's GNSS behaviour, as certification
 input, for navigation or safety of life, or to say anything about who caused a degradation. The file says so itself in its
 `caveats` block (section 5), and Sirb should surface that block wherever it shows the parameters.
 
