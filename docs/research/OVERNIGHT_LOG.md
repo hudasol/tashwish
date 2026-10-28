@@ -1,7 +1,6 @@
 # Overnight log, 2026-10-16
 
 A record of one unattended working session: what was done, what was found and what failed, in the order the work was done.
-Research and monitoring tool. Not for navigation or safety of life. Nothing here attributes interference to any state or actor.
 
 Rules followed throughout: the study window held out days stay closed (the held out validation was not run again), no frozen
 threshold or detector behaviour was changed, and no raw ADS-B archive was written to git. Result numbers are in the committed

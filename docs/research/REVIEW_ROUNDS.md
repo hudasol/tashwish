@@ -1,7 +1,7 @@
 # Review rounds
 
-Five rounds of independent review were run on this repository by separate reviewer agents, each reading from one angle. Each
-reviewer was told to find faults, not to confirm. Counts below are counts of numbered findings in the reviewer's written report.
+Five rounds of independent review were run on this repository by separate reviewers, each reading from one angle. Each
+reviewer was asked to find faults, not to confirm. Counts below are counts of numbered findings in the reviewer's written report.
 The reports themselves are working notes outside the repository; this file records their scope, counts, categories, what was
 fixed and what was not.
 
@@ -10,7 +10,7 @@ their findings changed the system before it was frozen. Rounds 4 and 5 ran after
 documents, labels, reporting and the dashboard, but not the frozen detectors or the held out result. The scoring code did not
 change after the freeze (see `results/FREEZE_LOG.jsonl`).
 
-No organisation reviewed this project. "Independent" means a separate agent without the author's context, not an external expert.
+No organisation reviewed this project. "Independent" means a separate reviewer without the author's context, not an external expert.
 
 ## Round 1: methods and statistics (before the freeze)
 

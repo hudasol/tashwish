@@ -2,8 +2,7 @@
 
 This page proposes future work. It is not a description of something that exists, and it is not a claim of use, review or
 support by anyone. **No organisation has reviewed, endorsed, adopted or partnered with this project, and no use by any entity is
-claimed.** Tashwish is a research and monitoring tool. It is not for navigation or safety of life, and it does not attribute
-interference to any state or actor.
+claimed.**
 
 ## What exists today
 

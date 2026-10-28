@@ -1,11 +1,8 @@
 # Tashwish research notes (Phase 0)
 
 Status: written 2026-10-11. Every factual claim below was taken from a page retrieved during research; the numbered
-links are in the source list at the end. Anything not verified is marked **unverified**. Design choices that are ours,
+links are in the source list at the end. Anything not verified is marked **unverified**. Design choices of the project,
 not literature backed, are marked **[DESIGN]**. Direct quotation is avoided on purpose.
-
-Tashwish is a research and monitoring tool. It is **not** a navigation or safety of life system, and it never
-attributes interference to an actor.
 
 ---
 
