@@ -1,6 +1,6 @@
 import { hasKey, boot, state, t, el, num, mlink, fmtInt, fmtDec, methodLabel } from "./common.js";
 
-const REPO_RESULTS_URL = "https://github.com/hudasol/tashwish/blob/main/docs/PREDICTIONS_RESULTS.md";
+const REPO_RESULTS_URL = "https://github.com/hudasol/tashwish/blob/main/docs/research/PREDICTIONS_RESULTS.md";
 
 function fmtVal(metric, x) {
   if (x === null || x === undefined) return t("common.na");
