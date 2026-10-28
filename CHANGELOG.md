@@ -12,6 +12,10 @@ The package version is now 0.9.0, a release candidate for the study dataset. It 
 
 ### Added
 
+- Forward evaluation results for 2026-03-14 to 2026-04-12 (`docs/research/FORWARD_RESULTS.md`, `results/forward/`): 2 miss,
+  8 hit, 2 not evaluable, scored once with the frozen state.
+- Ingest skips and counts trace members above 8 MiB (`MAX_MEMBER_BYTES`). One member of 2026-03-25 exhausted memory in a pool
+  worker; the exclusion is listed in `results/forward/deviations.json`.
 - The `tashwish` command with the subcommands `ingest`, `incremental`, `build`, `validate`, `api`, `version` and `doctor`.
   The first five hand their arguments to the existing modules unchanged. `doctor` checks the Python version, packages,
   optional extras, `state/`, `processed/` and whether `TASHWISH_STATE_KEY` is set, without printing it.

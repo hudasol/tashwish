@@ -24,9 +24,10 @@ need a check by the maintainer before anyone relies on them. Each item points to
 5. **AIS cross check.** Compare the Gulf aircraft view with ship position data (AIS) in the same hours and cells. AIS data are
    public only in part and often licensed; check terms first. This could give an independent signal for some events, and is the
    most useful next validation. Out of scope for the current release.
-6. **Run the forward evaluation.** Preregistered in `docs/PREDICTIONS_FORWARD.md` (2026-03-14 to 2026-04-12) with its scorer
-   `scripts/score_forward.py`, both committed before any day after the study window was downloaded. It needs item 3 (the
-   `TASHWISH_STATE_KEY` secret) and then one incremental run per day and one scorer run.
+6. **Forward evaluation: done.** The preregistered block of 30 days (2026-03-14 to 2026-04-12) was processed with the frozen
+   state and scored once. Results and misses are in `docs/research/FORWARD_RESULTS.md`; one oversized trace member of
+   2026-03-25 was excluded and is recorded there. Remaining: a second block, preregistered before it is downloaded, that
+   includes normal traffic days (the first block had none, so two predictions were not evaluable).
 7. **Act on the beta binomial sensitivity.** Done on development days (`docs/research/SECONDARY_ANALYSES.md`, section 1): the flags on
    elevated days do not survive the measured overdispersion. Decide, in a new preregistered version, whether the detector should
    account for overdispersion; the frozen detector stays as it is.
