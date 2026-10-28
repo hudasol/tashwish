@@ -318,6 +318,12 @@ def render(res: dict, spec: dict) -> str:
     lines.append("")
     if res["missing_days"]:
         lines += [f"Missing days: {', '.join(res['missing_days'])}.", ""]
+    dev = ROOT / "results" / "forward" / "deviations.json"
+    if dev.exists():
+        lines += ["## Deviations from the plan", ""]
+        for d in json.loads(dev.read_text(encoding="utf-8")):
+            lines += [f"* {d['day']}: {d['what']} {d['mechanism']} {d['effect']}"]
+        lines.append("")
     return "\n".join(lines)
 
 
