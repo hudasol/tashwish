@@ -94,7 +94,7 @@ times the reported speed, and a cluster of at least 3 aircraft.
 3. Regimes. Each day carries the traffic label (`normal` or `reduced`) from `results/regimes.csv`. Results are pooled and
    by traffic regime. The reduced traffic days are also the days with an elevated degraded share, except 2026-02-28.
 4. Uncertainty. Resampling whole days with replacement, 2000 repetitions, seed 5, 95 percent percentile intervals (the
-   function `cluster_bootstrap_rate` used by the system's own result files). Regimes with fewer than 2 days get no interval.
+   same estimator as `cluster_bootstrap_rate` used by the system's own result files, vectorised over repetitions). Regimes with fewer than 2 days get no interval.
 5. Real days (OBSERVED, no truth). For each detector on each day: number of flagged cell buckets, flagged share of tested
    cell buckets, and overlap with the system. The overlap is the Jaccard index of the set of flagged (cell, bucket) pairs
    with the set flagged by the system (for B4, jump origin cells and buckets against the origins of jumps inside system
