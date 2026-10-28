@@ -190,7 +190,7 @@
   "validation.col_class": "نوع البيانات",
   "validation.col_tested": "جرى الاختبار على",
   "validation.col_meaning": "معنى الرقم",
-  "validation.misses": "الإخفاقات مذكورة مع الإصابات في ملف docs/PREDICTIONS_RESULTS.md في المستودع.",
+  "validation.misses": "الإخفاقات مذكورة مع الإصابات في ملف docs/research/PREDICTIONS_RESULTS.md في المستودع.",
   "validation.misses_link": "افتح قائمة الإصابات والإخفاقات",
   "chip.synthetic": "اصطناعي",
   "chip.observed": "مرصود",

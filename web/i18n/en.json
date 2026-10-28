@@ -190,7 +190,7 @@
   "validation.col_class": "Data class",
   "validation.col_tested": "Tested on",
   "validation.col_meaning": "What the number means",
-  "validation.misses": "The misses are listed with the hits in docs/PREDICTIONS_RESULTS.md in the repository.",
+  "validation.misses": "The misses are listed with the hits in docs/research/PREDICTIONS_RESULTS.md in the repository.",
   "validation.misses_link": "Open the list of hits and misses",
   "chip.synthetic": "SYNTHETIC",
   "chip.observed": "OBSERVED",
