@@ -22,3 +22,21 @@ Build mode: `python -m tashwish.release.build --mode live|study_snapshot` (defau
 `live` is what the scheduled incremental workflow uses (it passes no mode); the dashboard then warns when data is stale.
 `study_snapshot` marks a fixed study dataset: the dashboard shows "STUDY SNAPSHOT, start to end, not live" instead of the
 staleness warning. The mode is written to both `web/data/manifest.json` and `release/manifest.json`.
+
+## `baselines.json` (`tashwish.web.baselines.v1`, optional)
+
+Written by the same build only when `results/baselines/summary.json` exists; otherwise the file is absent (a file left by an
+earlier build is removed) and the validation page hides the section "Comparison with simple detectors". Absence is never an
+error. It carries the common fields (`data_class` is `observed` at file level, as for `validation.json`) and `results`: rows
+`{metric, tier (jamming recall only), data_class (synthetic|observed), split (dev|held_out), regime (pooled|traffic_normal|traffic_reduced), detector, label_en, label_ar, value, ci_lo, ci_hi, n}`.
+Every number is copied from the summary by a pure function (`baseline_rows` in `release/build.py`); gaps stay null.
+
+| `metric` | `data_class` | `value`, `n` |
+|---|---|---|
+| `jamming_recall` (with `tier` easy, medium, hard, random) | synthetic | recall on injected scenarios, harness rule; `n` scenarios; 95% day bootstrap interval |
+| `spoofing_recall_3plus` | synthetic | recall on injected spoofing of 3 or more aircraft; `n` scenarios |
+| `flagged_per_day_jamming_like` | observed | mean flagged cell buckets per real day; `n` days |
+| `flagged_per_day_spoofing_like` | observed | mean flagged origin units per real day; `n` days |
+
+Real day rows are a burden count, not an error rate: there is no ground truth. `split` `held_out` is labelled post hoc, not
+preregistered. Rows with `data_class` synthetic stay out of the observed release, so this file is written to `web/data/` only.
