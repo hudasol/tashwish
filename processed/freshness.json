@@ -26,13 +26,15 @@
   "2026-04-06",
   "2026-04-07",
   "2026-04-08",
-  "2026-04-09"
+  "2026-04-09",
+  "2026-04-10",
+  "2026-04-11"
  ],
  "fallback_active": false,
- "generated_at": "2026-10-28T22:13:47Z",
+ "generated_at": "2026-10-28T22:27:26Z",
  "last_error": null,
- "last_run_at": "2026-10-28T22:07:39Z",
+ "last_run_at": "2026-10-28T22:21:58Z",
  "last_run_status": "ok",
- "latest_day": "2026-04-09",
+ "latest_day": "2026-04-11",
  "schema": "tashwish.freshness.v1"
 }
