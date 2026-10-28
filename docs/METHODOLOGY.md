@@ -133,3 +133,13 @@ windows, which are used as weak evidence only. Numbers are in `docs/research/VAL
 - The study window is short (35 days) and one season; results do not transfer automatically elsewhere.
 - The data contain a regime change (see [Regimes](#regimes)); statistics pooled across it describe neither side.
 - Public aircraft data does not describe drone scale receivers (see `docs/SIRB_INTERFACE.md`).
+- Spoofing that leaves the broadcast accuracy fields nominal, and spoofing aimed at a single aircraft, are largely invisible to
+  crowd based methods.
+- The raw archive is the union of volunteer feeders, not a uniform sensor network. Coverage changes over time, and closed airspace
+  and low traffic areas show nothing. The coverage model reduces but cannot remove this.
+- Documented incidents are few and mostly described in secondary sources. They are weak labels, never ground truth.
+- Numeric thresholds are design choices, not standards, and are tested for sensitivity rather than assumed.
+- Maritime (AIS) cross checking is out of scope for this release (see [ROADMAP.md](ROADMAP.md)).
+- Most real events found are spoofing-like clusters of the minimum size, 3 aircraft, and most carry an uncertain label. A position
+  jump seen by 3 aircraft can be a data error, for example a multilateration artefact, and some events imply speeds of thousands of
+  knots that no aircraft flew. Events are candidates for review.
