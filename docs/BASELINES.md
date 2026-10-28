@@ -23,7 +23,7 @@ result is seen. If a bug is found, it is fixed in a new commit and the fix is re
    `combine` and `match_scenario` read. Scenarios are scored by the unchanged `match_scenario` and `drop_background`.
 3. Scenarios, seeds, days, runs per day and the scenario mix are those of `results/dev` and `results/held_out` (4 runs per
    day, mix 6 jamming only, 4 spoofing jump, 3 spoofing and jamming, 3 null). Scenario generation is not changed. The
-   system is re-run inside the same loop and its outcomes are compared with the committed result files as a reproduction
+   system is run again inside the same loop and its outcomes are compared with the committed result files as a reproduction
    check.
 4. Fitting data. Anything fitted comes from development days only and never includes the scored day. A held out day is only
    scored. No constant below was tuned on any day.
@@ -88,7 +88,7 @@ times the reported speed, and a cluster of at least 3 aircraft.
    detectors, spoofing flag rate for B4 and the system).
 2. Two matching rules. The harness rule is the unchanged one: events with the same identifier as an event found on the
    uninjected day are removed, and the rest are matched. It can credit a noisy detector for merging an injection into a
-   pre-existing real flag. The strict rule builds events from newly flagged cell buckets only (cell buckets flagged on the
+   existing real flag. The strict rule builds events from newly flagged cell buckets only (cell buckets flagged on the
    uninjected day are removed before events are built), so only flags caused by the injection can count. Both are reported,
    and where they differ the strict one is the safer reading.
 3. Regimes. Each day carries the traffic label (`normal` or `reduced`) from `results/regimes.csv`. Results are pooled and
