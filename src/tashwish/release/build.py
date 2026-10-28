@@ -86,6 +86,7 @@ ROOT = Path(__file__).resolve().parents[3]
 WEB_SCHEMA = "tashwish.web.v1"
 REL_SCHEMA = "tashwish.release.v1"
 SCHEMA_VALIDATION = "tashwish.validation.v1"
+SCHEMA_BASELINES = "tashwish.web.baselines.v1"
 GRID = cfg.GRID_MAIN
 MIN_DEST_AIRCRAFT = 5  # destination coordinates are published only for spoofing events with at least this many aircraft
 ROUNDING_SENTENCE = (
@@ -261,9 +262,122 @@ def normalise_results(rows: list[dict]) -> list[dict]:
     return out
 
 
+# Plain labels for the detectors compared in results/baselines/summary.json (id, English, Arabic). The ids are keys only;
+# the page shows the labels.
+BASELINE_LABELS = {
+    "system": ("The system (frozen detector)", "النظام (الكاشف المثبت)"),
+    "B1": (
+        "Fixed fraction: a cell is flagged when the degraded share reaches a constant",
+        "نسبة ثابتة: تُعلَّم الخلية عندما تبلغ نسبة التدني حدا ثابتا",
+    ),
+    "B1b": ("Fixed fraction with a sparsity correction", "نسبة ثابتة مع تصحيح الندرة"),
+    "B2": ("Climatology: z score per cell and time slot", "مناخية: درجة معيارية لكل خلية وفترة زمنية"),
+    "B3a": ("The system without regime aware baselines", "النظام دون خطوط أساس تراعي نمط الحركة"),
+    "B3b": ("The system without coverage gating", "النظام دون تصفية التغطية"),
+    "B3c": ("The system without false discovery control", "النظام دون ضبط الاكتشافات الكاذبة"),
+    "B4": ("Naive speed threshold on single jumps", "عتبة سرعة بسيطة على القفزات المفردة"),
+}
+BASELINE_JAM_DETECTORS = ("system", "B1", "B1b", "B2", "B3a", "B3b", "B3c")
+BASELINE_SPOOF_DETECTORS = ("system", "B4")
+BASELINE_TIERS = ("easy", "medium", "hard", "random")
+BASELINE_SPLITS = ("dev", "held_out")
+BASELINE_REGIMES = {
+    "all": "pooled",
+    "normal": "traffic_normal",
+    "reduced": "traffic_reduced",
+}  # summary name -> row regime
+
+
+def _num(x):
+    """A finite number or None (the summary writes NaN where an interval does not exist)."""
+    if x is None or isinstance(x, bool):
+        return None
+    try:
+        f = float(x)
+    except (TypeError, ValueError):
+        return None
+    return f if np.isfinite(f) else None
+
+
+def baseline_rows(summary: dict) -> list[dict]:
+    """Compact rows for the validation page, derived only from the content of results/baselines/summary.json.
+
+    Row fields: metric, tier (jamming recall only), data_class (`synthetic` for injected scenarios, `observed` for real
+    days), split (`dev` or `held_out`), regime (`pooled`, `traffic_normal`, `traffic_reduced`), detector (id), label_en,
+    label_ar, value, ci_lo, ci_hi, n. Recall rows use the harness rule; `n` is the number of scenarios. Real day rows are
+    the mean number of flagged cell buckets (jamming-like) or origin units (spoofing-like) per day; `n` is the number of
+    days. Real day rows are a burden count, not an error rate: there is no ground truth. Missing sections are skipped."""
+    rows: list[dict] = []
+
+    def add(metric, data_class, split, regime, det, value, lo, hi, n, tier=None):
+        value = _num(value)
+        if value is None:
+            return
+        en, ar = BASELINE_LABELS[det]
+        row = {"metric": metric, "data_class": data_class, "split": split, "regime": BASELINE_REGIMES[regime], "detector": det,
+               "label_en": en, "label_ar": ar, "value": value, "ci_lo": _num(lo), "ci_hi": _num(hi), "n": int(n or 0)}  # fmt: skip
+        if tier is not None:
+            row["tier"] = tier
+        rows.append(row)
+
+    for split in BASELINE_SPLITS:
+        s = (summary or {}).get(split) or {}
+        for reg in BASELINE_REGIMES:
+            for det in BASELINE_JAM_DETECTORS:
+                for tier in BASELINE_TIERS:
+                    r = (((s.get("jam_recall") or {}).get("harness") or {}).get(reg) or {}).get(det, {}).get(tier)
+                    if r:
+                        add(
+                            "jamming_recall",
+                            "synthetic",
+                            split,
+                            reg,
+                            det,
+                            r.get("rate"),
+                            r.get("lo"),
+                            r.get("hi"),
+                            r.get("n"),
+                            tier,
+                        )
+            for det in BASELINE_SPOOF_DETECTORS:
+                r = ((s.get("spoof_recall_n_ge_3") or {}).get(reg) or {}).get(det)
+                if r:
+                    add(
+                        "spoofing_recall_3plus",
+                        "synthetic",
+                        split,
+                        reg,
+                        det,
+                        r.get("rate"),
+                        r.get("lo"),
+                        r.get("hi"),
+                        r.get("n"),
+                    )
+            for metric, key, dets in (
+                ("flagged_per_day_jamming_like", "real_days_jamming_like", BASELINE_JAM_DETECTORS),
+                ("flagged_per_day_spoofing_like", "real_days_spoofing_like", BASELINE_SPOOF_DETECTORS),
+            ):
+                for det in dets:
+                    r = ((s.get(key) or {}).get(reg) or {}).get(det)
+                    if r:
+                        add(metric, "observed", split, reg, det, r.get("flagged_per_day"), r.get("flagged_per_day_lo"),
+                            r.get("flagged_per_day_hi"), r.get("days"))  # fmt: skip
+    return rows
+
+
+def load_baselines(results: Path) -> list[dict] | None:
+    """Rows from results/baselines/summary.json, or None when the file is absent or yields no rows (the page then hides the section)."""
+    p = results / "baselines" / "summary.json"
+    if not p.exists():
+        return None
+    rows = baseline_rows(json.loads(p.read_text(encoding="utf-8")))
+    return rows or None
+
+
 def write_web(web: Path, cb: pd.DataFrame, ev: pd.DataFrame, metas: list[dict], cov: pd.DataFrame | None,
               generated_at: str, latest_day: str | None, results_block: dict, methods: dict,
-              daily: pd.DataFrame | None = None, dataset_version: str | None = None, mode: str = "live") -> None:  # fmt: skip
+              daily: pd.DataFrame | None = None, dataset_version: str | None = None, mode: str = "live",
+              baselines: list[dict] | None = None) -> None:  # fmt: skip
     common = {"schema": WEB_SCHEMA, "data_class": "observed", "generated_at": generated_at,
               "code_commit": code_commit(), "attribution": DATASET_ATTRIBUTION}  # fmt: skip
     shutil.rmtree(web / "days", ignore_errors=True)
@@ -298,6 +412,10 @@ def write_web(web: Path, cb: pd.DataFrame, ev: pd.DataFrame, metas: list[dict], 
     _dump(web / "validation.json", {**common, "results": normalise_results(results_block.get("results", [])),
           **({"note": results_block["note"]} if results_block.get("note") else {})})  # fmt: skip
     _dump(web / "methods.json", {**common, "metrics": methods})
+    if baselines:
+        _dump(web / "baselines.json", {**common, "schema": SCHEMA_BASELINES, "results": baselines})
+    else:  # no baseline results in this build: drop a file left by an earlier one so the page hides the section
+        (web / "baselines.json").unlink(missing_ok=True)
     if daily is not None:
         _dump(web / "daily.json", {**common, "days": daily.round(4).to_dict(orient="records")})
     _dump(web / "manifest.json", {**common, "dataset_version": dataset_version or (f"observed-{latest_day}" if latest_day else "empty"),
@@ -420,6 +538,7 @@ def build(a: argparse.Namespace, tmp_web: Path, tmp_rel: Path) -> bool:
         dr,
         dataset_version=version,
         mode=a.mode,
+        baselines=load_baselines(a.results),
     )
 
     rel = tmp_rel
