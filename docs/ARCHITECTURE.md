@@ -1,8 +1,7 @@
 # Architecture
 
-Principle: **precompute everything, serve static files.** The hard part is the signal processing and the validation,
-not hosting. Static outputs are cheap, fast, auditable and hard to break. The API is a thin read only layer over the same
-released files.
+Principle: **precompute everything, serve static files.** Static outputs are cheap, fast, auditable and hard to break.
+The API is a thin read only layer over the same released files. Method details are in [METHODOLOGY.md](METHODOLOGY.md).
 
 ## Data flow
 
@@ -36,48 +35,55 @@ data/processed/*.parquet   cell_hour metrics, coverage, events, event_evidence
 |---|---|---|
 | Python 3.13 | Matches the owner's environment; scientific stack | - |
 | DuckDB + Parquet | Columnar, single file, SQL for aggregation, zero server; Parquet is the released format too | SQLite (poor for analytics), Postgres (needs a server) |
-| H3 (Uber) | Equal ish area hexes, hierarchical, standard; resolution table sourced in RESEARCH.md | Lat/lon grid (distorts cell area), S2 |
+| H3 (Uber) | Equal ish area hexes, hierarchical, standard; resolution table sourced in [research/RESEARCH.md](research/RESEARCH.md) | Lat/lon grid (distorts cell area), S2 |
 | NumPy / SciPy / pandas | Wilson intervals, FDR, clustering; no heavy ML needed because methods are interpretable by design | scikit-learn only where a clustering primitive is needed |
 | FastAPI | Typed, OpenAPI docs for free, tiny | Flask |
 | MapLibre GL + deck.gl front end | Open source maps, performant hex layers, RTL capable UI | Leaflet (slow for many polygons), Mapbox (token and terms) |
 | pytest + hypothesis + ruff | Property tests for statistics, fast lint | - |
 | GitHub Actions | CI badge, runs tests and lint on a clean checkout | - |
 
-No LLM layer, no chatbot, no generated narrative text in the product.
+The product contains no generated narrative text.
 
-## Package layout (planned)
+## Package layout
 
 ```
 src/tashwish/
-  config.py        region box, H3 resolutions, thresholds (every default documented, every default tested)
-  schema.py        Parquet schemas, data_class (observed | synthetic), validation
-  ingest/          source adapters (adsblol), ranged download, trace parsing, quality report
-  metrics/         degradation tiers, per cell aggregation, statistics (Wilson, shrinkage, FDR)
-  coverage/        empirical coverage model
-  detect/          jamming and spoofing detectors, event table
-  validate/        injection scenarios (synthetic), replay, robustness sweeps
-  release/         dataset build, data card, checksums
-  api/             FastAPI app
-tests/             unit, property and integration tests; tiny fixtures in tests/fixtures (labelled synthetic where invented)
-web/               dashboard source
-docs/              RESEARCH, DATA_SOURCES, ARCHITECTURE, METHODOLOGY, VALIDATION, DATA_QUALITY, REVIEW_ROUNDS, REPORT, ROADMAP
-scripts/           one command entry points (ingest, build, validate, release)
+  config.py        region box, H3 resolutions, thresholds
+  schema.py        Arrow schema of the point table, data_class (observed | synthetic) rules
+  split.py         deterministic development and held out day split
+  regime.py        day level traffic and degraded regime labels
+  pipeline.py      stage orchestration from points to detections
+  attribution.py   attribution wording, the single source for every public surface
+  cli.py           the tashwish command
+  ingest/          source adapter, ranged download, trace parsing, quality report
+  metrics/         degradation tiers, per cell aggregation, statistics (Wilson, shrinkage, FDR), grid feasibility
+  coverage/        empirical receiver coverage model
+  detect/          jamming-like and spoofing-like detectors, event discrimination
+  validate/        injection scenarios (synthetic), harness, coverage test, sensitivity study
+  operate/         incremental run, scoring against the frozen state, refit
+  release/         dataset and dashboard data build, data card, checksums
+  api/             read only FastAPI service
+  interop/         Marsad and Sirb file formats, synthetic samples
+tests/             unit, property and integration tests; small fixtures in tests/fixtures (labelled synthetic where invented)
+web/               static dashboard
+docs/              user and developer documents (index in docs/README.md); docs/research holds the study records
+scripts/           document generators, regime and freshness checks, forward scoring
 ```
 
 ## Key design decisions (reversible, recorded)
 
-1. **Unique aircraft counting, worst quality in bucket.** Prevents long lived or chatty aircraft dominating a cell hour.
-2. **"Insufficient data" is a state, not a colour.** Any cell hour failing the coverage or minimum sample test is
-   rendered distinctly and excluded from "quiet" statistics.
+1. **Unique aircraft counting.** Prevents long lived or chatty aircraft dominating a cell bucket
+   (see [METHODOLOGY.md](METHODOLOGY.md), section Unique aircraft count).
+2. **"Insufficient data" is a state, not a colour.** Any cell bucket failing the coverage or minimum sample test is
+   rendered distinctly and excluded from "quiet" statistics (see [METHODOLOGY.md](METHODOLOGY.md), section Minimum sample rule).
 3. **Observed and synthetic never share a table.** Different directories, different schemas (`data_class` column checked
    at write time), different UI layers.
 4. **Everything is a pure function of the manifest.** Re running a stage on the same inputs and code version yields the
    same bytes (Parquet written with fixed settings, sorted rows). Tests assert this.
-5. **Raw archives are never stored or redistributed.** We stream, filter and discard. Only our derived aggregates are released.
+5. **Raw archives are never stored or redistributed.** The pipeline streams, filters and discards them. Only derived aggregates are released.
 6. **Hosting:** static dashboard on Vercel (or Render static site); read only API on Render. Both deploy from the repository.
-   If the repository cannot be linked, deployment uses direct file upload and this is recorded in the final report.
 
-## Failure modes we design for
+## Failure modes handled
 
 - Download interrupted by the egress proxy (connections are cut after roughly 100 seconds): ranged chunks with retries; a
   day is only marked complete when the whole tar parsed and row counts reconcile.
@@ -85,7 +91,7 @@ scripts/           one command entry points (ingest, build, validate, release)
 - Receiver set changes: coverage model is time varying; step changes in coverage are flagged in the data quality report.
 - Field sparsity: measured per day and published; thresholds only use fields above a documented presence rate.
 
-## Open items to be settled with data (see DATA_QUALITY.md)
+## Open items to be settled with data (see [DATA_QUALITY.md](DATA_QUALITY.md))
 
 - Presence rates of NIC, NACp, SIL, SDA, ADS-B version proxies in the archive.
 - Whether position source (ADS-B vs MLAT vs Mode S) is separable per point, so MLAT derived positions can be excluded.
