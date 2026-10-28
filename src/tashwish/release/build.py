@@ -447,7 +447,7 @@ def build(a: argparse.Namespace, tmp_web: Path, tmp_rel: Path) -> bool:
         newline="\n",
     )
     note = (
-        "Validation numbers: see `validation.json` and docs/VALIDATION.md in the repository (generated from result files)."
+        "Validation numbers: see `validation.json` and docs/research/VALIDATION.md in the repository (generated from result files)."
         if results_block.get("results")
         else "Validation numbers: not yet attached to this build."
     )
