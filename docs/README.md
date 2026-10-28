@@ -50,6 +50,9 @@ These files are frozen. Results are never written into them.
 - [research/OVERNIGHT_LOG.md](research/OVERNIGHT_LOG.md): log of the working session of 2026-10-16.
 - [research/PROPOSAL.md](research/PROPOSAL.md): proposed future work.
 
+The frozen preregistration records (`PREDICTIONS.md`, `PREDICTIONS_AMENDMENT.md` and `PREDICTIONS_FORWARD.md`) keep their original relative paths and are not edited,
+so they name study records at the locations they had when they were written.
+
 Generated files carry a header naming the script that writes them. Regenerate them with `scripts/make_results_docs.py`,
 `scripts/make_report.py`, `scripts/make_secondary_doc.py` and `scripts/make_data_quality_doc.py`; the README status block comes from
 `scripts/make_readme_status.py`.
