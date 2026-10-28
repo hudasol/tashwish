@@ -113,7 +113,7 @@ def test_build_writes_baselines_json_only_when_the_summary_exists(tmp_path, monk
     assert not (tmp_path / "web" / "baselines.json").exists()  # absent file: no error, no output
     assert "baselines.json" not in {p.name for p in (tmp_path / "rel").iterdir()}
     (tmp_path / "res" / "baselines").mkdir(parents=True)
-    (tmp_path / "res" / "baselines" / "summary.json").write_text(json.dumps(SUMMARY), encoding="utf-8")
+    (tmp_path / "res" / "baselines" / "summary.json").write_text(json.dumps(SUMMARY), encoding="utf-8", newline="\n")
     build.main()
     doc = json.loads((tmp_path / "web" / "baselines.json").read_text(encoding="utf-8"))
     assert doc["schema"] == "tashwish.web.baselines.v1" and doc["data_class"] == "observed"
@@ -128,7 +128,7 @@ def test_build_writes_baselines_json_only_when_the_summary_exists(tmp_path, monk
 
 def test_a_summary_without_usable_rows_counts_as_absent(tmp_path):
     (tmp_path / "baselines").mkdir()
-    (tmp_path / "baselines" / "summary.json").write_text(json.dumps({"dev": {}}), encoding="utf-8")
+    (tmp_path / "baselines" / "summary.json").write_text(json.dumps({"dev": {}}), encoding="utf-8", newline="\n")
     assert build.load_baselines(tmp_path) is None
     assert build.load_baselines(tmp_path / "nowhere") is None
 
@@ -136,3 +136,7 @@ def test_a_summary_without_usable_rows_counts_as_absent(tmp_path):
 @pytest.mark.parametrize("bad", ["x", None, float("nan")])
 def test_num_rejects_non_numbers(bad):
     assert build._num(bad) is None
+
+
+def test_values_are_rounded_to_six_decimals_only():
+    assert build._num(1 / 3) == 0.333333 and build._num(0.5) == 0.5 and build._num(7) == 7.0

@@ -289,14 +289,14 @@ BASELINE_REGIMES = {
 
 
 def _num(x):
-    """A finite number or None (the summary writes NaN where an interval does not exist)."""
+    """A finite number rounded to 6 decimals, or None (the summary writes NaN where an interval does not exist)."""
     if x is None or isinstance(x, bool):
         return None
     try:
         f = float(x)
     except (TypeError, ValueError):
         return None
-    return f if np.isfinite(f) else None
+    return round(f, 6) if np.isfinite(f) else None
 
 
 def baseline_rows(summary: dict) -> list[dict]:
