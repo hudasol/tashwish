@@ -24,7 +24,7 @@ evidence of degraded position quality. It is not about who or what caused anythi
 - Study window 2026-02-07 to 2026-03-13, 35 UTC days. Grid: H3 resolution 4, 3 hour UTC buckets.
 - Split rule `tashwish-heldout-v1`: 21 development days and 14 held out days, fixed by a hash of the date before any held out
   result existed. The held out run was executed once, at commit `94eafcd`, frozen 2026-10-12 06:27:49 UTC.
-- Release candidate `observed-2026-03-13-73ebe3c6` (code commit `e61fbc3`), data class observed.
+- Release candidate `observed-2026-03-13-73ebe3c6` (code commit `5fb5195`), data class observed.
 
 ## 3. Methods
 

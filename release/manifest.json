@@ -1,8 +1,8 @@
 {
  "schema": "tashwish.release.v1",
  "dataset_version": "observed-2026-03-13-73ebe3c6",
- "generated_at": "2026-10-13T13:07:00Z",
- "code_commit": "e61fbc3",
+ "generated_at": "2026-10-28T14:26:32Z",
+ "code_commit": "5fb5195",
  "data_class": "observed",
  "attribution": "Contains information from adsb.lol, which is made available here under the Open Database License (ODbL). This derived database (Tashwish aggregates) is also made available under the ODbL 1.0.",
  "grid": {
@@ -371,8 +371,8 @@
  "files": {
   "DATA_CARD.md": {
    "path": "DATA_CARD.md",
-   "sha256": "784f552c60cab6635f81a46735bba374da2f0aeff05bd7c5f1b59ec1858b9c96",
-   "bytes": 4720
+   "sha256": "2764bb7b309a775fa896a3556ebca66d0b53bd80f92c1e3be861968cb8b25826",
+   "bytes": 4732
   },
   "NOTICE": {
    "path": "NOTICE",
@@ -386,7 +386,7 @@
   },
   "cell_buckets.csv.gz": {
    "path": "cell_buckets.csv.gz",
-   "sha256": "8274ae35ecb1ea92708a02c0b97f49c9baa402c0d5c5c4508a1aaaed89eee4b7",
+   "sha256": "f67ef684eb7deaca2882771d32a27212488e3b997545e73671f630f916c83503",
    "bytes": 1450997
   },
   "cell_buckets.parquet": {
@@ -406,7 +406,7 @@
   },
   "events.csv.gz": {
    "path": "events.csv.gz",
-   "sha256": "213bae5e6bace257f3114248fec5ae996174f32bdfe328755268c6bd79201b30",
+   "sha256": "671e33a20e53b3fa69868c762b5b5af353192c40aa20e350729ae72cc49dd5d3",
    "bytes": 2125
   },
   "events.parquet": {
@@ -416,7 +416,7 @@
   },
   "freshness.json": {
    "path": "freshness.json",
-   "sha256": "42ad543159a23a3d46dd510fa2fc377ec5ea3d6e3be129c456a864eda73f27e3",
+   "sha256": "2844e604693177203649e62bb78da89c9b6d00051790c1d0c7adff6da2709798",
    "bytes": 72
   },
   "validation.json": {
@@ -426,7 +426,7 @@
   },
   "checksums.sha256": {
    "path": "checksums.sha256",
-   "sha256": "b547c7e057465989c12c130423be4b5a6ff69ab4841f1d79db12d10f566340f5",
+   "sha256": "cb8ef2ce316a1ff2702054e64aef5a374a538edb8c3a1332499157bef8904d20",
    "bytes": 894
   }
  },

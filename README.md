@@ -71,7 +71,7 @@ See [docs/DATA_CARD.md](docs/DATA_CARD.md), [docs/DATA_SOURCES.md](docs/DATA_SOU
 
 **What this repository shows (study snapshot, not a live feed)**
 
-- Study window: 2026-02-07 to 2026-03-13, 35 UTC days of public ADS-B, released as a release candidate (dataset version `observed-2026-03-13-73ebe3c6`, built at code commit `e61fbc3`).
+- Study window: 2026-02-07 to 2026-03-13, 35 UTC days of public ADS-B, released as a release candidate (dataset version `observed-2026-03-13-73ebe3c6`, built at code commit `5fb5195`).
 - Split rule `tashwish-heldout-v1`: 21 development days and 14 held out days. The held out days were fixed and listed before any held out result was computed, and scored once at commit `94eafcd` (frozen 2026-10-12 06:27:49 UTC).
 - OBSERVED, regime change: tested degraded share was 0.008 to 0.018 on days up to 2026-02-27 and 0.088 to 0.336 from 2026-03-01. The median daily total of en route aircraft counts over cell buckets (traffic units) fell from 48605 to 3864. The reduced traffic regime starts on 2026-02-28 and the elevated degraded regime on 2026-03-01; the development analysis places the sharp change at about 2026-03-02. 14 of 35 study days (6 of 14 held out days) are in the reduced traffic regime. No cause is identified and none is asserted.
 
