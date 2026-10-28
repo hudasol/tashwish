@@ -7,7 +7,7 @@ from pathlib import Path
 WEB = Path(__file__).resolve().parents[1] / "web"
 EN = json.loads((WEB / "i18n" / "en.json").read_text(encoding="utf-8"))
 AR = json.loads((WEB / "i18n" / "ar.json").read_text(encoding="utf-8"))
-BANNED = re.compile("[–—−\U0001f300-\U0001faff☀-➿]")
+BANNED = re.compile("[\u2013\u2014\u2212\U0001f300-\U0001faff\u2600-\u27bf]")
 ALLOWED_HYPHENS = {"jamming-like", "spoofing-like", "ads-b"}  # ADS-B is a standard name
 
 
