@@ -30,5 +30,5 @@ from the build environment, so each should be compared with what the interface s
 7. Optional: in Zenodo **Account, GitHub**, switch on the `hudasol/tashwish` repository. After that, every GitHub Release
    that is created is archived as a code snapshot with its own DOI. This archives source code only, not the dataset files; the dataset is
    the manual upload in step 2.
-8. Create the GitHub Releases from the tags suggested in `docs/RELEASES.md` (the Releases page, **Draft a new release**, choose
-   **Create new tag on publish** and the commit hash listed there).
+8. Create the GitHub Release for the same software version by following `docs/RELEASES.md` (the Releases page, **Draft a new
+   release**, choose **Create new tag on publish**).
