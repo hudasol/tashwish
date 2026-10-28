@@ -1,6 +1,6 @@
 """Small, dependency-light statistics used by the metrics and detection stages.
 
-References (see docs/RESEARCH.md section 2.5): Wilson (1927) score interval; empirical-Bayes beta-binomial shrinkage;
+References (see docs/research/RESEARCH.md section 2.5): Wilson (1927) score interval; empirical-Bayes beta-binomial shrinkage;
 Benjamini-Hochberg (1995) and Benjamini-Yekutieli (2001) false-discovery control.
 """
 

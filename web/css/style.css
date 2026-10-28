@@ -229,3 +229,15 @@ details > summary { cursor: pointer; font-weight: 600; padding: .5rem 0; min-blo
 .chart .mark { stroke: var(--text); stroke-width: 1.5; stroke-dasharray: 4 3; }
 #events-table table.data tbody th { min-inline-size: 13rem; }
 #events-table .linkbtn { text-align: start; line-height: 1.35; }
+
+/* comparison with simple detectors */
+.bl h3 { margin-block: 1.2rem .2rem; }
+.bl h4 { font-size: 1rem; margin-block: .9rem .2rem; display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+.bl-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin-block: .6rem; }
+.bl-ctl select { font: inherit; min-block-size: 44px; padding-inline: .5rem; }
+.bl-num { unicode-bidi: isolate; direction: ltr; display: inline-block; font-variant-numeric: tabular-nums; }
+.bl-table tbody th { min-inline-size: 12rem; }
+.bl-table tr.sys > th, .bl-table tr.sys > td { background: var(--sakura); font-weight: 700; }
+.bl-table tr.sys > th { border-inline-start: 4px solid var(--accent); }
+.bl .table-wrap { max-block-size: none; }
+.bl-table td .cell-sub { white-space: nowrap; }

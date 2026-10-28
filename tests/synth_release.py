@@ -134,7 +134,7 @@ def build_synthetic_release(
     (root / "validation.json").write_text(
         json.dumps({"schema": "tashwish.validation.v1", "data_class": data_class, "note": banner,
                     "headline": {"precision": {"value": 0.8, "ci": [0.6, 0.9]}}}),
-        encoding="utf-8",
+        encoding="utf-8", newline="\n",
     )  # fmt: skip
     (root / "freshness.json").write_text(
         json.dumps(
@@ -147,16 +147,19 @@ def build_synthetic_release(
             }
         ),
         encoding="utf-8",
+        newline="\n",
     )
-    (root / "DATA_CARD.md").write_text(f"# Data card\n\n{banner}\n\n{NOTICE}\n", encoding="utf-8")
-    (root / "NOTICE").write_text(f"{DATASET_ATTRIBUTION}\n{banner}\n", encoding="utf-8")
-    (root / "ODbL-1.0.txt").write_text("TEST PLACEHOLDER, not the licence text.\n", encoding="utf-8")
+    (root / "DATA_CARD.md").write_text(f"# Data card\n\n{banner}\n\n{NOTICE}\n", encoding="utf-8", newline="\n")
+    (root / "NOTICE").write_text(f"{DATASET_ATTRIBUTION}\n{banner}\n", encoding="utf-8", newline="\n")
+    (root / "ODbL-1.0.txt").write_text("TEST PLACEHOLDER, not the licence text.\n", encoding="utf-8", newline="\n")
 
     data_files = [
         "cell_buckets.parquet", "events.parquet", "coverage.parquet", "validation.json", "freshness.json",
         "DATA_CARD.md", "NOTICE", "ODbL-1.0.txt",
     ]  # fmt: skip
-    (root / "checksums.sha256").write_text("".join(f"{_sha(root / f)}  {f}\n" for f in data_files), encoding="utf-8")
+    (root / "checksums.sha256").write_text(
+        "".join(f"{_sha(root / f)}  {f}\n" for f in data_files), encoding="utf-8", newline="\n"
+    )
     files = {
         f: {"path": f, "sha256": _sha(root / f), "bytes": (root / f).stat().st_size}
         for f in [*data_files, "checksums.sha256"]
@@ -179,5 +182,5 @@ def build_synthetic_release(
         "latest_day": DAYS[-1],
         "files": files,
     }  # fmt: skip
-    (root / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    (root / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8", newline="\n")
     return SynthRelease(root, cb, events, cells, generated_at)

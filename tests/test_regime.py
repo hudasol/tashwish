@@ -29,10 +29,10 @@ def test_untestable_cells_do_not_enter_the_share():
 
 def test_freeze_cannot_be_replaced_silently(tmp_path):
     (tmp_path).mkdir(exist_ok=True)
-    (tmp_path / "FREEZE.json").write_text(json.dumps({"commit": "x"}))
+    (tmp_path / "FREEZE.json").write_text(json.dumps({"commit": "x"}), encoding="utf-8", newline="\n")
     with pytest.raises(SystemExit):
         vrun.freeze(tmp_path, tmp_path)  # a freeze exists and no reason is given
     (tmp_path / "held_out").mkdir()
-    (tmp_path / "held_out" / "RUNNING").write_text("{}")
+    (tmp_path / "held_out" / "RUNNING").write_text("{}", encoding="utf-8", newline="\n")
     with pytest.raises(SystemExit):
         vrun.freeze(tmp_path, tmp_path, reason="again")  # the held-out run has started

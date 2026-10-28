@@ -47,9 +47,11 @@ def test_main_exit_codes(tmp_path, capsys):
     p = tmp_path / "freshness.json"
     fresh = (datetime.now(UTC) - timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
     yesterday = (datetime.now(UTC) - timedelta(days=1)).date().isoformat()
-    p.write_text(json.dumps({"generated_at": fresh, "latest_day": yesterday}))
+    p.write_text(json.dumps({"generated_at": fresh, "latest_day": yesterday}), encoding="utf-8", newline="\n")
     assert cf.main([str(p)]) == 0
-    p.write_text(json.dumps({"generated_at": "2020-01-01T00:00:00Z", "latest_day": "2020-01-01"}))
+    p.write_text(
+        json.dumps({"generated_at": "2020-01-01T00:00:00Z", "latest_day": "2020-01-01"}), encoding="utf-8", newline="\n"
+    )
     assert cf.main([str(p)]) == 2
     assert "red" in capsys.readouterr().out
 
@@ -57,18 +59,18 @@ def test_main_exit_codes(tmp_path, capsys):
 def test_missing_and_malformed_are_unknown(tmp_path):
     assert cf.main([str(tmp_path / "nope.json")]) == 3
     bad = tmp_path / "bad.json"
-    bad.write_text("{not json")
+    bad.write_text("{not json", encoding="utf-8", newline="\n")
     assert cf.main([str(bad)]) == 3
-    bad.write_text(json.dumps({"latest_day": "2026-10-01"}))
+    bad.write_text(json.dumps({"latest_day": "2026-10-01"}), encoding="utf-8", newline="\n")
     assert cf.main([str(bad)]) == 3
 
 
 def test_mark_failed_keeps_last_good(tmp_path):
     p = tmp_path / "sub" / "freshness.json"
     p.parent.mkdir()
-    p.write_text(json.dumps(doc(3, "2026-10-11")))
+    p.write_text(json.dumps(doc(3, "2026-10-11")), encoding="utf-8", newline="\n")
     assert cf.main([str(p), "--mark-failed", "download failed"]) == 0
-    out = json.loads(p.read_text())
+    out = json.loads(p.read_text(encoding="utf-8"))
     assert out["last_run_status"] == "failed" and out["fallback_active"] is True
     assert out["latest_day"] == "2026-10-11" and out["generated_at"] == doc(3, "2026-10-11")["generated_at"]
     assert out["last_error"] == "download failed"
@@ -77,7 +79,7 @@ def test_mark_failed_keeps_last_good(tmp_path):
 def test_mark_failed_creates_file(tmp_path):
     p = tmp_path / "freshness.json"
     cf.mark_failed(p, "x", NOW)
-    assert json.loads(p.read_text())["fallback_active"] is True
+    assert json.loads(p.read_text(encoding="utf-8"))["fallback_active"] is True
     assert cf.main([str(p)]) == 3  # no generated_at: cannot be evaluated, never looks healthy
 
 
@@ -88,7 +90,11 @@ def test_timestamp_forms(ts):
 
 def test_null_fields_are_unknown_not_a_crash(tmp_path):
     p = tmp_path / "f.json"
-    p.write_text(json.dumps({"generated_at": None, "latest_day": None, "last_run_status": "noop"}))
+    p.write_text(
+        json.dumps({"generated_at": None, "latest_day": None, "last_run_status": "noop"}),
+        encoding="utf-8",
+        newline="\n",
+    )
     with pytest.raises(ValueError):
-        cf.evaluate(json.loads(p.read_text()), NOW)
+        cf.evaluate(json.loads(p.read_text(encoding="utf-8")), NOW)
     assert cf.main([str(p)]) == cf.EXIT["unknown"]

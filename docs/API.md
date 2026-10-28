@@ -1,7 +1,5 @@
 # Release API (`tashwish.api.v1`)
 
-> **Research and monitoring tool, not for navigation or safety of life, no attribution to any actor.**
-
 A read only JSON service over one released dataset directory. It adds no data of its own: every number is a row of the
 release Parquet files, and every response says which `dataset_version` it came from. Code is Apache-2.0, the data is ODbL 1.0.
 Attribution: `src/tashwish/attribution.py` (`DATASET_ATTRIBUTION`), sent on every response.
@@ -154,8 +152,8 @@ Every error is `{"error": {"code", "message", "details"?}}` (plus `synthetic_not
   rate limiter and caches reset on every restart.
 * **Freshness.** `age_hours` and `/v1/freshness` tell you how old the data is. A stale dataset still answers (`status: stale` in `/health`);
   it is the caller's job to check it. There is no SLA, no support, and no guarantee the service stays up.
-* **Fitness for use.** Indicators are evidence of degraded ADS-B accuracy, not proof of interference, and not attribution. Do not use
-  the service for navigation, flight planning or any safety of life decision. Use NOTAMs and your regulator.
+* **Fitness for use.** What the indicators mean and what they do not mean is stated in [METHODOLOGY.md](METHODOLOGY.md) and the data
+  card. The service is not a source for operational decisions.
 
 ## Tests
 

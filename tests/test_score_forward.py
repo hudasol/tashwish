@@ -27,7 +27,7 @@ def _mod():
 
 def _state(root: Path, ref_units: float = 1000.0) -> str:
     root.mkdir(parents=True)
-    (root / "state.json").write_text(json.dumps({"ref_units": ref_units}), encoding="utf-8")
+    (root / "state.json").write_text(json.dumps({"ref_units": ref_units}), encoding="utf-8", newline="\n")
     return hashlib.sha256((root / "state.json").read_bytes()).hexdigest()
 
 
@@ -49,7 +49,7 @@ def _day(processed: Path, day: str, *, units: int, degraded: int, not_enough: in
     ).to_parquet(d / "events.parquet", index=False)
     meta = {"day": day, "mode": mode, "data_class": data_class, "ingested_at": ingested_at,
             "provenance": {"state_sha256": sha}}  # fmt: skip
-    (d / "day.json").write_text(json.dumps(meta), encoding="utf-8")
+    (d / "day.json").write_text(json.dumps(meta), encoding="utf-8", newline="\n")
 
 
 def _spec(sha: str, **over) -> dict:

@@ -2,8 +2,7 @@
 
 This page proposes future work. It is not a description of something that exists, and it is not a claim of use, review or
 support by anyone. **No organisation has reviewed, endorsed, adopted or partnered with this project, and no use by any entity is
-claimed.** Tashwish is a research and monitoring tool. It is not for navigation or safety of life, and it does not attribute
-interference to any state or actor.
+claimed.**
 
 ## What exists today
 
@@ -14,10 +13,10 @@ interference to any state or actor.
   and a static bilingual dashboard showing that fixed snapshot. It is not live data.
 - A validation record: controlled injection of SYNTHETIC scenarios into real traffic, preregistered predictions scored once on
   held out days with misses reported as prominently as hits, and a report of where the method fails. Numbers are generated into
-  [README.md](../README.md), [REPORT.md](REPORT.md) and [VALIDATION.md](VALIDATION.md).
+  [README.md](../../README.md), [REPORT.md](REPORT.md) and [VALIDATION.md](VALIDATION.md).
 - A finding about the data: a sharp change from about 2026-03-02 that splits the window into two regimes, with no cause identified.
-- Two file formats, not integrations. A context file for Marsad ([MARSAD_INTERFACE.md](MARSAD_INTERFACE.md)) and a degradation
-  parameter file for Sirb ([SIRB_INTERFACE.md](SIRB_INTERFACE.md)). Marsad and Sirb are the author's own separate projects. Neither
+- Two file formats, not integrations. A context file for Marsad ([MARSAD_INTERFACE.md](../MARSAD_INTERFACE.md)) and a degradation
+  parameter file for Sirb ([SIRB_INTERFACE.md](../SIRB_INTERFACE.md)). Marsad and Sirb are the author's own separate projects. Neither
   reads these files in production, and Tashwish does not modify them.
 
 Its limits are large. There is no ground truth, so accuracy against real interference is unknown. Precision and detection delay are
@@ -36,7 +35,7 @@ events found are minimum size spoofing like clusters that may be data errors.
    interference intervals kept by an operator or regulator, evaluated on their terms and with their permission. Nothing of this kind
    exists in this project. If it were offered, the preregistration approach used here (predictions and split fixed before scoring)
    should be repeated.
-4. **Forward chained validation** and more realistic injection, as listed in [NEXT_STEPS.md](NEXT_STEPS.md).
+4. **Forward chained validation** and more realistic injection, as listed in [ROADMAP.md](../ROADMAP.md).
 
 ## Budget: free only
 
@@ -57,9 +56,9 @@ the author's own.
 - **Data dependence.** The method depends on volunteer receivers and one archive; a change in either, as the regime change may
   show, can break comparability. Mitigation: regimes, per regime baselines, honest reporting of misses.
 - **Licence.** The ODbL reading for derived aggregates is conservative and not legal advice; the maintainers of the source were not
-  consulted ([LICENSING.md](LICENSING.md)).
+  consulted ([LICENSING.md](../LICENSING.md)).
 - **Privacy.** Event rows could isolate a few aircraft. Mitigation: times rounded to the bucket, destination coordinates withheld
-  below 5 aircraft, no identifiers, and a secret keyed emitter list. Git history still needs a decision (see NEXT_STEPS).
+  below 5 aircraft, no identifiers, and a secret keyed emitter list. Git history still needs a decision (see ROADMAP).
 - **Overclaiming.** The results are from one 35 day window in one season. Nothing here transfers automatically elsewhere.
 
 ## What would change this proposal

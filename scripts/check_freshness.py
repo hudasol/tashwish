@@ -52,7 +52,7 @@ def evaluate(doc: dict, now: datetime | None = None) -> dict:
 def mark_failed(path: Path, reason: str, now: datetime | None = None) -> dict:
     """Set last_run_status=failed and fallback_active=true, keep everything else (the last good dataset stays served)."""
     now = now or datetime.now(UTC)
-    doc = json.loads(path.read_text()) if path.exists() else {}
+    doc = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
     doc.update(
         {
             "last_run_status": "failed",
@@ -63,7 +63,7 @@ def mark_failed(path: Path, reason: str, now: datetime | None = None) -> dict:
     )
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".tmp")
-    tmp.write_text(json.dumps(doc, indent=2, sort_keys=True) + "\n")
+    tmp.write_text(json.dumps(doc, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
     tmp.replace(path)
     return doc
 
@@ -78,7 +78,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"marked failed: {args.path}")
         return 0
     try:
-        res = evaluate(json.loads(args.path.read_text()))
+        res = evaluate(json.loads(args.path.read_text(encoding="utf-8")))
     except (OSError, ValueError, KeyError, TypeError, AttributeError) as e:
         print(f"unknown: cannot evaluate {args.path}: {e}")
         return EXIT["unknown"]

@@ -1,4 +1,4 @@
-"""Generate docs/PREDICTIONS_RESULTS.md, docs/VALIDATION.md and results/headline.json from result files.
+"""Generate docs/research/PREDICTIONS_RESULTS.md, docs/research/VALIDATION.md and results/headline.json from result files.
 
   python scripts/make_results_docs.py [--dev results/dev] [--held results/held_out] [--interim data/interim]
 
@@ -106,15 +106,15 @@ class Split:
         self.scen = pd.read_csv(path / "synthetic_scenarios.csv", keep_default_na=False, na_values=[""])
         self.ev = pd.read_csv(path / "observed_events.csv")
         self.cov = pd.read_csv(path / "observed_coverage_outcomes.csv")
-        self.covsum = json.loads((path / "observed_coverage_summary.json").read_text())
-        self.inj = json.loads((path / "synthetic_injection_summary.json").read_text())
-        self.meta = json.loads((path / "run_meta.json").read_text())
+        self.covsum = json.loads((path / "observed_coverage_summary.json").read_text(encoding="utf-8"))
+        self.inj = json.loads((path / "synthetic_injection_summary.json").read_text(encoding="utf-8"))
+        self.meta = json.loads((path / "run_meta.json").read_text(encoding="utf-8"))
         self.daily = pd.read_csv(path / "observed_daily_event_counts.csv")
         self.thin = pd.read_csv(path / "synthetic_thinning.csv")
         self.sev = pd.read_csv(path / "synthetic_scenario_events.csv")
         self.days = self.meta["score_days"]
         sp = path / "sensitivity_summary.json"
-        self.sens = json.loads(sp.read_text()) if sp.exists() else None
+        self.sens = json.loads(sp.read_text(encoding="utf-8")) if sp.exists() else None
 
 
 def jam_subsets(s: pd.DataFrame) -> dict[str, pd.DataFrame]:
@@ -464,7 +464,7 @@ def predictions_md(rows: list[dict], freeze: dict | None, held: Split) -> str:
     L += [
         "",
         "Recall figures in rows J1 to J3 are for criterion subsets written in `docs/PREDICTIONS.md`. They differ from the tier recall in "
-        "`docs/VALIDATION.md` section 2, which uses every scenario of a tier. Values are rounded to three decimals; "
+        "`docs/research/VALIDATION.md` section 2, which uses every scenario of a tier. Values are rounded to three decimals; "
         "a row marked at threshold passed with a value equal to its bar.",
         "",
         "### Reported alongside, not scored",
@@ -481,7 +481,7 @@ def predictions_md(rows: list[dict], freeze: dict | None, held: Split) -> str:
         if r.get("scored", True) and (r["note"] or r["short"] != r["observed"]):
             body = cell(r["observed"]) if r["short"] != r["observed"] else ""
             L.append(f"- **{r['id']}**: {(body + ' ' + r['note']).strip()}")
-    L += ["", "Misses are not explained away here; the discussion is in `docs/VALIDATION.md` section 7.", ""]
+    L += ["", "Misses are not explained away here; the discussion is in `docs/research/VALIDATION.md` section 7.", ""]
     return "\n".join(L)
 
 
@@ -1225,28 +1225,44 @@ def main() -> None:
     dev, held = Split(a.dev), Split(a.held)
     if not (dev.ok and held.ok):
         raise SystemExit("need results/dev and results/held_out")
-    freeze = json.loads((ROOT / "results/FREEZE.json").read_text()) if (ROOT / "results/FREEZE.json").exists() else None
+    freeze = (
+        json.loads((ROOT / "results/FREEZE.json").read_text(encoding="utf-8"))
+        if (ROOT / "results/FREEZE.json").exists()
+        else None
+    )
     ingest = None
     mp = a.interim / "manifest.jsonl"
     if mp.exists():
         recs = {}
-        for line in mp.read_text().splitlines():
+        for line in mp.read_text(encoding="utf-8").splitlines():
             r = json.loads(line)
             if r.get("status") == "complete":
                 recs[r["day"]] = {"day": r["day"], "rows": r["rows"], "aircraft": r["aircraft"]}
         ingest = pd.DataFrame(recs.values())
-        ingest[ingest["day"].isin(held.days + dev.days)].to_csv(ROOT / "results/ingest_days.csv", index=False)
+        ingest[ingest["day"].isin(held.days + dev.days)].to_csv(
+            ROOT / "results/ingest_days.csv", index=False, lineterminator="\n"
+        )
     elif (ROOT / "results/ingest_days.csv").exists():
         ingest = pd.read_csv(ROOT / "results/ingest_days.csv")
     rows = evaluate(held, dev, ingest)
-    regime = json.loads((a.dev / "regime_check.json").read_text()) if (a.dev / "regime_check.json").exists() else None
-    daily = pd.read_csv(a.daily) if a.daily.exists() else None
-    (ROOT / "docs/PREDICTIONS_RESULTS.md").write_text(predictions_md(rows, freeze, held), encoding="utf-8")
-    (ROOT / "docs/VALIDATION.md").write_text(
-        validation_md(held, dev, freeze, rows, regime, daily, ingest), encoding="utf-8"
+    regime = (
+        json.loads((a.dev / "regime_check.json").read_text(encoding="utf-8"))
+        if (a.dev / "regime_check.json").exists()
+        else None
     )
-    (ROOT / "results/headline.json").write_text(json.dumps(headline(held, rows), indent=1, allow_nan=False) + "\n")
-    (ROOT / "results/predictions_scored.json").write_text(json.dumps(rows, indent=1, default=str) + "\n")
+    daily = pd.read_csv(a.daily) if a.daily.exists() else None
+    (ROOT / "docs/research/PREDICTIONS_RESULTS.md").write_text(
+        predictions_md(rows, freeze, held), encoding="utf-8", newline="\n"
+    )
+    (ROOT / "docs/research/VALIDATION.md").write_text(
+        validation_md(held, dev, freeze, rows, regime, daily, ingest), encoding="utf-8", newline="\n"
+    )
+    (ROOT / "results/headline.json").write_text(
+        json.dumps(headline(held, rows), indent=1, allow_nan=False) + "\n", encoding="utf-8", newline="\n"
+    )
+    (ROOT / "results/predictions_scored.json").write_text(
+        json.dumps(rows, indent=1, default=str) + "\n", encoding="utf-8", newline="\n"
+    )
     print("written")
 
 

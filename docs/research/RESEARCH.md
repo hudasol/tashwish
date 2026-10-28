@@ -1,11 +1,8 @@
 # Tashwish research notes (Phase 0)
 
 Status: written 2026-10-11. Every factual claim below was taken from a page retrieved during research; the numbered
-links are in the source list at the end. Anything not verified is marked **unverified**. Design choices that are ours,
+links are in the source list at the end. Anything not verified is marked **unverified**. Design choices of the project,
 not literature backed, are marked **[DESIGN]**. Direct quotation is avoided on purpose.
-
-Tashwish is a research and monitoring tool. It is **not** a navigation or safety of life system, and it never
-attributes interference to an actor.
 
 ---
 
@@ -61,7 +58,7 @@ attributes interference to an actor.
   Murmansk, Haifa and Moscow, **not** the Persian Gulf or Hormuz [32].
 - AIS depends on the same GNSS being attacked, attribution is not definitive, and coverage is uneven [16, 31, 32].
 - No free historical Gulf AIS archive was identified (aisstream.io appears live only; **unverified**). AIS cross checking
-  is therefore **out of scope for v1** and listed in NEXT_STEPS.
+  is therefore **out of scope for v1** and listed in ROADMAP.
 
 ### 1.4 Gap analysis: candidate differentiators checked against what we retrieved
 

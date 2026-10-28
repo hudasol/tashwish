@@ -1,7 +1,7 @@
 # Review rounds
 
-Five rounds of independent review were run on this repository by separate reviewer agents, each reading from one angle. Each
-reviewer was told to find faults, not to confirm. Counts below are counts of numbered findings in the reviewer's written report.
+Five rounds of independent review were run on this repository by separate reviewers, each reading from one angle. Each
+reviewer was asked to find faults, not to confirm. Counts below are counts of numbered findings in the reviewer's written report.
 The reports themselves are working notes outside the repository; this file records their scope, counts, categories, what was
 fixed and what was not.
 
@@ -10,7 +10,7 @@ their findings changed the system before it was frozen. Rounds 4 and 5 ran after
 documents, labels, reporting and the dashboard, but not the frozen detectors or the held out result. The scoring code did not
 change after the freeze (see `results/FREEZE_LOG.jsonl`).
 
-No organisation reviewed this project. "Independent" means a separate agent without the author's context, not an external expert.
+No organisation reviewed this project. "Independent" means a separate reviewer without the author's context, not an external expert.
 
 ## Round 1: methods and statistics (before the freeze)
 
@@ -37,7 +37,7 @@ METHODOLOGY bounding box (now 46 to 62 E), the `coverage_lost` condition and the
   partial degradation and drifting spoof tracks were not added before the freeze and cannot be added to the frozen run.
 - Shared false discovery families across scenarios (M4) were not measured; a one scenario per run comparison was not done.
 - The spoof injection does not rebuild the jamming input, so S2 and S3 remain close to true by construction.
-- The beta binomial sensitivity check for day level overdispersion (m7) is not done (listed in `docs/NEXT_STEPS.md`).
+- The beta binomial sensitivity check for day level overdispersion (m7) is not done (listed in `docs/ROADMAP.md`).
 - Data quality documents generated from every manifest day, including held out days, were not checked again for a development day
   filter. Treat that as open.
 
@@ -63,8 +63,8 @@ by the release builder; CITATION and Zenodo notes; Arabic banner wording.
 
 **Not fixed, and why.**
 - The raw fixture files and the affiliation sentence remain in git history. History was not rewritten. This is an owner
-  decision and is listed in `docs/NEXT_STEPS.md`. Until then the repository must not be pushed to a public remote.
-- The ODbL text in `licenses/` has not been compared with the copy on opendatacommons.org (listed in NEXT_STEPS).
+  decision and is listed in `docs/ROADMAP.md`. Until then the repository must not be pushed to a public remote.
+- The ODbL text in `licenses/` has not been compared with the copy on opendatacommons.org (listed in ROADMAP).
 - Whether every download response carries the attribution header was not checked again here.
 
 ## Round 3: code and operations (before the freeze)
@@ -111,7 +111,7 @@ freshness check.
 **Fixed.** Regime split rows replace pooled rows in the headline, VALIDATION, the README block and the report; data class column
 and statement added to PREDICTIONS_RESULTS; README rewritten (no airport claim, recall on injected scenarios only, 3 hour
 buckets, third party maps cited from RESEARCH.md 1.1, minimum size caveat); METHODOLOGY gained a Regimes section and the
-corrected bounding box; DATA_CARD aligned with the release candidate; plan.md corrected; REVIEW_ROUNDS, REPORT and NEXT_STEPS written;
+corrected bounding box; DATA_CARD aligned with the release candidate; plan.md corrected; REVIEW_ROUNDS, REPORT and ROADMAP written;
 the baseline numbers that no file reproduced were replaced by values from `results/dev/regime_check.json`;
 names removed from RESEARCH.md; a FREEZE_LOG entry records that the builder, generators and web changed after the freeze and the
 scoring code did not; the amendment wording was made precise and its edit is disclosed in its section 6. The dashboard items
@@ -119,7 +119,7 @@ scoring code did not; the amendment wording was made precise and its edit is dis
 generators.
 
 **Not fixed, and why.**
-- Git history still contains the university name and raw fixtures (B4). Rewriting history is an owner decision (NEXT_STEPS).
+- Git history still contains the university name and raw fixtures (B4). Rewriting history is an owner decision (ROADMAP).
 - The forward chained check (fit up to 2026-03-02, score 2026-03-08 to 2026-03-13) is not done; the held out run is single use.
 - Hyphenated words remain in frozen or generated files not owned by the documentation pass (`docs/PREDICTIONS.md`, generated
   tables) and in quoted licence text in `docs/LICENSING.md`, where altering a quotation would be wrong.

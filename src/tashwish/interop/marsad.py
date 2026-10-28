@@ -111,8 +111,17 @@ def code_commit(repo: Path | None = None) -> str:
     """Short git commit of the code, with '+dirty' if the working tree has changes; 'unknown' if git is unavailable."""
     cwd = str(repo or Path(__file__).resolve().parent)
     try:
-        h = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=cwd, capture_output=True, text=True, check=True)
-        dirty = subprocess.run(["git", "status", "--porcelain"], cwd=cwd, capture_output=True, text=True, check=True)
+        h = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=True,
+        )
+        dirty = subprocess.run(
+            ["git", "status", "--porcelain"], cwd=cwd, capture_output=True, text=True, encoding="utf-8", check=True
+        )
         return h.stdout.strip() + ("+dirty" if dirty.stdout.strip() else "")
     except (OSError, subprocess.CalledProcessError):
         return "unknown"
@@ -297,7 +306,9 @@ def to_geojson(
             for i, f in enumerate(fc["features"])
         ]
         lines.append("]}")
-        p.write_text("\n".join(lines) + "\n", encoding="utf-8")  # one feature per line, still plain valid JSON
+        p.write_text(
+            "\n".join(lines) + "\n", encoding="utf-8", newline="\n"
+        )  # one feature per line, still plain valid JSON
     return fc
 
 

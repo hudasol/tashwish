@@ -11,7 +11,7 @@ Contains information from adsb.lol, which is made available here under the Open 
 - Dataset licence: ODbL 1.0, text in `licenses/ODbL-1.0.txt` (shipped with every release, ODbL 4.2.b).
 - Source: adsb.lol `globe_history` archives, https://github.com/adsblol/globe_history. Licence URL: https://opendatacommons.org/licenses/odbl/1-0/
 - Code that builds the dataset: Apache-2.0.
-- The ODbL is applied conservatively: we treat the aggregates as a Derivative Database. Whether that is legally required is
+- The ODbL is applied conservatively: the aggregates are treated as a Derivative Database. Whether that is legally required is
   uncertain; see `docs/LICENSING.md`.
 - ODbL 4.6: the full dataset and the build method are offered free of charge as machine readable files.
 - Source release tags and build commit: `FROM RESULTS`.
@@ -44,7 +44,7 @@ jamming-like and spoofing-like anomalies. No raw traces, no aircraft identifiers
 
 ## Files, schema, coverage, validation numbers, known biases
 
-`FROM RESULTS` (generated at release time from `data/processed` and `docs/VALIDATION.md`).
+`FROM RESULTS` (generated at release time from `data/processed` and `docs/research/VALIDATION.md`).
 
 ## Synthetic data
 

@@ -158,12 +158,14 @@ export async function loadData() {
   const files = await Promise.all(names.map((n) => tryJson(base + n + ".json")));
   const data = { base, manifest, events: files[0], coverage: files[1], validation: files[2], methods: files[3], daily: files[4], missing: [] };
   names.forEach((n, i) => { if (!files[i]) data.missing.push(n); });
+  // optional: the comparison with simple detectors. An absent file hides that section of the validation page, it is not an error.
+  data.baselines = await tryJson(base + "baselines.json");
   // contract checks: schema, one data class everywhere (never mix synthetic and observed)
   const dc = manifest.data_class;
   if (manifest.schema !== SCHEMA) throw new Error(t("error.schema", { schema: String(manifest.schema) }));
   if (dc !== "synthetic" && dc !== "observed") throw new Error(t("error.data_class"));
   // validation.json keeps the file level class of the release; each of its rows states its own class (see validation.js)
-  for (const n of names) {
+  for (const n of [...names, "baselines"]) {
     const f = data[n];
     if (f && f.data_class !== dc) throw new Error(t("error.mixed"));
   }

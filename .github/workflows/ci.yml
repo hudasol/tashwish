@@ -9,17 +9,19 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
+    name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.13"]
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,8 +32,23 @@ jobs:
           cache: pip
           cache-dependency-path: pyproject.toml
       - name: Install
-        run: pip install -e ".[dev,api]"
+        run: python -m pip install -e ".[api,dev]"
       - name: Lint
-        run: ruff check . && ruff format --check .
-      - name: Tests
-        run: pytest --cov=tashwish --cov-report=term-missing
+        run: |
+          python -m ruff check .
+          python -m ruff format --check .
+      - name: Command line smoke test
+        run: |
+          tashwish --version
+          tashwish doctor
+      - name: Tests with coverage
+        run: python -m pytest --cov=tashwish --cov-report=term-missing:skip-covered
+      - name: Coverage summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "### Coverage, Python ${{ matrix.python-version }} on ${{ matrix.os }}"
+            echo
+            python -m coverage report --format=markdown --skip-covered || true
+          } >> "$GITHUB_STEP_SUMMARY"

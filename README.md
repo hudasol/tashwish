@@ -1,49 +1,77 @@
-# Tashwish (تشويش, "interference" or "jamming"): Gulf GNSS Interference Observatory
+# Tashwish
 
-> **Research and monitoring tool. Not a navigation, flight planning or safety of life system.**
-> Do not use it to make operational decisions about aircraft, vessels or vehicles. Use official NOTAMs, airspace
-> notices and your regulator.
->
-> **No attribution.** Tashwish reports what the data shows (where, when, which signal behaviour, how confident). It does
-> **not** say who is responsible, and nothing in it should be read as attributing interference to any state or actor.
->
-> **No endorsement.** No organisation has reviewed, endorsed, adopted or partnered with this project. It is an
-> independent research project by one author.
+[![CI](https://github.com/hudasol/tashwish/actions/workflows/ci.yml/badge.svg)](https://github.com/hudasol/tashwish/actions/workflows/ci.yml)
+[![Code licence: Apache-2.0](https://img.shields.io/badge/code-Apache--2.0-blue.svg)](LICENSE)
+[![Data licence: ODbL 1.0](https://img.shields.io/badge/data-ODbL--1.0-blue.svg)](licenses/ODbL-1.0.txt)
 
-An open, reproducible pipeline and dashboard that turns public aircraft broadcast (ADS-B) data into maps and time series
-of GNSS **jamming-like** and **spoofing-like** anomalies across the Gulf, with stated uncertainty. GNSS means satellite
-navigation (GPS and similar systems). Terms are explained in [docs/GLOSSARY.md](docs/GLOSSARY.md).
+Open Python pipeline, static dashboard and read only API for GNSS jamming-like and spoofing-like anomalies in public ADS-B data over the Gulf.
 
-Live dashboard: https://tashwish.onrender.com. It is a free static site that shows a **study snapshot of fixed days**
-(2026-02-07 to 2026-03-13). It is **not live data** and must not be read as current conditions.
-Repository: https://github.com/hudasol/tashwish
+**Status:** release candidate, study snapshot of 2026-02-07 to 2026-03-13. Research and monitoring tool, not for navigation or
+safety of life. It reports evidence of degraded position quality and attributes nothing to any state or actor. No organisation has
+reviewed, endorsed or partnered with the project.
 
-## Start here
+- Dashboard (study snapshot of fixed days, not live data): https://tashwish.onrender.com
+- API (read only, free tier, may take about a minute to wake): https://tashwish-api.onrender.com
+- Repository: https://github.com/hudasol/tashwish
 
-1. This README, for what the project is and what it found.
-2. [docs/VALIDATION.md](docs/VALIDATION.md), the generated validation report. It opens with a five line summary.
-3. [docs/PREDICTIONS_RESULTS.md](docs/PREDICTIONS_RESULTS.md), every preregistered prediction with its HIT or MISS.
-4. [docs/METHODOLOGY.md](docs/METHODOLOGY.md), how every number is computed, including the regimes.
-5. [docs/GLOSSARY.md](docs/GLOSSARY.md), plain definitions of the technical terms.
-6. [docs/REPORT.md](docs/REPORT.md), a technical report generated from the result files.
-7. [docs/REVIEW_ROUNDS.md](docs/REVIEW_ROUNDS.md), five review rounds, what was fixed and what was not.
-8. [docs/NEXT_STEPS.md](docs/NEXT_STEPS.md) and [docs/PROPOSAL.md](docs/PROPOSAL.md), what is unfinished and what is proposed.
-9. [docs/PREDICTIONS_FORWARD.md](docs/PREDICTIONS_FORWARD.md), the preregistered forward evaluation on days after the study
-   window (not yet run), and [docs/SECONDARY_ANALYSES.md](docs/SECONDARY_ANALYSES.md), analyses outside the preregistration.
-10. [docs/OVERNIGHT_LOG.md](docs/OVERNIGHT_LOG.md), the log of the 2026-10-16 working session.
-11. Everything else: [docs/RESEARCH.md](docs/RESEARCH.md), [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md),
-   [docs/DATA_CARD.md](docs/DATA_CARD.md), [docs/LICENSING.md](docs/LICENSING.md), [docs/OPERATIONS.md](docs/OPERATIONS.md),
-   [docs/API.md](docs/API.md), [docs/DASHBOARD.md](docs/DASHBOARD.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md),
-   [plan.md](plan.md).
+## What it does
 
-## What this repository shows
+1. Downloads daily adsb.lol `globe_history` archives, keeps the Gulf box (22 to 31 N, 46 to 62 E) and discards the raw bytes.
+2. Counts unique aircraft per H3 cell (resolution 4), 3 hour UTC bucket and altitude stratum, and the share that report degraded NIC or NACp, with Wilson intervals.
+3. Flags jamming-like cells against each cell's own baseline with false discovery control, and spoofing-like clusters of impossible position jumps.
+4. Models receiver coverage so that cells nobody can see are marked as insufficient data, never as quiet.
+5. Validates with labelled synthetic injections and a preregistered set of held out days, then publishes a versioned dataset, a dashboard and an API.
+
+## Install
+
+Python 3.11 or later.
+
+```
+pip install -e .            # pipeline and command line tool
+pip install -e ".[api]"     # adds FastAPI and uvicorn for the API
+pip install -e ".[dev]"     # adds pytest, hypothesis and ruff
+```
+
+## Quickstart
+
+```
+tashwish doctor                                   # check Python, packages, state/ and processed/
+tashwish build --mode study_snapshot              # build release/ and web/data from processed/
+tashwish api --release-dir release/ --port 8000   # serve the read only API
+(cd web && python -m http.server 8080)            # serve the dashboard
+```
+
+The incremental command scores the next missing archive day against the frozen baseline in `state/`. It needs the secret
+`TASHWISH_STATE_KEY` (at least 16 characters, never committed) and refuses days inside the study window.
+
+```
+tashwish incremental --state state --processed processed --spool /tmp/spool --max-days 1
+```
+
+`tashwish ingest`, `tashwish validate` and `tashwish --help` list the remaining commands. Operation is described in
+[docs/OPERATIONS.md](docs/OPERATIONS.md) and the API in [docs/API.md](docs/API.md).
+
+## Data
+
+The aggregates are released as `release/cell_buckets.parquet`, `release/events.parquet` and `release/coverage.parquet` (CSV copies
+for the first two), with `manifest.json`, `validation.json`, `checksums.sha256`, a data card and the ODbL text. They hold no raw
+traces, no aircraft identifiers and no per point positions. A Zenodo record is prepared but not yet published
+([docs/ZENODO.md](docs/ZENODO.md)). Raw archives are never stored or redistributed.
+
+Source: [adsb.lol](https://github.com/adsblol/globe_history) `globe_history`, ODbL 1.0. Attribution:
+
+> Contains information from adsb.lol, which is made available here under the Open Database License (ODbL). This derived database (Tashwish aggregates) is also made available under the ODbL 1.0.
+
+See [docs/DATA_CARD.md](docs/DATA_CARD.md), [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md) and [docs/LICENSING.md](docs/LICENSING.md).
+
+## Results
 
 <!-- STATUS:BEGIN -->
 <!-- Generated by scripts/make_readme_status.py from result files. Do not edit by hand. -->
 
 **What this repository shows (study snapshot, not a live feed)**
 
-- Study window: 2026-02-07 to 2026-03-13, 35 UTC days of public ADS-B, released as a release candidate (dataset version `observed-2026-03-13-73ebe3c6`, built at code commit `e61fbc3`).
+- Study window: 2026-02-07 to 2026-03-13, 35 UTC days of public ADS-B, released as a release candidate (dataset version `observed-2026-03-13-73ebe3c6`, built at code commit `5fb5195`).
 - Split rule `tashwish-heldout-v1`: 21 development days and 14 held out days. The held out days were fixed and listed before any held out result was computed, and scored once at commit `94eafcd` (frozen 2026-10-12 06:27:49 UTC).
 - OBSERVED, regime change: tested degraded share was 0.008 to 0.018 on days up to 2026-02-27 and 0.088 to 0.336 from 2026-03-01. The median daily total of en route aircraft counts over cell buckets (traffic units) fell from 48605 to 3864. The reduced traffic regime starts on 2026-02-28 and the elevated degraded regime on 2026-03-01; the development analysis places the sharp change at about 2026-03-02. 14 of 35 study days (6 of 14 held out days) are in the reduced traffic regime. No cause is identified and none is asserted.
 
@@ -59,88 +87,63 @@ Held out results (8 normal traffic days and 6 reduced traffic days). Intervals a
 
 SYNTHETIC rows measure whether the detector finds scenarios that were injected into real traffic. They are not accuracy against real interference. Precision and detection delay are not measured on real data.
 
-Preregistered predictions: 19 HIT, 8 MISS, 1 not evaluable, out of 28 scored. Misses: D2, C3, S1, S4, R3, R4, X1, A2. Details in [docs/PREDICTIONS_RESULTS.md](docs/PREDICTIONS_RESULTS.md) and [docs/VALIDATION.md](docs/VALIDATION.md).
+Preregistered predictions: 19 HIT, 8 MISS, 1 not evaluable, out of 28 scored. Misses: D2, C3, S1, S4, R3, R4, X1, A2. Details in [docs/research/PREDICTIONS_RESULTS.md](docs/research/PREDICTIONS_RESULTS.md) and [docs/research/VALIDATION.md](docs/research/VALIDATION.md).
 <!-- STATUS:END -->
 
-Plain reading of the table: on injected jamming like scenarios the detector found strong, wide, long scenarios on normal
-traffic days and missed most weak, small or short ones, and its recall fell on the reduced traffic days. On injected
-spoofing like scenarios it found about half of those with 3 or more aircraft and none with 1 or 2 aircraft. These are
-tests on invented scenarios. This repository does not show how accurate the detector is on real interference, because
-there is no ground truth for that in public ADS-B data. Precision and detection delay are not measured on real data.
+The table is generated by `scripts/make_readme_status.py` from the result files. Method details are in
+[docs/METHODOLOGY.md](docs/METHODOLOGY.md).
 
-## The problem
+## Limitations
 
-GNSS interference over the Gulf is acknowledged by regulators and operators, and regional bodies have asked for shared
-monitoring and a regional repository of interference data (see [docs/RESEARCH.md](docs/RESEARCH.md), section 1.2). Public
-maps exist. Some do not publish their thresholds or code, and some aggregate over 24 hours or show a blank where no
-receiver sees any aircraft; the cited cases are in [docs/RESEARCH.md](docs/RESEARCH.md), section 1.1 (GPSJam, Flightradar24,
-Stanford's RFI portal, SkAI). Tashwish tries to be an open alternative where every number can be traced to a computation
-and every claim carries its uncertainty.
+- There is no ground truth for GNSS interference in public ADS-B data. Real events are candidates for review: most spoofing-like events involve the minimum of 3 aircraft and can be data errors. Precision and detection delay are not measured on real data.
+- Recall is measured on synthetic scenarios injected into real traffic. Jamming-like recall is low for weak, small or short scenarios and lower on reduced traffic days.
+- The data change sharply from about 2026-03-02. Baselines and coverage are fitted per regime, rates pooled across the change describe neither side, and no cause is identified.
+- The study window is 35 days in one season. Held out days are not independent samples and are not later in time than the days used for fitting.
+- Coverage follows volunteer receivers and changes over time. NIC and NACp can degrade for reasons unrelated to interference, so a degraded share is evidence and not proof.
+- The forward evaluation on days after the study window is preregistered in [docs/PREDICTIONS_FORWARD.md](docs/PREDICTIONS_FORWARD.md) and has not been run.
 
-## What is different (and what is not)
+## Project layout
 
-Jamming maps from ADS-B quality indicators already exist, so **mapping interference from ADS-B is not our novelty**
-([docs/RESEARCH.md](docs/RESEARCH.md), section 1.4). What Tashwish adds:
+```
+src/tashwish/
+  config.py        region box, grid and thresholds
+  schema.py        point table schema and data class rules
+  split.py         development and held out day split
+  regime.py        day level traffic and degraded regime labels
+  pipeline.py      stage orchestration from points to detections
+  attribution.py   attribution wording, single source
+  cli.py           the tashwish command
+  ingest/          archive download, trace parsing, quality report
+  metrics/         aggregation and statistics
+  coverage/        receiver coverage model
+  detect/          jamming-like and spoofing-like detectors
+  validate/        synthetic injection, harness, sensitivity
+  operate/         incremental run, scoring, state, refit
+  release/         dataset and dashboard data build
+  api/             read only FastAPI service
+  interop/         file formats for Marsad and Sirb
+web/               static dashboard
+tests/             unit, property and integration tests
+scripts/           document generators and checks
+docs/              documentation
+```
 
-1. **Open, tested, resumable pipeline** from a fully open raw archive to a released dataset.
-2. **Per cell, per 3 hour bucket uncertainty:** Wilson intervals, minimum sample rules, shrinkage and false discovery control.
-3. **Explicit receiver coverage model:** "no data" and "insufficient data" are never drawn as "no interference".
-4. **Altitude stratified analysis,** with en route traffic (at or above 10,000 ft) as the main layer.
-5. **Validation as a feature:** controlled injection of clearly labelled synthetic interference into real traffic (recall
-   on injected scenarios), a preregistered held out set of days, coverage and sensitivity tests, and failures reported.
-   Precision and detection delay are not measured on real data.
+## Documentation
 
-## Method in brief
+[docs/README.md](docs/README.md) indexes every document. Start with [docs/METHODOLOGY.md](docs/METHODOLOGY.md),
+[docs/DATA_CARD.md](docs/DATA_CARD.md) and [docs/research/VALIDATION.md](docs/research/VALIDATION.md). Open work is in
+[docs/ROADMAP.md](docs/ROADMAP.md). File formats for [Marsad](https://github.com/hudasol/marsad) and Sirb, two separate projects by
+the same author, are in [docs/MARSAD_INTERFACE.md](docs/MARSAD_INTERFACE.md) and [docs/SIRB_INTERFACE.md](docs/SIRB_INTERFACE.md).
 
-Aircraft broadcast how well their GNSS receiver thinks it knows its position (the NIC and NACp fields, which are
-self reported accuracy and integrity categories). When many aircraft in a cell report degraded accuracy, that is
-*jamming-like*. When aircraft report positions that jump, imply impossible speeds, or cluster at common false locations,
-that is *spoofing-like*. We count **unique aircraft** per H3 cell (resolution 4, cells of about 1,770 square kilometres)
-per 3 hour UTC bucket, compute confidence intervals on the degraded share, require minimum sample sizes, correct for many
-cells at once, and mark cells the receiver network cannot see as *insufficient data*. The study box is 22 to 31 N and
-46 to 62 E. Full specification: [docs/METHODOLOGY.md](docs/METHODOLOGY.md).
+## Contributing
 
-## Honest limitations (known now)
+See [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) and [SECURITY.md](SECURITY.md). Before opening a
+pull request run `python -m pytest -p no:warnings`, `ruff check .` and `ruff format --check .`.
 
-- The data changed sharply from about 2026-03-02 (see the status block above). Baselines and coverage are fitted per
-  regime, and results differ between regimes. The cause is unknown and no cause is asserted.
-- ADS-B accuracy fields can degrade for reasons unrelated to interference (older avionics, installation faults, ADS-B
-  version mix). Degradation is evidence, not proof.
-- Most real events found are spoofing-like clusters of the minimum size, 3 aircraft, and most carry an uncertain label.
-  A position jump seen by 3 aircraft can be a data error, for example a multilateration artefact, and some events imply
-  speeds of thousands of knots that no aircraft flew. Read the events as candidates for review.
-- Spoofing that leaves the broadcast accuracy fields nominal, and spoofing aimed at a single aircraft, are largely
-  invisible to crowd based methods.
-- The raw archive is the union of volunteer feeders, not a uniform sensor network. Coverage changes over time. Closed
-  airspace and low traffic areas show nothing. The coverage model reduces but cannot remove this.
-- The held out days are not independent samples and are not later in time than the days used for fitting. See
-  [docs/VALIDATION.md](docs/VALIDATION.md), section 1.
-- Documented incidents we can use are few and mostly described in secondary sources. They are weak labels, never ground
-  truth. The open archive starts on 2025-12-14.
-- Numeric thresholds are design choices, not standards, and are tested for sensitivity rather than assumed.
-- Maritime (AIS) cross checking is out of scope for this release (see [docs/NEXT_STEPS.md](docs/NEXT_STEPS.md)).
+## Licence
 
-## Data and licensing
+Code: Apache License 2.0 ([LICENSE](LICENSE)). Data: Open Database License 1.0 ([licenses/ODbL-1.0.txt](licenses/ODbL-1.0.txt), [NOTICE](NOTICE)).
 
-- Primary source: [adsb.lol](https://www.adsb.lol/) `globe_history` archives, ODbL 1.0. *Contains information from adsb.lol, which is made available here under the Open Database License (ODbL).* Licence analysis: [docs/LICENSING.md](docs/LICENSING.md). Details and every other source we checked: [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md).
-- Code: Apache-2.0 (see `LICENSE`). Released dataset: ODbL 1.0 (derived aggregates), with a data card.
-- Synthetic data is always labelled synthetic (filenames, schema, UI, docs) and never appears in real data views.
+## Citation
 
-## Quickstart
-
-Install with `pip install -e ".[dev]"` (Python 3.11 or later) and run `pytest -p no:warnings` and `ruff check .`.
-Operational commands (incremental run, release build, API, dashboard) are listed in
-[docs/OPERATIONS.md](docs/OPERATIONS.md), [docs/API.md](docs/API.md) and [docs/DASHBOARD.md](docs/DASHBOARD.md).
-The status block above is regenerated with `python scripts/make_readme_status.py`.
-
-## Relationship to Marsad and Sirb
-
-[Marsad](https://github.com/hudasol/marsad) (a per vehicle position trust layer) and Sirb (a drone show planner and
-verifier) are the author's own separate projects. Tashwish shares files with them in a documented format only; these are
-file formats, not integrations, and neither project is modified by this one. The proposed files are specified in
-[docs/MARSAD_INTERFACE.md](docs/MARSAD_INTERFACE.md) and [docs/SIRB_INTERFACE.md](docs/SIRB_INTERFACE.md). The Sirb file
-is an illustrative stress prior built from aircraft data, not a drone receiver model.
-
-## Author
-
-Huda Mueen.
+See [CITATION.cff](CITATION.cff). Author: Huda Mueen.

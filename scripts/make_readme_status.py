@@ -107,7 +107,7 @@ def build_block() -> str:
         "against real interference. Precision and detection delay are not measured on real data.",
         "",
         f"Preregistered predictions: {hits} HIT, {misses} MISS, {notev} not evaluable, out of {len(ev)} scored. Misses: {miss_ids}. "
-        "Details in [docs/PREDICTIONS_RESULTS.md](docs/PREDICTIONS_RESULTS.md) and [docs/VALIDATION.md](docs/VALIDATION.md).",
+        "Details in [docs/research/PREDICTIONS_RESULTS.md](docs/research/PREDICTIONS_RESULTS.md) and [docs/research/VALIDATION.md](docs/research/VALIDATION.md).",
         END,
     ]
     return "\n".join(lines)
@@ -130,7 +130,7 @@ def main() -> int:
             print("README.md status block is out of date; run scripts/make_readme_status.py", file=sys.stderr)
             return 1
         return 0
-    readme.write_text(new, encoding="utf-8")
+    readme.write_text(new, encoding="utf-8", newline="\n")
     return 0
 
 

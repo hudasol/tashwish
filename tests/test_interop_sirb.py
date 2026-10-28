@@ -254,7 +254,7 @@ def test_cli_end_to_end_on_synthetic_interim(tmp_path):
     ).to_parquet(tmp_path / points_filename(DAY))
     out = tmp_path / "out" / "params.json"
     assert main(["--days", DAY, "--interim", str(tmp_path), "--out", str(out), "--n-boot", "20", "--seed", "5"]) == 0
-    p = json.loads(out.read_text())
+    p = json.loads(out.read_text(encoding="utf-8"))
     assert p["schema"] == SCHEMA_ID and p["provenance"]["days"][0]["split"] == "dev" and p["provenance"]["seed"] == 5
     assert p["provenance"]["dataset_version"].startswith("draft-")
     assert p["regions"]["gulf_box"]["strata"]["enroute"]["degraded_episode"]["episodes"]["n_episodes"] == 10

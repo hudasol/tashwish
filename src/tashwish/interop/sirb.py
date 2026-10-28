@@ -705,7 +705,7 @@ def days_meta_from_manifest(interim: Path, days: list[str]) -> list[dict]:
     recs: dict[str, dict] = {}
     mf = interim / "manifest.jsonl"
     if mf.exists():
-        for line in mf.read_text().splitlines():
+        for line in mf.read_text(encoding="utf-8").splitlines():
             if line.strip():
                 r = json.loads(line)
                 if r.get("status") == "complete" and r.get("data_class") == cfg.DATA_CLASS_OBSERVED:
@@ -754,7 +754,9 @@ def main(argv: list[str] | None = None) -> int:
         dataset_version=a.dataset_version or f"draft-{digest}",
     )
     a.out.parent.mkdir(parents=True, exist_ok=True)
-    a.out.write_text(json.dumps(params, ensure_ascii=False, allow_nan=False, indent=1) + "\n", encoding="utf-8")
+    a.out.write_text(
+        json.dumps(params, ensure_ascii=False, allow_nan=False, indent=1) + "\n", encoding="utf-8", newline="\n"
+    )
     print(f"wrote {a.out} from days {', '.join(days)}")
     return 0
 

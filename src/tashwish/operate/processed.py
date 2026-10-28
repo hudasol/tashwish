@@ -26,7 +26,7 @@ def write_day(root: Path, day: str, cb: pd.DataFrame, events: pd.DataFrame, *, s
             "aircraft": int(aircraft), "ingested_at": ingested_at, "n_events": int(len(ev))}  # fmt: skip
     if provenance:
         meta["provenance"] = provenance
-    (tmp / "day.json").write_text(json.dumps(meta, indent=1, sort_keys=True))
+    (tmp / "day.json").write_text(json.dumps(meta, indent=1, sort_keys=True), encoding="utf-8", newline="\n")
     if d.exists():
         shutil.rmtree(d)
     tmp.replace(d)
@@ -38,4 +38,4 @@ def list_days(root: Path) -> list[str]:
 
 
 def read_day_meta(root: Path, day: str) -> dict:
-    return json.loads((root / "days" / day / "day.json").read_text())
+    return json.loads((root / "days" / day / "day.json").read_text(encoding="utf-8"))

@@ -11,10 +11,10 @@ Contains information from adsb.lol, which is made available here under the Open 
 - Dataset licence: ODbL 1.0, text in `licenses/ODbL-1.0.txt` (shipped with every release, ODbL 4.2.b).
 - Source: adsb.lol `globe_history` archives, https://github.com/adsblol/globe_history. Licence URL: https://opendatacommons.org/licenses/odbl/1-0/
 - Code that builds the dataset: Apache-2.0.
-- The ODbL is applied conservatively: we treat the aggregates as a Derivative Database. Whether that is legally required is
+- The ODbL is applied conservatively: the aggregates are treated as a Derivative Database. Whether that is legally required is
   uncertain; see `docs/LICENSING.md`.
 - ODbL 4.6: the full dataset and the build method are offered free of charge as machine readable files.
-- Build commit: `e61fbc3`. Source: adsb.lol globe_history daily releases (the release kind and tag are in the ingest manifest).
+- Build commit: `5fb5195`. Source: adsb.lol globe_history daily releases (the release kind and tag are in the ingest manifest).
 - Study window: 2026-02-07 to 2026-03-13, 35 UTC days.
 
 ## Regimes and independence (read before using any rate)
@@ -44,7 +44,7 @@ jamming-like and spoofing-like anomalies. No raw traces, no aircraft identifiers
 
 ## Files, schema, coverage, validation numbers, known biases
 
-Generated 2026-10-13T13:07:06Z from processed result files. Latest day: 2026-03-13. Days: 35 (dev 21, held_out 14).
+Generated 2026-10-28T14:26:38Z from processed result files. Latest day: 2026-03-13. Days: 35 (dev 21, held_out 14).
 
 - `cell_buckets.parquet` and `.csv.gz`: h3, bucket_start, slot, stratum, n_aircraft, k_strong, share, ci_lo, ci_hi, status, coverage_class, data_class.
   `share`, `ci_lo`, `ci_hi` are empty unless status is `ok`.
@@ -56,7 +56,7 @@ Generated 2026-10-13T13:07:06Z from processed result files. Latest day: 2026-03-
 Cell bucket rows by status: coverage_lost 2968, insufficient 79986, ok 100663.
 Events by kind: both 2, jamming_like 6, spoofing_like 19; marked uncertain: 23.
 
-Validation numbers: see `validation.json` and docs/VALIDATION.md in the repository (generated from result files).
+Validation numbers: see `validation.json` and docs/research/VALIDATION.md in the repository (generated from result files).
 
 Known biases: coverage follows volunteer receivers and changes over time; a missing or insufficient cell is not a quiet cell; degraded accuracy indicators have non interference causes; the window is short and not representative of other seasons; dates are not independent samples.
 Days scored `dev_leave_one_day_out` were also used to fit the baseline (each day excluded from its own baseline). Days marked `held_out` were scored once with a baseline fitted on development days only.

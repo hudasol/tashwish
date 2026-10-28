@@ -17,7 +17,7 @@ Rules that every producer and consumer must keep:
 2. **No attribution.** Nothing in the format names a state, an actor or an intent. `jamming_like` and `spoofing_like` describe
    signal behaviour only.
 3. **Evidence, not proof.** Degraded accuracy fields can also come from old avionics or installation faults (see the
-   README, honest limitations).
+   README, section Limitations).
 4. **Missing is not clear.** `insufficient`, `coverage_lost`, `no_record`, `stale` and `out_of_region` are all different
    from "no interference". A consumer must never turn any of them into a zero or into `none`.
 5. **Altitude.** The data come from aircraft, mostly at cruise altitudes. A ground vehicle or a low drone may experience a very

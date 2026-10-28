@@ -75,7 +75,7 @@ def day_bounds_ms(day: str) -> tuple[int, int]:
 def code_version() -> str:
     try:
         sha = subprocess.run(
-            ["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True, timeout=5,
+            ["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True, encoding="utf-8", timeout=5,
             cwd=Path(__file__).parent,
         ).stdout.strip()  # fmt: skip
     except (OSError, subprocess.SubprocessError):
@@ -233,7 +233,7 @@ def write_parquet(table: pa.Table, path: Path, data_class: str) -> str:
 def read_manifest(path: Path) -> list[dict]:
     if not path.exists():
         return []
-    return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
 def is_complete(cfg: IngestConfig, day: str) -> bool:
@@ -280,7 +280,7 @@ def ingest_day(
     qdir.mkdir(parents=True, exist_ok=True)
     report = quality_report(table, day, stats)
     (qdir / f"{day}{'_synthetic' if cfg.data_class != DATA_CLASS_OBSERVED else ''}.json").write_text(
-        json.dumps(report, indent=1, sort_keys=True)
+        json.dumps(report, indent=1, sort_keys=True), encoding="utf-8", newline="\n"
     )
     rec = {
         "day": day,
@@ -301,7 +301,7 @@ def ingest_day(
         "ingested_utc": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "seconds": round(time.time() - t0, 1),
     }
-    with open(cfg.out_dir / "manifest.jsonl", "a") as f:
+    with open(cfg.out_dir / "manifest.jsonl", "a", encoding="utf-8", newline="\n") as f:
         f.write(json.dumps(rec, sort_keys=True) + "\n")
     if not cfg.keep_spool:
         for p in paths:

@@ -158,9 +158,9 @@ def test_validation_and_freshness(client):
 
 def test_validation_missing_is_404_not_empty(tmp_path):
     r = build_synthetic_release(tmp_path)
-    m = json.loads((r.path / "manifest.json").read_text())
+    m = json.loads((r.path / "manifest.json").read_text(encoding="utf-8"))
     del m["files"]["validation.json"]
-    (r.path / "manifest.json").write_text(json.dumps(m))
+    (r.path / "manifest.json").write_text(json.dumps(m), encoding="utf-8", newline="\n")
     (r.path / "validation.json").unlink()
     resp = TestClient(create_app(r.path)).get("/v1/validation")
     assert resp.status_code == 404 and resp.json()["error"]["code"] == "validation_unavailable"
@@ -501,9 +501,9 @@ def test_etag_includes_manifest_checksums(rel, tmp_path):
 
     other = tmp_path / "rel2"
     shutil.copytree(rel.path, other)
-    m = json.loads((other / "manifest.json").read_text())
+    m = json.loads((other / "manifest.json").read_text(encoding="utf-8"))
     m["files"]["checksums.sha256"]["sha256"] = "0" * 64  # same dataset_version, different content hash
-    (other / "manifest.json").write_text(json.dumps(m))
+    (other / "manifest.json").write_text(json.dumps(m), encoding="utf-8", newline="\n")
     e1 = TestClient(create_app(rel.path, rate_limit_per_minute=0)).get("/v1/days").headers["ETag"]
     e2 = TestClient(create_app(other, rate_limit_per_minute=0)).get("/v1/days").headers["ETag"]
     assert e1 != e2
@@ -610,14 +610,18 @@ def test_startup_refuses_missing_or_inconsistent_releases(tmp_path):
     with pytest.raises(ReleaseError, match="manifest.json not found"):
         create_app(tmp_path / "nowhere")
     r = build_synthetic_release(tmp_path / "a")
-    m = json.loads((r.path / "manifest.json").read_text())
-    (r.path / "manifest.json").write_text(json.dumps({**m, "attribution": "mine"}))
+    m = json.loads((r.path / "manifest.json").read_text(encoding="utf-8"))
+    (r.path / "manifest.json").write_text(json.dumps({**m, "attribution": "mine"}), encoding="utf-8", newline="\n")
     with pytest.raises(ReleaseError, match="attribution"):
         create_app(r.path)
-    (r.path / "manifest.json").write_text(json.dumps({**m, "data_class": "observed"}))  # rows say synthetic
+    (r.path / "manifest.json").write_text(
+        json.dumps({**m, "data_class": "observed"}), encoding="utf-8", newline="\n"
+    )  # rows say synthetic
     with pytest.raises(ReleaseError, match="refusing to mix"):
         create_app(r.path)
-    (r.path / "manifest.json").write_text(json.dumps({**m, "schema": "tashwish.release.v0"}))
+    (r.path / "manifest.json").write_text(
+        json.dumps({**m, "schema": "tashwish.release.v0"}), encoding="utf-8", newline="\n"
+    )
     with pytest.raises(ReleaseError, match="schema"):
         create_app(r.path)
 
@@ -631,7 +635,9 @@ def test_startup_refuses_missing_columns_and_tampered_files(tmp_path):
         create_app(r.path)
     r2 = build_synthetic_release(tmp_path / "b")
     p = r2.path / "NOTICE"
-    p.write_text(p.read_text().replace("a", "b", 1))  # same size, different bytes
+    p.write_text(
+        p.read_text(encoding="utf-8").replace("a", "b", 1), encoding="utf-8", newline="\n"
+    )  # same size, different bytes
     with pytest.raises(ReleaseError, match="sha256"):
         create_app(r2.path, verify_hashes=True)
     assert create_app(r2.path, verify_hashes=False) is not None  # hashing is opt in (cold start cost)
@@ -641,8 +647,10 @@ def test_new_manifest_is_picked_up_without_restart(tmp_path):
     r = build_synthetic_release(tmp_path)
     c = TestClient(create_app(r.path))
     assert ok(c.get("/health"))["dataset_version"] == "synthetic-2026.01.11-test"
-    m = json.loads((r.path / "manifest.json").read_text())
-    (r.path / "manifest.json").write_text(json.dumps({**m, "dataset_version": "synthetic-v2-test"}))
+    m = json.loads((r.path / "manifest.json").read_text(encoding="utf-8"))
+    (r.path / "manifest.json").write_text(
+        json.dumps({**m, "dataset_version": "synthetic-v2-test"}), encoding="utf-8", newline="\n"
+    )
     os.utime(r.path / "manifest.json", ns=(1, 2_000_000_000_000_000_000))
     assert ok(c.get("/health"))["dataset_version"] == "synthetic-v2-test"
     assert c.get("/v1/days").headers["X-Dataset-Version"] == "synthetic-v2-test"
@@ -654,7 +662,7 @@ def test_import_of_api_package_does_not_need_fastapi():
 
 
 def test_pyproject_api_extra_lists_runtime_and_test_deps():
-    text = (Path(__file__).resolve().parents[1] / "pyproject.toml").read_text()
+    text = (Path(__file__).resolve().parents[1] / "pyproject.toml").read_text(encoding="utf-8")
     line = next(x for x in text.splitlines() if x.startswith("api = "))
     for dep in ("fastapi", "uvicorn", "httpx"):
         assert dep in line

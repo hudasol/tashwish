@@ -86,7 +86,7 @@ def test_download_resumes_from_existing_bytes(tmp_path):
     url = "u://a"
     dest = tmp_path / "aa"
     dest.write_bytes(data[:3000])
-    (tmp_path / "aa.meta").write_text(json.dumps({"url": url, "total": len(data)}))
+    (tmp_path / "aa.meta").write_text(json.dumps({"url": url, "total": len(data)}), encoding="utf-8", newline="\n")
     fs = FakeServer({url: data})
     download_part(fs, url, dest, len(data), chunk=4096, sleep=NOSLEEP)
     assert dest.read_bytes() == data

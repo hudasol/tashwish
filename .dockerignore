@@ -1,0 +1,11 @@
+# Only pyproject.toml, README.md, LICENSE, NOTICE, src/ and release/ are needed to build the API image.
+**
+!pyproject.toml
+!README.md
+!LICENSE
+!NOTICE
+!src/**
+!release/**
+**/__pycache__
+**/*.pyc
+**/*.egg-info
