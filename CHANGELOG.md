@@ -54,6 +54,10 @@ The package version is now 0.9.0, a release candidate for the study dataset. It 
 - Test fixtures were replaced by anonymised excerpts of the source data.
 - Statements in documents were updated after the verification of 2026-10-16, and recalled free tier limits were replaced
   by figures from the official pages.
+- Study records (`RESEARCH`, `VALIDATION`, `PREDICTIONS_RESULTS`, `REPORT`, `REVIEW_ROUNDS`, `OVERNIGHT_LOG`,
+  `SECONDARY_ANALYSES`, `PROPOSAL`) moved to `docs/research/`, and `NEXT_STEPS.md` became `docs/ROADMAP.md`. The document
+  generators write to the new paths. `docs/README.md` indexes the documents.
+- The README was rewritten as a project overview. The generated status block is unchanged apart from its links.
 
 ### Fixed
 
