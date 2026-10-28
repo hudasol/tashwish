@@ -24,7 +24,7 @@ tashwish.detect   -- jamming-like events (baseline + Wilson bound + FDR + hyster
         v
 data/processed/*.parquet   cell_hour metrics, coverage, events, event_evidence
         |
-        +--> tashwish.validate  (synthetic injection, weak label replay, robustness)  -> docs/VALIDATION.md + results/
+        +--> tashwish.validate  (synthetic injection, weak label replay, robustness)  -> docs/research/VALIDATION.md + results/
         +--> tashwish.release   (versioned dataset + data card + checksums)
         +--> tashwish.api       (FastAPI, read only, DuckDB over Parquet)
         +--> web/               (static dashboard built from processed outputs)
@@ -60,7 +60,7 @@ src/tashwish/
   api/             FastAPI app
 tests/             unit, property and integration tests; tiny fixtures in tests/fixtures (labelled synthetic where invented)
 web/               dashboard source
-docs/              RESEARCH, DATA_SOURCES, ARCHITECTURE, METHODOLOGY, VALIDATION, DATA_QUALITY, REVIEW_ROUNDS, REPORT, NEXT_STEPS
+docs/              RESEARCH, DATA_SOURCES, ARCHITECTURE, METHODOLOGY, VALIDATION, DATA_QUALITY, REVIEW_ROUNDS, REPORT, ROADMAP
 scripts/           one command entry points (ingest, build, validate, release)
 ```
 

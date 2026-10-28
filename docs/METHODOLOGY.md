@@ -123,7 +123,7 @@ There are no ground truth labels for GNSS interference in public ADS-B data. Val
 injection of synthetic jamming and spoofing into real traffic, always labelled synthetic; (2) a deterministic held out
 set of days (a hash of the date, rule `tashwish-heldout-v1`), fixed and listed in `docs/PREDICTIONS.md` before any held out result was
 examined, and run once; (3) a coverage model failure test; (4) a sensitivity study; (5) weak labels from publicly documented incident
-windows, which are used as weak evidence only. Numbers are in `docs/VALIDATION.md`, generated from result files.
+windows, which are used as weak evidence only. Numbers are in `docs/research/VALIDATION.md`, generated from result files.
 
 ## Limits
 

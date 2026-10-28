@@ -28,16 +28,16 @@ navigation or safety of life.
 6. **Run the forward evaluation.** Preregistered in `docs/PREDICTIONS_FORWARD.md` (2026-03-14 to 2026-04-12) with its scorer
    `scripts/score_forward.py`, both committed before any day after the study window was downloaded. It needs item 3 (the
    `TASHWISH_STATE_KEY` secret) and then one incremental run per day and one scorer run.
-7. **Act on the beta binomial sensitivity.** Done on development days (`docs/SECONDARY_ANALYSES.md`, section 1): the flags on
+7. **Act on the beta binomial sensitivity.** Done on development days (`docs/research/SECONDARY_ANALYSES.md`, section 1): the flags on
    elevated days do not survive the measured overdispersion. Decide, in a new preregistered version, whether the detector should
    account for overdispersion; the frozen detector stays as it is.
 8. **More realistic injection.** Partial degradation of an aircraft's samples, drifting spoof tracks, and one scenario per run to
    test whether shared false discovery families inflate recall.
 9. **Explain the regime change.** Public sources on airspace closures and on maritime GNSS interference from 28 February 2026 are
-   recorded in `docs/SECONDARY_ANALYSES.md`, section 3, as consistent timing only. Still open: receiver network changes in the same
+   recorded in `docs/research/SECONDARY_ANALYSES.md`, section 3, as consistent timing only. Still open: receiver network changes in the same
    days, and aviation specific reports. Do not assert a cause without independent evidence.
 10. **Evaluation with ground truth.** Public ADS-B has none. An operator's own interference logs, evaluated under that operator's
-    terms, would allow precision and detection delay to be measured. None exists in this repository (see `docs/PROPOSAL.md`).
+    terms, would allow precision and detection delay to be measured. None exists in this repository (see `docs/research/PROPOSAL.md`).
 11. **Understand the spoofing recall trend** with displacement (higher at 10 km than at 250 km) and the high share of minimum size
     clusters among real events.
 
@@ -57,7 +57,7 @@ navigation or safety of life.
     should check meaning, tone and the technical terms.
 16. **Zenodo release.** Follow `docs/ZENODO.md`: account, upload, metadata, DOI. A DOI exists only after publishing; none is claimed.
 17. **Merge order.** Pull request 2 and the stacked pull requests of 2026-10-16 (forward preregistration, secondary analyses,
-    verification) are open; merge them in order (`docs/OVERNIGHT_LOG.md`).
+    verification) are open; merge them in order (`docs/research/OVERNIGHT_LOG.md`).
 
 ## Not planned
 

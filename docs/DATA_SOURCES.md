@@ -37,7 +37,7 @@ access method are recorded here. We respect each source's terms and rate limits 
 - **Share alike caveat (our reading, not legal advice):** the ODbL generally requires derived databases to be shared
   under the ODbL with attribution. Our released dataset is an aggregated derivative (cell hour counts and event
   tables), not the raw traces. **We release it under ODbL 1.0 to be safe; code is Apache-2.0.** A university IP office or
-  lawyer should confirm before any commercial use. Open item in NEXT_STEPS.
+  lawyer should confirm before any commercial use. Open item in ROADMAP.
 
 ## 2. OpenSky Network historical database (fallback)
 
@@ -89,7 +89,7 @@ docs/METHODOLOGY.md and the data card.
 ## 7. Study window and split (decided 2026-10-12, reversible until the held out run)
 
 - **Window:** 2026-02-07 to 2026-03-13 inclusive, 35 UTC days, all from the `globe_history_2026` repository (prod or staging,
-  the larger release per day). It covers the cited 2026 incident dates 28 Feb, 2 Mar, 7 Mar and 13 Mar (docs/RESEARCH.md section 3).
+  the larger release per day). It covers the cited 2026 incident dates 28 Feb, 2 Mar, 7 Mar and 13 Mar (docs/research/RESEARCH.md section 3).
   Why this size: about 6 minutes of parsing plus download per day on 2 cores gives roughly 4 hours for the whole window in this
   environment, and at least 14 days are needed for baselines. Pre-2025-12 events are out of reach of this archive.
 - **Resumable ingest:** `scripts/run_study_ingest.sh` skips complete days (manifest), writes each day atomically, retries a day up

@@ -44,7 +44,7 @@ jamming-like and spoofing-like anomalies. No raw traces, no aircraft identifiers
 
 ## Files, schema, coverage, validation numbers, known biases
 
-`FROM RESULTS` (generated at release time from `data/processed` and `docs/VALIDATION.md`).
+`FROM RESULTS` (generated at release time from `data/processed` and `docs/research/VALIDATION.md`).
 
 ## Synthetic data
 

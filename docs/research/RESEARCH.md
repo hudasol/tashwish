@@ -61,7 +61,7 @@ attributes interference to an actor.
   Murmansk, Haifa and Moscow, **not** the Persian Gulf or Hormuz [32].
 - AIS depends on the same GNSS being attacked, attribution is not definitive, and coverage is uneven [16, 31, 32].
 - No free historical Gulf AIS archive was identified (aisstream.io appears live only; **unverified**). AIS cross checking
-  is therefore **out of scope for v1** and listed in NEXT_STEPS.
+  is therefore **out of scope for v1** and listed in ROADMAP.
 
 ### 1.4 Gap analysis: candidate differentiators checked against what we retrieved
 

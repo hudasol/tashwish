@@ -34,7 +34,7 @@ honest uncertainty, validation against documented incidents, and a released data
 Each milestone ends with tests passing in CI, a small commits history and a git tag. "Done" is checked literally.
 
 ### M0: Research and repo (tag v0.0.1)
-- docs/RESEARCH.md, DATA_SOURCES.md, ARCHITECTURE.md, plan.md, README.md pushed; About text and topics set.
+- docs/research/RESEARCH.md, DATA_SOURCES.md, ARCHITECTURE.md, plan.md, README.md pushed; About text and topics set.
 - Done when: all five files exist, every citation in RESEARCH.md is from a retrieved page, README has the safety and
   no attribution statements.
 
@@ -72,7 +72,7 @@ Each milestone ends with tests passing in CI, a small commits history and a git 
 - Controlled injection of **synthetic** degradation into real traffic: precision, recall and detection delay by scenario
   difficulty (intensity, area, duration, traffic density, coverage).
 - Robustness: sensitivity to density, coverage, thresholds, and day to day stability. Failures reported honestly.
-- Done when: docs/VALIDATION.md reports numbers produced by committed scripts, including the scenarios where the method fails.
+- Done when: docs/research/VALIDATION.md reports numbers produced by committed scripts, including the scenarios where the method fails.
 
 ### M6: API and dataset (v0.6.0)
 - Read only FastAPI API with OpenAPI docs; versioned open dataset (Parquet and CSV) with a data card (sources, licence,
@@ -92,15 +92,15 @@ Each milestone ends with tests passing in CI, a small commits history and a git 
 ## Phase 3: critique rounds (v0.9.0 and v1.0.0)
 Five internal self review rounds, each by a separate reviewer reading from a different angle: methods and statistics, honesty,
 code, results and claims, non expert readability. Each: scope, findings, fixed, not fixed and why. Recorded in
-docs/REVIEW_ROUNDS.md.
+docs/research/REVIEW_ROUNDS.md.
 
 ## Phase 4: research output
-docs/REPORT.md (6 to 10 pages equivalent), one page summary, 60 to 90 second demo script, docs/NEXT_STEPS.md.
+docs/research/REPORT.md (6 to 10 pages equivalent), one page summary, 60 to 90 second demo script, docs/ROADMAP.md.
 
 ## Definition of done (project)
 Live dashboard and API; CI passing; meaningful tests; reproducible from a clean clone; honest validation including failures;
 released dataset with data card; README, plan.md, ARCHITECTURE.md, DATA_SOURCES.md, RESEARCH.md, REVIEW_ROUNDS.md,
-REPORT.md present and consistent with the code; NEXT_STEPS.md sized for short sessions.
+REPORT.md present and consistent with the code; ROADMAP.md sized for short sessions.
 
 ## Risks and how they are handled
 | Risk | Handling |
