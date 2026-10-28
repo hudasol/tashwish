@@ -3,7 +3,6 @@
 *.egg-info/
 *.pyc
 *.tar.*
-.claude/
 .env
 .hypothesis/
 .pytest_cache/
