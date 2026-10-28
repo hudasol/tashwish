@@ -56,6 +56,11 @@ def test_b1b_subtracts_one_degraded_aircraft():
     assert corrected[(CELL, t2)]  # (2 minus 1) / 5 = 0.20
 
 
+def test_flag_frame_keeps_timezone_aware_buckets():
+    f = flag_fixed_fraction(_cb([(CELL, T, "enroute", 10, 5)]))
+    assert str(f["bucket"].dtype) == "datetime64[ns, UTC]" or str(f["bucket"].dtype).endswith(", UTC]")
+
+
 def test_b1_events_merge_adjacent_cells_in_one_bucket():
     cb = _cb([(CELL, T, "enroute", 10, 5), (NB, T, "enroute", 10, 5)])
     flags, events = detect_fixed_fraction(cb, GRID)

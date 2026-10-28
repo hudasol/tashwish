@@ -27,14 +27,15 @@ def _day(bucket: pd.Series) -> pd.Series:
 
 def _frame(t: pd.DataFrame, flag: np.ndarray) -> pd.DataFrame:
     """Flags in the shape `build_events` reads. `p_value` is NaN because these baselines compute none."""
+    t = t.reset_index(drop=True)
     k = t["k_strong"].astype(int).to_numpy()
     n = t["n_aircraft"].to_numpy()
     lo, hi = wilson_interval(k, n)
-    return pd.DataFrame({
-        "cell": t["cell"].to_numpy(), "bucket": t["bucket"].to_numpy(), "stratum": t["stratum"].to_numpy(),
-        "n_aircraft": n, "k": k, "ci_lo": np.asarray(lo), "ci_hi": np.asarray(hi), "p_value": np.nan,
-        "flag": np.asarray(flag, dtype=bool),
-    })[FLAG_COLS]  # fmt: skip
+    out = pd.DataFrame({
+        "cell": t["cell"], "bucket": t["bucket"], "stratum": t["stratum"], "n_aircraft": n, "k": k,
+        "ci_lo": np.asarray(lo), "ci_hi": np.asarray(hi), "p_value": np.nan, "flag": np.asarray(flag, dtype=bool),
+    })  # fmt: skip
+    return out[FLAG_COLS]
 
 
 def _tested(cb: pd.DataFrame, stratum: str, min_aircraft: int) -> pd.DataFrame:
