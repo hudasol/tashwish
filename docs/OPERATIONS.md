@@ -220,7 +220,7 @@ python -m tashwish.release.build --processed ../tashwish-data/processed --web ..
 python scripts/check_freshness.py ../tashwish-data/processed/freshness.json
 # 3. publish only after the check prints ok or a level you accept
 cd ../tashwish-data && git checkout -B data origin/data && git add processed web/data release && git commit -m "data: manual recovery" && git push origin data
-# 4. or simply re-run in the cloud: Actions > Incremental run > Run workflow (max_days 1)
+# 4. or simply run again in the cloud: Actions > Incremental run > Run workflow (max_days 1)
 ```
 
 Backfill: dispatch the workflow with `start_day` set to the first missing day (or leave it empty to resume) and `max_days` 3,
@@ -240,7 +240,7 @@ If the release naming changes: the URL pattern is the single `_URL` in `src/tash
 `DayNotAvailable` for days that exist in the browser. Fix `_URL`/`KINDS`, update `tests/test_source.py`, and re run. Compare the
 result with an already ingested day before trusting it (row counts per cell).
 
-User agent: `HttpxFetcher` previously sent httpx's default agent. It now sends
+Request identification: `HttpxFetcher` previously sent the default httpx value in the `User-Agent` header. It now sends
 `tashwish/0.1 (+https://github.com/hudasol/tashwish; research, sequential ranged downloads)` (`USER_AGENT` in
 `src/tashwish/ingest/source.py`), so the maintainers can identify and contact the project.
 
