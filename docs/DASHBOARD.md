@@ -40,7 +40,7 @@ exporting an image. If the basemap fetch failed, the map shows a plain backgroun
 The deck.gl umbrella bundle does not include h3-js; `H3HexagonLayer` fails without the `h3` global, so h3-js is loaded first.
 Attribution control text on the map: "Natural Earth (public domain)".
 
-## Contract shapes the contract text leaves open (to be reconciled with `tashwish.release.web`)
+## Contract shapes the contract text leaves open (to be reconciled with the release builder, `tashwish.release.build`)
 
 - `manifest.bbox`: object `{south, west, north, east}` (an array `[west, south, east, north]` is also accepted). The released
   manifest carries the study box (22 to 31 N, 46 to 62 E) so the map opens on the data.
@@ -52,7 +52,7 @@ Attribution control text on the map: "Natural Earth (public domain)".
 - Method keys the UI looks up: every field name above plus `degraded_share`, `evidence.<name>` for each key in an event's
   `evidence`, `generated_at`, `latest_day`, `freshness_hours_hint`, `slot`, `bucket_hours`, `h3_res`. A number whose key is
   missing links to `methods.html#unmapped` and logs a console warning.
-- The sample anchors (`wilson-interval`, `event-definition`, ...) are placeholders until `docs/METHODOLOGY.md` exists.
+- The method anchors (`wilson-interval`, `event-definition`, ...) name sections of `docs/METHODOLOGY.md`.
 - The `attribution` field carries `DATASET_ATTRIBUTION` (primary notice plus derived database sentence) from `attribution.py`.
 
 ## Behaviour notes
