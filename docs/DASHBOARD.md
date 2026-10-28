@@ -28,7 +28,7 @@ exporting an image. If the basemap fetch failed, the map shows a plain backgroun
 `i18n/ar.json`, `map/style.json`, `scripts/fetch_basemap.sh`, `scripts/clip_basemap.py`, `scripts/make_sample.py`,
 `data/ne_countries.json`, `data/sample_synthetic/`.
 
-## Third party libraries (pinned, loaded from jsDelivr with SRI; local fallback path `web/vendor/<name>-<version>/` if you vendor them)
+## Third party libraries (pinned, loaded from jsDelivr with SRI; local fallback path `web/vendor/<name>-<version>/` if they are vendored)
 
 | Library | Version | Licence | Use |
 |---|---|---|---|
@@ -40,7 +40,7 @@ exporting an image. If the basemap fetch failed, the map shows a plain backgroun
 The deck.gl umbrella bundle does not include h3-js; `H3HexagonLayer` fails without the `h3` global, so h3-js is loaded first.
 Attribution control text on the map: "Natural Earth (public domain)".
 
-## Contract shapes the contract text left open (please reconcile with `tashwish.release.web`)
+## Contract shapes the contract text leaves open (to be reconciled with `tashwish.release.web`)
 
 - `manifest.bbox`: object `{south, west, north, east}` (an array `[west, south, east, north]` is also accepted). The released
   manifest carries the study box (22 to 31 N, 46 to 62 E) so the map opens on the data.
