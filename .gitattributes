@@ -1,0 +1,13 @@
+# Normalise line endings in the repository and on checkout so that text files are identical on every platform.
+* text=auto eol=lf
+
+*.parquet binary
+*.gz binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.pbf binary
+*.zip binary
