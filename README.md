@@ -59,7 +59,7 @@ Held out results (8 normal traffic days and 6 reduced traffic days). Intervals a
 
 SYNTHETIC rows measure whether the detector finds scenarios that were injected into real traffic. They are not accuracy against real interference. Precision and detection delay are not measured on real data.
 
-Preregistered predictions: 19 HIT, 8 MISS, 1 not evaluable, out of 28 scored. Misses: D2, C3, S1, S4, R3, R4, X1, A2. Details in [docs/PREDICTIONS_RESULTS.md](docs/PREDICTIONS_RESULTS.md) and [docs/VALIDATION.md](docs/VALIDATION.md).
+Preregistered predictions: 19 HIT, 8 MISS, 1 not evaluable, out of 28 scored. Misses: D2, C3, S1, S4, R3, R4, X1, A2. Details in [docs/research/PREDICTIONS_RESULTS.md](docs/research/PREDICTIONS_RESULTS.md) and [docs/research/VALIDATION.md](docs/research/VALIDATION.md).
 <!-- STATUS:END -->
 
 Plain reading of the table: on injected jamming like scenarios the detector found strong, wide, long scenarios on normal

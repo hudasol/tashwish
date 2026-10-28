@@ -1,4 +1,4 @@
-"""Generate docs/PREDICTIONS_RESULTS.md, docs/VALIDATION.md and results/headline.json from result files.
+"""Generate docs/research/PREDICTIONS_RESULTS.md, docs/research/VALIDATION.md and results/headline.json from result files.
 
   python scripts/make_results_docs.py [--dev results/dev] [--held results/held_out] [--interim data/interim]
 
@@ -464,7 +464,7 @@ def predictions_md(rows: list[dict], freeze: dict | None, held: Split) -> str:
     L += [
         "",
         "Recall figures in rows J1 to J3 are for criterion subsets written in `docs/PREDICTIONS.md`. They differ from the tier recall in "
-        "`docs/VALIDATION.md` section 2, which uses every scenario of a tier. Values are rounded to three decimals; "
+        "`docs/research/VALIDATION.md` section 2, which uses every scenario of a tier. Values are rounded to three decimals; "
         "a row marked at threshold passed with a value equal to its bar.",
         "",
         "### Reported alongside, not scored",
@@ -481,7 +481,7 @@ def predictions_md(rows: list[dict], freeze: dict | None, held: Split) -> str:
         if r.get("scored", True) and (r["note"] or r["short"] != r["observed"]):
             body = cell(r["observed"]) if r["short"] != r["observed"] else ""
             L.append(f"- **{r['id']}**: {(body + ' ' + r['note']).strip()}")
-    L += ["", "Misses are not explained away here; the discussion is in `docs/VALIDATION.md` section 7.", ""]
+    L += ["", "Misses are not explained away here; the discussion is in `docs/research/VALIDATION.md` section 7.", ""]
     return "\n".join(L)
 
 
@@ -1251,10 +1251,10 @@ def main() -> None:
         else None
     )
     daily = pd.read_csv(a.daily) if a.daily.exists() else None
-    (ROOT / "docs/PREDICTIONS_RESULTS.md").write_text(
+    (ROOT / "docs/research/PREDICTIONS_RESULTS.md").write_text(
         predictions_md(rows, freeze, held), encoding="utf-8", newline="\n"
     )
-    (ROOT / "docs/VALIDATION.md").write_text(
+    (ROOT / "docs/research/VALIDATION.md").write_text(
         validation_md(held, dev, freeze, rows, regime, daily, ingest), encoding="utf-8", newline="\n"
     )
     (ROOT / "results/headline.json").write_text(

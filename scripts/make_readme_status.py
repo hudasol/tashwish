@@ -107,7 +107,7 @@ def build_block() -> str:
         "against real interference. Precision and detection delay are not measured on real data.",
         "",
         f"Preregistered predictions: {hits} HIT, {misses} MISS, {notev} not evaluable, out of {len(ev)} scored. Misses: {miss_ids}. "
-        "Details in [docs/PREDICTIONS_RESULTS.md](docs/PREDICTIONS_RESULTS.md) and [docs/VALIDATION.md](docs/VALIDATION.md).",
+        "Details in [docs/research/PREDICTIONS_RESULTS.md](docs/research/PREDICTIONS_RESULTS.md) and [docs/research/VALIDATION.md](docs/research/VALIDATION.md).",
         END,
     ]
     return "\n".join(lines)

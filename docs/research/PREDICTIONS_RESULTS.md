@@ -38,7 +38,7 @@ Frozen code commit: `94eafcd93ae903bb84f6f07137ae1b04407e00d0`; held out run fin
 | A3 | OBSERVED | Few medium or high events on degraded baseline days | <= 0.5 per day on average | 0.33 per day (3 events over 9 days) | 0.50 | **HIT** |
 | A4 | SYNTHETIC | Easy tier recall not lowered by the new placement rule | easy tier recall >= 0.90 | 0.917 (77/84; day bootstrap 0.859 to 0.966; Wilson 0.838 to 0.959) | 0.75 | **HIT** |
 
-Recall figures in rows J1 to J3 are for criterion subsets written in `docs/PREDICTIONS.md`. They differ from the tier recall in `docs/VALIDATION.md` section 2, which uses every scenario of a tier. Values are rounded to three decimals; a row marked at threshold passed with a value equal to its bar.
+Recall figures in rows J1 to J3 are for criterion subsets written in `docs/PREDICTIONS.md`. They differ from the tier recall in `docs/research/VALIDATION.md` section 2, which uses every scenario of a tier. Values are rounded to three decimals; a row marked at threshold passed with a value equal to its bar.
 
 ### Reported alongside, not scored
 
@@ -68,4 +68,4 @@ Recall figures in rows J1 to J3 are for criterion subsets written in `docs/PREDI
 - **A1**: February days matching: 8 of 8; March days matching: 4 of 4. 02-28: reduced traffic and baseline, 03-01: reduced traffic and elevated (not predicted)
 - **A2**: traffic normal: 0.058 over 14952 units, 8 days, day bootstrap 0.052 to 0.063; traffic reduced: 0.425 over 1458 units, 6 days, day bootstrap 0.357 to 0.486
 
-Misses are not explained away here; the discussion is in `docs/VALIDATION.md` section 7.
+Misses are not explained away here; the discussion is in `docs/research/VALIDATION.md` section 7.

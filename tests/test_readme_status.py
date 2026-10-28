@@ -39,4 +39,4 @@ def test_report_equals_generated_report():
     spec = importlib.util.spec_from_file_location("make_report", ROOT / "scripts" / "make_report.py")
     m = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)
-    assert (ROOT / "docs" / "REPORT.md").read_text(encoding="utf-8") == m.build()
+    assert (ROOT / "docs" / "research" / "REPORT.md").read_text(encoding="utf-8") == m.build()

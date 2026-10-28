@@ -6,7 +6,7 @@ Written and committed before any day after 2026-03-13 was downloaded. It reads o
   calibrate  per day measures on DEVELOPMENT days only (the anchor the predictions were written against), written to
              results/forward/dev_calibration.json. Held out days are never read.
   score      per day measures on the forward block of results/forward/predictions_forward.json, HIT or MISS per
-             prediction, Brier score, the first day each daily check fails, and docs/FORWARD_RESULTS.md. Refuses any day
+             prediction, Brier score, the first day each daily check fails, and docs/research/FORWARD_RESULTS.md. Refuses any day
              inside the study window and any day not scored in `frozen_baseline` mode with the current frozen state.
 
 Every measure here is OBSERVED (real days, nothing injected). Day bootstrap intervals resample whole days.
@@ -37,7 +37,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SPEC = ROOT / "results" / "forward" / "predictions_forward.json"
 CALIB = ROOT / "results" / "forward" / "dev_calibration.json"
 SCORED = ROOT / "results" / "forward" / "forward_scored.json"
-DOC = ROOT / "docs" / "FORWARD_RESULTS.md"
+DOC = ROOT / "docs" / "research" / "FORWARD_RESULTS.md"
 JAM_KINDS = ("jamming_like", "both")
 SPOOF_KINDS = ("spoofing_like", "both")
 
