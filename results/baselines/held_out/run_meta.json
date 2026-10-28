@@ -1,0 +1,40 @@
+{
+ "split": "held_out",
+ "score_days": [
+  "2026-02-07",
+  "2026-02-10",
+  "2026-02-11",
+  "2026-02-12",
+  "2026-02-15",
+  "2026-02-18",
+  "2026-02-24",
+  "2026-02-26",
+  "2026-02-28",
+  "2026-03-01",
+  "2026-03-03",
+  "2026-03-08",
+  "2026-03-10",
+  "2026-03-13"
+ ],
+ "runs_per_day": 4,
+ "mix": [
+  6,
+  4,
+  3,
+  3
+ ],
+ "run_commit": "fcb7d312338abca97fc8ace925faae8585645b37",
+ "combine_commit": "fcb7d312338abca97fc8ace925faae8585645b37",
+ "baseline_sources_sha256": "3f9f12ec02164579d8eec6222515366c6b32be96372d1988a44689f058915a02",
+ "combine_dirty": false,
+ "reproduction_of_system": {
+  "scenarios_here": 830,
+  "scenarios_committed": 830,
+  "matched_sid": 830,
+  "jam_detected_equal": 830,
+  "spoof_detected_equal": 830
+ },
+ "finished": "2026-10-28T14:09:48.161760+00:00",
+ "baselines_fixed_before_run_commit": "fcb7d312338abca97fc8ace925faae8585645b37",
+ "baseline_sources_sha256_at_start": "3f9f12ec02164579d8eec6222515366c6b32be96372d1988a44689f058915a02"
+}
