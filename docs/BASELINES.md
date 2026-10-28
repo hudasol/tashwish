@@ -133,6 +133,37 @@ The system is run again inside the same loop as the baselines. The two right han
 | Split | Days | Scenarios here | Matched to committed file | System jam outcome equal | System spoof outcome equal | Commit |
 |---|---|---|---|---|---|---|
 | dev | 21 | 1257 | 1257 | 1257 of 1257 | 1257 of 1257 | 400ed6d545 |
+| held_out | 14 | 830 | 830 | 830 of 830 | 830 of 830 | fcb7d31233 |
+
+### Headline comparison
+
+Recall is the harness rule on all days. For B4 the last two columns count spoofing-like origin units; for all others they count jamming-like cell buckets. Real day columns are OBSERVED and have no truth. Detail, intervals and the strict rule follow in the numbered tables.
+
+Development days (the system was developed on these days; the baselines were not tuned on any day)
+
+| Detector | Easy | Medium | Hard | Random | Spoofing recall, 3 or more displaced | Real days flagged per day, normal | Real days flagged per day, reduced |
+|---|---|---|---|---|---|---|---|
+| system | 0.92 | 0.82 | 0.14 | 0.48 | 0.63 | 0.1 | 0.4 |
+| B1 | 0.80 | 0.80 | 0.45 | 0.70 | n/a | 65.0 | 179.4 |
+| B1b | 0.84 | 0.82 | 0.46 | 0.76 | n/a | 9.3 | 118.9 |
+| B2 | 0.90 | 0.89 | 0.44 | 0.72 | n/a | 53.9 | 75.5 |
+| B3a | 0.94 | 0.88 | 0.19 | 0.58 | n/a | 0.1 | 45.6 |
+| B3b | 0.92 | 0.82 | 0.14 | 0.48 | n/a | 0.1 | 0.5 |
+| B3c | 0.93 | 0.90 | 0.17 | 0.52 | n/a | 0.1 | 5.9 |
+| B4 | n/a | n/a | n/a | n/a | 0.99 | 35.5 | 98.2 |
+
+Held out days: post hoc, not preregistered, baselines fixed before run (fcb7d31233)
+
+| Detector | Easy | Medium | Hard | Random | Spoofing recall, 3 or more displaced | Real days flagged per day, normal | Real days flagged per day, reduced |
+|---|---|---|---|---|---|---|---|
+| system | 0.92 | 0.82 | 0.10 | 0.39 | 0.52 | 0.0 | 0.5 |
+| B1 | 0.83 | 0.81 | 0.42 | 0.58 | n/a | 62.2 | 135.5 |
+| B1b | 0.89 | 0.85 | 0.42 | 0.65 | n/a | 7.8 | 83.0 |
+| B2 | 0.94 | 0.93 | 0.37 | 0.62 | n/a | 57.8 | 47.3 |
+| B3a | 0.95 | 0.98 | 0.10 | 0.49 | n/a | 0.0 | 30.5 |
+| B3b | 0.93 | 0.87 | 0.10 | 0.40 | n/a | 0.0 | 0.7 |
+| B3c | 0.98 | 0.93 | 0.12 | 0.44 | n/a | 0.0 | 4.0 |
+| B4 | n/a | n/a | n/a | n/a | 0.99 | 28.0 | 87.2 |
 
 ### 1. Jamming recall by tier: Development days (the system was developed on these days; the baselines were not tuned on any day)
 
@@ -518,6 +549,391 @@ OBSERVED, reduced days: B3c flagged 5.9 cell buckets per day against 0.4 for the
 OBSERVED, normal days: B4 gave 45.2 events per day against 0.3 for the system.
 
 OBSERVED, reduced days: B4 gave 245.1 events per day against 1.2 for the system.
+
+### 8. Jamming recall by tier: Held out days: post hoc, not preregistered, baselines fixed before run (fcb7d31233)
+
+Harness rule (unchanged `drop_background` and `match_scenario`). SYNTHETIC.
+
+Traffic regime: all (14 days)
+
+| Detector | easy (n=84) | medium (n=84) | hard (n=84) | random (n=84) |
+|---|---|---|---|---|
+| system | 0.92 [0.86, 0.97] | 0.82 [0.65, 0.95] | 0.10 [0.02, 0.18] | 0.39 [0.26, 0.53] |
+| B1 | 0.83 [0.70, 0.94] | 0.81 [0.64, 0.94] | 0.42 [0.29, 0.56] | 0.58 [0.41, 0.74] |
+| B1b | 0.89 [0.78, 0.98] | 0.85 [0.69, 0.96] | 0.42 [0.31, 0.52] | 0.65 [0.50, 0.78] |
+| B2 | 0.94 [0.88, 0.99] | 0.93 [0.86, 0.99] | 0.37 [0.29, 0.44] | 0.62 [0.49, 0.74] |
+| B3a | 0.95 [0.90, 0.99] | 0.98 [0.94, 1.00] | 0.10 [0.03, 0.17] | 0.49 [0.38, 0.59] |
+| B3b | 0.93 [0.87, 0.98] | 0.87 [0.71, 0.98] | 0.10 [0.02, 0.18] | 0.40 [0.27, 0.54] |
+| B3c | 0.98 [0.94, 1.00] | 0.93 [0.82, 1.00] | 0.12 [0.05, 0.20] | 0.44 [0.32, 0.56] |
+
+Traffic regime: normal (8 days)
+
+| Detector | easy (n=51) | medium (n=50) | hard (n=45) | random (n=46) |
+|---|---|---|---|---|
+| system | 1.00 [1.00, 1.00] | 1.00 [1.00, 1.00] | 0.13 [0.00, 0.27] | 0.54 [0.38, 0.69] |
+| B1 | 0.96 [0.91, 1.00] | 1.00 [1.00, 1.00] | 0.42 [0.31, 0.54] | 0.78 [0.68, 0.89] |
+| B1b | 0.98 [0.94, 1.00] | 1.00 [1.00, 1.00] | 0.49 [0.40, 0.58] | 0.80 [0.72, 0.90] |
+| B2 | 0.98 [0.93, 1.00] | 0.98 [0.94, 1.00] | 0.40 [0.32, 0.48] | 0.76 [0.63, 0.89] |
+| B3a | 1.00 [1.00, 1.00] | 1.00 [1.00, 1.00] | 0.09 [0.00, 0.22] | 0.54 [0.38, 0.69] |
+| B3b | 1.00 [1.00, 1.00] | 1.00 [1.00, 1.00] | 0.13 [0.00, 0.27] | 0.54 [0.38, 0.69] |
+| B3c | 1.00 [1.00, 1.00] | 1.00 [1.00, 1.00] | 0.16 [0.04, 0.28] | 0.54 [0.38, 0.69] |
+
+Traffic regime: reduced (6 days)
+
+| Detector | easy (n=33) | medium (n=34) | hard (n=39) | random (n=38) |
+|---|---|---|---|---|
+| system | 0.79 [0.75, 0.82] | 0.56 [0.30, 0.81] | 0.05 [0.00, 0.12] | 0.21 [0.11, 0.32] |
+| B1 | 0.64 [0.38, 0.86] | 0.53 [0.29, 0.77] | 0.41 [0.18, 0.69] | 0.34 [0.11, 0.56] |
+| B1b | 0.76 [0.56, 0.94] | 0.62 [0.34, 0.85] | 0.33 [0.18, 0.55] | 0.47 [0.26, 0.68] |
+| B2 | 0.88 [0.79, 0.97] | 0.85 [0.74, 0.97] | 0.33 [0.21, 0.44] | 0.45 [0.32, 0.61] |
+| B3a | 0.88 [0.79, 0.97] | 0.94 [0.89, 1.00] | 0.10 [0.03, 0.18] | 0.42 [0.34, 0.50] |
+| B3b | 0.82 [0.75, 0.91] | 0.68 [0.39, 0.91] | 0.05 [0.00, 0.12] | 0.24 [0.13, 0.34] |
+| B3c | 0.94 [0.88, 1.00] | 0.82 [0.61, 0.97] | 0.08 [0.02, 0.14] | 0.32 [0.22, 0.42] |
+
+Strict rule (only flags caused by the injection can count). SYNTHETIC.
+
+Traffic regime: all (14 days)
+
+| Detector | easy (n=84) | medium (n=84) | hard (n=84) | random (n=84) |
+|---|---|---|---|---|
+| system | 0.92 [0.86, 0.97] | 0.82 [0.65, 0.95] | 0.10 [0.02, 0.18] | 0.39 [0.26, 0.53] |
+| B1 | 0.90 [0.83, 0.97] | 0.92 [0.83, 0.99] | 0.37 [0.28, 0.47] | 0.68 [0.53, 0.81] |
+| B1b | 0.94 [0.89, 0.99] | 0.96 [0.93, 1.00] | 0.45 [0.36, 0.55] | 0.70 [0.56, 0.82] |
+| B2 | 0.95 [0.90, 1.00] | 0.96 [0.93, 1.00] | 0.35 [0.27, 0.42] | 0.63 [0.50, 0.76] |
+| B3a | 0.95 [0.90, 0.99] | 0.98 [0.94, 1.00] | 0.10 [0.03, 0.17] | 0.49 [0.38, 0.59] |
+| B3b | 0.93 [0.87, 0.98] | 0.87 [0.71, 0.98] | 0.10 [0.02, 0.18] | 0.40 [0.27, 0.54] |
+| B3c | 0.98 [0.94, 1.00] | 0.93 [0.82, 1.00] | 0.12 [0.05, 0.20] | 0.44 [0.32, 0.56] |
+
+Traffic regime: normal (8 days)
+
+| Detector | easy (n=51) | medium (n=50) | hard (n=45) | random (n=46) |
+|---|---|---|---|---|
+| system | 1.00 [1.00, 1.00] | 1.00 [1.00, 1.00] | 0.13 [0.00, 0.27] | 0.54 [0.38, 0.69] |
+| B1 | 0.96 [0.91, 1.00] | 1.00 [1.00, 1.00] | 0.42 [0.31, 0.54] | 0.80 [0.72, 0.90] |
+| B1b | 0.98 [0.94, 1.00] | 1.00 [1.00, 1.00] | 0.49 [0.40, 0.58] | 0.80 [0.72, 0.90] |
+| B2 | 0.98 [0.93, 1.00] | 0.98 [0.94, 1.00] | 0.38 [0.27, 0.48] | 0.76 [0.63, 0.89] |
+| B3a | 1.00 [1.00, 1.00] | 1.00 [1.00, 1.00] | 0.09 [0.00, 0.22] | 0.54 [0.38, 0.69] |
+| B3b | 1.00 [1.00, 1.00] | 1.00 [1.00, 1.00] | 0.13 [0.00, 0.27] | 0.54 [0.38, 0.69] |
+| B3c | 1.00 [1.00, 1.00] | 1.00 [1.00, 1.00] | 0.16 [0.04, 0.28] | 0.54 [0.38, 0.69] |
+
+Traffic regime: reduced (6 days)
+
+| Detector | easy (n=33) | medium (n=34) | hard (n=39) | random (n=38) |
+|---|---|---|---|---|
+| system | 0.79 [0.75, 0.82] | 0.56 [0.30, 0.81] | 0.05 [0.00, 0.12] | 0.21 [0.11, 0.32] |
+| B1 | 0.82 [0.69, 0.94] | 0.79 [0.66, 0.94] | 0.31 [0.18, 0.47] | 0.53 [0.30, 0.74] |
+| B1b | 0.88 [0.79, 0.97] | 0.91 [0.85, 0.97] | 0.41 [0.25, 0.59] | 0.58 [0.33, 0.79] |
+| B2 | 0.91 [0.81, 1.00] | 0.94 [0.89, 1.00] | 0.31 [0.19, 0.40] | 0.47 [0.32, 0.69] |
+| B3a | 0.88 [0.79, 0.97] | 0.94 [0.89, 1.00] | 0.10 [0.03, 0.18] | 0.42 [0.34, 0.50] |
+| B3b | 0.82 [0.75, 0.91] | 0.68 [0.39, 0.91] | 0.05 [0.00, 0.12] | 0.24 [0.13, 0.34] |
+| B3c | 0.94 [0.88, 1.00] | 0.82 [0.61, 0.97] | 0.08 [0.02, 0.14] | 0.32 [0.22, 0.42] |
+
+### 9. Spoofing recall, 3 or more displaced aircraft: Held out days: post hoc, not preregistered, baselines fixed before run (fcb7d31233)
+
+SYNTHETIC.
+
+| Traffic regime | Scenarios | system | B4 |
+|---|---|---|---|
+| all | 126 | 0.52 [0.41, 0.62] | 0.99 [0.98, 1.00] |
+| normal | 81 | 0.43 [0.30, 0.56] | 0.99 [0.96, 1.00] |
+| reduced | 45 | 0.67 [0.56, 0.77] | 1.00 [1.00, 1.00] |
+
+### 10. Flag rate on null scenarios: Held out days: post hoc, not preregistered, baselines fixed before run (fcb7d31233)
+
+SYNTHETIC. Fraction of null scenarios overlapped by an event after background removal. See the limits on why this is close to zero by construction.
+
+| Traffic regime | Null scenarios | system harness jam | B1 harness jam | B1b harness jam | B2 harness jam | B3a harness jam | B3b harness jam | B3c harness jam | system strict jam | B1 strict jam | B1b strict jam | B2 strict jam | B3a strict jam | B3b strict jam | B3c strict jam | system harness spoof | B4 harness spoof |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| all | 154 | 0.000 | 0.052 | 0.006 | 0.032 | 0.006 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.097 |
+| normal | 96 | 0.000 | 0.000 | 0.000 | 0.010 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.115 |
+| reduced | 58 | 0.000 | 0.138 | 0.017 | 0.069 | 0.017 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.069 |
+
+### 11. Real days, jamming-like flags: Held out days: post hoc, not preregistered, baselines fixed before run (fcb7d31233)
+
+OBSERVED, no truth. Flagged cell buckets are not claimed to be false alarms or true events.
+
+| Traffic regime | Detector | Days | Tested per day | Flagged per day [day bootstrap] | Flagged share of tested | Events per day | Jaccard with system | Share of system flags also flagged | Flagged but not by system per day |
+|---|---|---|---|---|---|---|---|---|---|
+| all | system | 14 | 1180 | 0.2 [0.0, 0.6] | 0.000 | 0.2 | 1.000 | 1.00 | 0.0 |
+| all | B1 | 14 | 1231 | 93.6 [70.9, 118.8] | 0.076 | 20.1 | 0.002 | 1.00 | 93.4 |
+| all | B1b | 14 | 1231 | 40.0 [20.8, 63.0] | 0.032 | 7.7 | 0.005 | 1.00 | 39.8 |
+| all | B2 | 14 | 1231 | 53.3 [45.7, 60.7] | 0.043 | 24.6 | 0.003 | 0.67 | 53.1 |
+| all | B3a | 14 | 1202 | 13.1 [3.9, 25.3] | 0.011 | 2.9 | 0.011 | 0.67 | 12.9 |
+| all | B3b | 14 | 1231 | 0.3 [0.0, 0.8] | 0.000 | 0.3 | 0.750 | 1.00 | 0.1 |
+| all | B3c | 14 | 1180 | 1.7 [0.5, 3.1] | 0.001 | 1.0 | 0.125 | 1.00 | 1.5 |
+| normal | system | 8 | 1853 | 0.0 [0.0, 0.0] | 0.000 | 0.0 | n/a | n/a | 0.0 |
+| normal | B1 | 8 | 1875 | 62.2 [46.4, 79.4] | 0.033 | 24.6 | 0.000 | n/a | 62.2 |
+| normal | B1b | 8 | 1875 | 7.8 [3.6, 12.6] | 0.004 | 3.9 | 0.000 | n/a | 7.8 |
+| normal | B2 | 8 | 1875 | 57.8 [47.4, 66.9] | 0.031 | 29.1 | 0.000 | n/a | 57.8 |
+| normal | B3a | 8 | 1838 | 0.0 [0.0, 0.0] | 0.000 | 0.0 | n/a | n/a | 0.0 |
+| normal | B3b | 8 | 1875 | 0.0 [0.0, 0.0] | 0.000 | 0.0 | n/a | n/a | 0.0 |
+| normal | B3c | 8 | 1853 | 0.0 [0.0, 0.0] | 0.000 | 0.0 | n/a | n/a | 0.0 |
+| reduced | system | 6 | 284 | 0.5 [0.0, 1.2] | 0.002 | 0.5 | 1.000 | 1.00 | 0.0 |
+| reduced | B1 | 6 | 373 | 135.5 [110.5, 161.0] | 0.363 | 14.2 | 0.004 | 1.00 | 135.0 |
+| reduced | B1b | 6 | 373 | 83.0 [57.0, 104.0] | 0.223 | 12.8 | 0.006 | 1.00 | 82.5 |
+| reduced | B2 | 6 | 373 | 47.3 [38.2, 57.2] | 0.127 | 18.7 | 0.007 | 0.67 | 47.0 |
+| reduced | B3a | 6 | 354 | 30.5 [11.2, 48.8] | 0.086 | 6.7 | 0.011 | 0.67 | 30.2 |
+| reduced | B3b | 6 | 373 | 0.7 [0.0, 1.7] | 0.002 | 0.7 | 0.750 | 1.00 | 0.2 |
+| reduced | B3c | 6 | 284 | 4.0 [1.8, 6.2] | 0.014 | 2.3 | 0.125 | 1.00 | 3.5 |
+
+### 12. Real days, spoofing-like jumps: Held out days: post hoc, not preregistered, baselines fixed before run (fcb7d31233)
+
+OBSERVED, no truth.
+
+| Traffic regime | Detector | Days | Flagged origin units per day [day bootstrap] | Events per day | Jaccard with system | Share of system units also flagged |
+|---|---|---|---|---|---|---|
+| all | system | 14 | 1.2 [0.1, 2.6] | 0.5 | 1.000 | 1.00 |
+| all | B4 | 14 | 53.4 [37.1, 73.8] | 107.7 | 0.023 | 1.00 |
+| normal | system | 8 | 0.0 [0.0, 0.0] | 0.0 | n/a | n/a |
+| normal | B4 | 8 | 28.0 [19.0, 36.5] | 32.0 | 0.000 | n/a |
+| reduced | system | 6 | 2.8 [0.7, 5.3] | 1.2 | 1.000 | 1.00 |
+| reduced | B4 | 6 | 87.2 [66.2, 112.5] | 208.7 | 0.033 | 1.00 |
+
+### 13. Baseline minus system on identical scenarios: Held out days: post hoc, not preregistered, baselines fixed before run (fcb7d31233)
+
+Differences in recall on the same scenarios. The verdict is above when the whole day bootstrap interval of the difference is positive, below when it is negative, and tied otherwise. A baseline that is above or tied with the system is reported as such.
+
+| Metric | Traffic regime | Detector | Scenarios | Rule | Baseline minus system [day bootstrap] | Verdict |
+|---|---|---|---|---|---|---|
+| jamming recall, easy | all | B1 | 84 | harness | -0.08 [-0.18, +0.00] | tied |
+| jamming recall, easy | all | B1b | 84 | harness | -0.02 [-0.09, +0.04] | tied |
+| jamming recall, easy | all | B2 | 84 | harness | +0.02 [-0.02, +0.07] | tied |
+| jamming recall, easy | all | B3a | 84 | harness | +0.04 [+0.00, +0.08] | tied |
+| jamming recall, easy | all | B3b | 84 | harness | +0.01 [+0.00, +0.04] | tied |
+| jamming recall, easy | all | B3c | 84 | harness | +0.06 [+0.02, +0.11] | above |
+| jamming recall, medium | all | B1 | 84 | harness | -0.01 [-0.21, +0.16] | tied |
+| jamming recall, medium | all | B1b | 84 | harness | +0.02 [-0.17, +0.22] | tied |
+| jamming recall, medium | all | B2 | 84 | harness | +0.11 [+0.00, +0.25] | tied |
+| jamming recall, medium | all | B3a | 84 | harness | +0.15 [+0.03, +0.31] | above |
+| jamming recall, medium | all | B3b | 84 | harness | +0.05 [+0.00, +0.15] | tied |
+| jamming recall, medium | all | B3c | 84 | harness | +0.11 [+0.01, +0.24] | above |
+| jamming recall, hard | all | B1 | 84 | harness | +0.32 [+0.20, +0.47] | above |
+| jamming recall, hard | all | B1b | 84 | harness | +0.32 [+0.23, +0.41] | above |
+| jamming recall, hard | all | B2 | 84 | harness | +0.27 [+0.19, +0.35] | above |
+| jamming recall, hard | all | B3a | 84 | harness | +0.00 [-0.06, +0.07] | tied |
+| jamming recall, hard | all | B3b | 84 | harness | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, hard | all | B3c | 84 | harness | +0.02 [+0.00, +0.06] | tied |
+| jamming recall, random | all | B1 | 84 | harness | +0.19 [+0.02, +0.36] | above |
+| jamming recall, random | all | B1b | 84 | harness | +0.26 [+0.12, +0.41] | above |
+| jamming recall, random | all | B2 | 84 | harness | +0.23 [+0.11, +0.36] | above |
+| jamming recall, random | all | B3a | 84 | harness | +0.10 [+0.03, +0.18] | above |
+| jamming recall, random | all | B3b | 84 | harness | +0.01 [+0.00, +0.04] | tied |
+| jamming recall, random | all | B3c | 84 | harness | +0.05 [+0.00, +0.10] | tied |
+| jamming recall, all tiers | all | B1 | 336 | harness | +0.10 [-0.01, +0.22] | tied |
+| jamming recall, all tiers | all | B1b | 336 | harness | +0.15 [+0.04, +0.25] | above |
+| jamming recall, all tiers | all | B2 | 336 | harness | +0.16 [+0.10, +0.23] | above |
+| jamming recall, all tiers | all | B3a | 336 | harness | +0.07 [+0.01, +0.14] | above |
+| jamming recall, all tiers | all | B3b | 336 | harness | +0.02 [+0.00, +0.05] | tied |
+| jamming recall, all tiers | all | B3c | 336 | harness | +0.06 [+0.02, +0.11] | above |
+| jamming recall, easy | all | B1 | 84 | strict | -0.01 [-0.06, +0.04] | tied |
+| jamming recall, easy | all | B1b | 84 | strict | +0.02 [-0.02, +0.07] | tied |
+| jamming recall, easy | all | B2 | 84 | strict | +0.04 [-0.01, +0.09] | tied |
+| jamming recall, easy | all | B3a | 84 | strict | +0.04 [+0.00, +0.08] | tied |
+| jamming recall, easy | all | B3b | 84 | strict | +0.01 [+0.00, +0.04] | tied |
+| jamming recall, easy | all | B3c | 84 | strict | +0.06 [+0.02, +0.11] | above |
+| jamming recall, medium | all | B1 | 84 | strict | +0.10 [-0.05, +0.27] | tied |
+| jamming recall, medium | all | B1b | 84 | strict | +0.14 [+0.02, +0.30] | above |
+| jamming recall, medium | all | B2 | 84 | strict | +0.14 [+0.02, +0.30] | above |
+| jamming recall, medium | all | B3a | 84 | strict | +0.15 [+0.03, +0.31] | above |
+| jamming recall, medium | all | B3b | 84 | strict | +0.05 [+0.00, +0.15] | tied |
+| jamming recall, medium | all | B3c | 84 | strict | +0.11 [+0.01, +0.24] | above |
+| jamming recall, hard | all | B1 | 84 | strict | +0.27 [+0.19, +0.36] | above |
+| jamming recall, hard | all | B1b | 84 | strict | +0.36 [+0.28, +0.44] | above |
+| jamming recall, hard | all | B2 | 84 | strict | +0.25 [+0.18, +0.32] | above |
+| jamming recall, hard | all | B3a | 84 | strict | +0.00 [-0.06, +0.07] | tied |
+| jamming recall, hard | all | B3b | 84 | strict | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, hard | all | B3c | 84 | strict | +0.02 [+0.00, +0.06] | tied |
+| jamming recall, random | all | B1 | 84 | strict | +0.29 [+0.13, +0.46] | above |
+| jamming recall, random | all | B1b | 84 | strict | +0.31 [+0.16, +0.48] | above |
+| jamming recall, random | all | B2 | 84 | strict | +0.24 [+0.11, +0.39] | above |
+| jamming recall, random | all | B3a | 84 | strict | +0.10 [+0.03, +0.18] | above |
+| jamming recall, random | all | B3b | 84 | strict | +0.01 [+0.00, +0.04] | tied |
+| jamming recall, random | all | B3c | 84 | strict | +0.05 [+0.00, +0.10] | tied |
+| jamming recall, all tiers | all | B1 | 336 | strict | +0.16 [+0.08, +0.26] | above |
+| jamming recall, all tiers | all | B1b | 336 | strict | +0.21 [+0.13, +0.30] | above |
+| jamming recall, all tiers | all | B2 | 336 | strict | +0.17 [+0.10, +0.25] | above |
+| jamming recall, all tiers | all | B3a | 336 | strict | +0.07 [+0.01, +0.14] | above |
+| jamming recall, all tiers | all | B3b | 336 | strict | +0.02 [+0.00, +0.05] | tied |
+| jamming recall, all tiers | all | B3c | 336 | strict | +0.06 [+0.02, +0.11] | above |
+| spoofing recall, 3 or more displaced | all | B4 | 126 | harness | +0.48 [+0.37, +0.58] | above |
+| jamming recall, easy | normal | B1 | 51 | harness | -0.04 [-0.09, +0.00] | tied |
+| jamming recall, easy | normal | B1b | 51 | harness | -0.02 [-0.06, +0.00] | tied |
+| jamming recall, easy | normal | B2 | 51 | harness | -0.02 [-0.07, +0.00] | tied |
+| jamming recall, easy | normal | B3a | 51 | harness | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, easy | normal | B3b | 51 | harness | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, easy | normal | B3c | 51 | harness | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, medium | normal | B1 | 50 | harness | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, medium | normal | B1b | 50 | harness | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, medium | normal | B2 | 50 | harness | -0.02 [-0.06, +0.00] | tied |
+| jamming recall, medium | normal | B3a | 50 | harness | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, medium | normal | B3b | 50 | harness | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, medium | normal | B3c | 50 | harness | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, hard | normal | B1 | 45 | harness | +0.29 [+0.20, +0.39] | above |
+| jamming recall, hard | normal | B1b | 45 | harness | +0.36 [+0.28, +0.44] | above |
+| jamming recall, hard | normal | B2 | 45 | harness | +0.27 [+0.17, +0.36] | above |
+| jamming recall, hard | normal | B3a | 45 | harness | -0.04 [-0.10, +0.00] | tied |
+| jamming recall, hard | normal | B3b | 45 | harness | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, hard | normal | B3c | 45 | harness | +0.02 [+0.00, +0.06] | tied |
+| jamming recall, random | normal | B1 | 46 | harness | +0.24 [+0.09, +0.41] | above |
+| jamming recall, random | normal | B1b | 46 | harness | +0.26 [+0.14, +0.41] | above |
+| jamming recall, random | normal | B2 | 46 | harness | +0.22 [+0.12, +0.36] | above |
+| jamming recall, random | normal | B3a | 46 | harness | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, random | normal | B3b | 46 | harness | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, random | normal | B3c | 46 | harness | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, all tiers | normal | B1 | 192 | harness | +0.11 [+0.08, +0.15] | above |
+| jamming recall, all tiers | normal | B1b | 192 | harness | +0.14 [+0.10, +0.18] | above |
+| jamming recall, all tiers | normal | B2 | 192 | harness | +0.10 [+0.07, +0.14] | above |
+| jamming recall, all tiers | normal | B3a | 192 | harness | -0.01 [-0.03, +0.00] | tied |
+| jamming recall, all tiers | normal | B3b | 192 | harness | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, all tiers | normal | B3c | 192 | harness | +0.01 [+0.00, +0.02] | tied |
+| jamming recall, easy | normal | B1 | 51 | strict | -0.04 [-0.09, +0.00] | tied |
+| jamming recall, easy | normal | B1b | 51 | strict | -0.02 [-0.06, +0.00] | tied |
+| jamming recall, easy | normal | B2 | 51 | strict | -0.02 [-0.07, +0.00] | tied |
+| jamming recall, easy | normal | B3a | 51 | strict | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, easy | normal | B3b | 51 | strict | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, easy | normal | B3c | 51 | strict | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, medium | normal | B1 | 50 | strict | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, medium | normal | B1b | 50 | strict | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, medium | normal | B2 | 50 | strict | -0.02 [-0.06, +0.00] | tied |
+| jamming recall, medium | normal | B3a | 50 | strict | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, medium | normal | B3b | 50 | strict | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, medium | normal | B3c | 50 | strict | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, hard | normal | B1 | 45 | strict | +0.29 [+0.20, +0.39] | above |
+| jamming recall, hard | normal | B1b | 45 | strict | +0.36 [+0.28, +0.44] | above |
+| jamming recall, hard | normal | B2 | 45 | strict | +0.24 [+0.15, +0.35] | above |
+| jamming recall, hard | normal | B3a | 45 | strict | -0.04 [-0.10, +0.00] | tied |
+| jamming recall, hard | normal | B3b | 45 | strict | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, hard | normal | B3c | 45 | strict | +0.02 [+0.00, +0.06] | tied |
+| jamming recall, random | normal | B1 | 46 | strict | +0.26 [+0.14, +0.41] | above |
+| jamming recall, random | normal | B1b | 46 | strict | +0.26 [+0.14, +0.41] | above |
+| jamming recall, random | normal | B2 | 46 | strict | +0.22 [+0.12, +0.36] | above |
+| jamming recall, random | normal | B3a | 46 | strict | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, random | normal | B3b | 46 | strict | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, random | normal | B3c | 46 | strict | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, all tiers | normal | B1 | 192 | strict | +0.12 [+0.09, +0.15] | above |
+| jamming recall, all tiers | normal | B1b | 192 | strict | +0.14 [+0.10, +0.18] | above |
+| jamming recall, all tiers | normal | B2 | 192 | strict | +0.10 [+0.07, +0.13] | above |
+| jamming recall, all tiers | normal | B3a | 192 | strict | -0.01 [-0.03, +0.00] | tied |
+| jamming recall, all tiers | normal | B3b | 192 | strict | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, all tiers | normal | B3c | 192 | strict | +0.01 [+0.00, +0.02] | tied |
+| spoofing recall, 3 or more displaced | normal | B4 | 81 | harness | +0.56 [+0.43, +0.68] | above |
+| jamming recall, easy | reduced | B1 | 33 | harness | -0.15 [-0.38, +0.06] | tied |
+| jamming recall, easy | reduced | B1b | 33 | harness | -0.03 [-0.19, +0.12] | tied |
+| jamming recall, easy | reduced | B2 | 33 | harness | +0.09 [+0.03, +0.17] | above |
+| jamming recall, easy | reduced | B3a | 33 | harness | +0.09 [+0.03, +0.17] | above |
+| jamming recall, easy | reduced | B3b | 33 | harness | +0.03 [+0.00, +0.09] | tied |
+| jamming recall, easy | reduced | B3c | 33 | harness | +0.15 [+0.08, +0.21] | above |
+| jamming recall, medium | reduced | B1 | 34 | harness | -0.03 [-0.47, +0.41] | tied |
+| jamming recall, medium | reduced | B1b | 34 | harness | +0.06 [-0.47, +0.53] | tied |
+| jamming recall, medium | reduced | B2 | 34 | harness | +0.29 [+0.06, +0.53] | above |
+| jamming recall, medium | reduced | B3a | 34 | harness | +0.38 [+0.15, +0.62] | above |
+| jamming recall, medium | reduced | B3b | 34 | harness | +0.12 [+0.00, +0.35] | tied |
+| jamming recall, medium | reduced | B3c | 34 | harness | +0.26 [+0.06, +0.51] | above |
+| jamming recall, hard | reduced | B1 | 39 | harness | +0.36 [+0.12, +0.64] | above |
+| jamming recall, hard | reduced | B1b | 39 | harness | +0.28 [+0.12, +0.46] | above |
+| jamming recall, hard | reduced | B2 | 39 | harness | +0.28 [+0.16, +0.40] | above |
+| jamming recall, hard | reduced | B3a | 39 | harness | +0.05 [-0.06, +0.16] | tied |
+| jamming recall, hard | reduced | B3b | 39 | harness | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, hard | reduced | B3c | 39 | harness | +0.03 [+0.00, +0.08] | tied |
+| jamming recall, random | reduced | B1 | 38 | harness | +0.13 [-0.15, +0.45] | tied |
+| jamming recall, random | reduced | B1b | 38 | harness | +0.26 [+0.00, +0.53] | tied |
+| jamming recall, random | reduced | B2 | 38 | harness | +0.24 [+0.05, +0.49] | above |
+| jamming recall, random | reduced | B3a | 38 | harness | +0.21 [+0.10, +0.33] | above |
+| jamming recall, random | reduced | B3b | 38 | harness | +0.03 [+0.00, +0.08] | tied |
+| jamming recall, random | reduced | B3c | 38 | harness | +0.11 [+0.03, +0.20] | above |
+| jamming recall, all tiers | reduced | B1 | 144 | harness | +0.09 [-0.17, +0.36] | tied |
+| jamming recall, all tiers | reduced | B1b | 144 | harness | +0.15 [-0.08, +0.40] | tied |
+| jamming recall, all tiers | reduced | B2 | 144 | harness | +0.23 [+0.10, +0.36] | above |
+| jamming recall, all tiers | reduced | B3a | 144 | harness | +0.18 [+0.10, +0.27] | above |
+| jamming recall, all tiers | reduced | B3b | 144 | harness | +0.04 [+0.00, +0.12] | tied |
+| jamming recall, all tiers | reduced | B3c | 144 | harness | +0.13 [+0.06, +0.22] | above |
+| jamming recall, easy | reduced | B1 | 33 | strict | +0.03 [-0.06, +0.13] | tied |
+| jamming recall, easy | reduced | B1b | 33 | strict | +0.09 [+0.03, +0.17] | above |
+| jamming recall, easy | reduced | B2 | 33 | strict | +0.12 [+0.05, +0.20] | above |
+| jamming recall, easy | reduced | B3a | 33 | strict | +0.09 [+0.03, +0.17] | above |
+| jamming recall, easy | reduced | B3b | 33 | strict | +0.03 [+0.00, +0.09] | tied |
+| jamming recall, easy | reduced | B3c | 33 | strict | +0.15 [+0.08, +0.21] | above |
+| jamming recall, medium | reduced | B1 | 34 | strict | +0.24 [-0.09, +0.59] | tied |
+| jamming recall, medium | reduced | B1b | 34 | strict | +0.35 [+0.09, +0.62] | above |
+| jamming recall, medium | reduced | B2 | 34 | strict | +0.38 [+0.15, +0.62] | above |
+| jamming recall, medium | reduced | B3a | 34 | strict | +0.38 [+0.15, +0.62] | above |
+| jamming recall, medium | reduced | B3b | 34 | strict | +0.12 [+0.00, +0.35] | tied |
+| jamming recall, medium | reduced | B3c | 34 | strict | +0.26 [+0.06, +0.51] | above |
+| jamming recall, hard | reduced | B1 | 39 | strict | +0.26 [+0.12, +0.39] | above |
+| jamming recall, hard | reduced | B1b | 39 | strict | +0.36 [+0.21, +0.51] | above |
+| jamming recall, hard | reduced | B2 | 39 | strict | +0.26 [+0.15, +0.34] | above |
+| jamming recall, hard | reduced | B3a | 39 | strict | +0.05 [-0.06, +0.16] | tied |
+| jamming recall, hard | reduced | B3b | 39 | strict | +0.00 [+0.00, +0.00] | tied |
+| jamming recall, hard | reduced | B3c | 39 | strict | +0.03 [+0.00, +0.08] | tied |
+| jamming recall, random | reduced | B1 | 38 | strict | +0.32 [+0.03, +0.63] | above |
+| jamming recall, random | reduced | B1b | 38 | strict | +0.37 [+0.08, +0.66] | above |
+| jamming recall, random | reduced | B2 | 38 | strict | +0.26 [+0.05, +0.56] | above |
+| jamming recall, random | reduced | B3a | 38 | strict | +0.21 [+0.10, +0.33] | above |
+| jamming recall, random | reduced | B3b | 38 | strict | +0.03 [+0.00, +0.08] | tied |
+| jamming recall, random | reduced | B3c | 38 | strict | +0.11 [+0.03, +0.20] | above |
+| jamming recall, all tiers | reduced | B1 | 144 | strict | +0.22 [+0.03, +0.41] | above |
+| jamming recall, all tiers | reduced | B1b | 144 | strict | +0.30 [+0.12, +0.47] | above |
+| jamming recall, all tiers | reduced | B2 | 144 | strict | +0.26 [+0.12, +0.40] | above |
+| jamming recall, all tiers | reduced | B3a | 144 | strict | +0.18 [+0.10, +0.27] | above |
+| jamming recall, all tiers | reduced | B3b | 144 | strict | +0.04 [+0.00, +0.12] | tied |
+| jamming recall, all tiers | reduced | B3c | 144 | strict | +0.13 [+0.06, +0.22] | above |
+| spoofing recall, 3 or more displaced | reduced | B4 | 45 | harness | +0.33 [+0.23, +0.44] | above |
+
+### 14. Summary of where baselines are above, tied with or below the system: Held out days: post hoc, not preregistered, baselines fixed before run (fcb7d31233)
+
+B1, jamming recall by tier, harness rule: above the system in 3 of 8 tier and regime cells (hard on normal days (+0.29); random on normal days (+0.24); hard on reduced days (+0.36)), tied in 5, below in 0.
+
+B1, jamming recall by tier, strict rule: above the system in 4 of 8 tier and regime cells (hard on normal days (+0.29); random on normal days (+0.26); hard on reduced days (+0.26); random on reduced days (+0.32)), tied in 4, below in 0.
+
+B1b, jamming recall by tier, harness rule: above the system in 3 of 8 tier and regime cells (hard on normal days (+0.36); random on normal days (+0.26); hard on reduced days (+0.28)), tied in 5, below in 0.
+
+B1b, jamming recall by tier, strict rule: above the system in 6 of 8 tier and regime cells (hard on normal days (+0.36); random on normal days (+0.26); easy on reduced days (+0.09); medium on reduced days (+0.35); hard on reduced days (+0.36); random on reduced days (+0.37)), tied in 2, below in 0.
+
+B2, jamming recall by tier, harness rule: above the system in 6 of 8 tier and regime cells (hard on normal days (+0.27); random on normal days (+0.22); easy on reduced days (+0.09); medium on reduced days (+0.29); hard on reduced days (+0.28); random on reduced days (+0.24)), tied in 2, below in 0.
+
+B2, jamming recall by tier, strict rule: above the system in 6 of 8 tier and regime cells (hard on normal days (+0.24); random on normal days (+0.22); easy on reduced days (+0.12); medium on reduced days (+0.38); hard on reduced days (+0.26); random on reduced days (+0.26)), tied in 2, below in 0.
+
+B3a, jamming recall by tier, harness rule: above the system in 3 of 8 tier and regime cells (easy on reduced days (+0.09); medium on reduced days (+0.38); random on reduced days (+0.21)), tied in 5, below in 0.
+
+B3a, jamming recall by tier, strict rule: above the system in 3 of 8 tier and regime cells (easy on reduced days (+0.09); medium on reduced days (+0.38); random on reduced days (+0.21)), tied in 5, below in 0.
+
+B3b, jamming recall by tier, harness rule: above the system in 0 of 8 tier and regime cells, tied in 8, below in 0.
+
+B3b, jamming recall by tier, strict rule: above the system in 0 of 8 tier and regime cells, tied in 8, below in 0.
+
+B3c, jamming recall by tier, harness rule: above the system in 3 of 8 tier and regime cells (easy on reduced days (+0.15); medium on reduced days (+0.26); random on reduced days (+0.11)), tied in 5, below in 0.
+
+B3c, jamming recall by tier, strict rule: above the system in 3 of 8 tier and regime cells (easy on reduced days (+0.15); medium on reduced days (+0.26); random on reduced days (+0.11)), tied in 5, below in 0.
+
+B4, spoofing recall, harness rule: above the system in 2 of 2 tier and regime cells (spoofing on normal days (+0.56); spoofing on reduced days (+0.33)), tied in 0, below in 0.
+
+OBSERVED, normal days: B1 flagged 62.2 cell buckets per day against 0.0 for the system; the share of the system's own flags that it also flagged was n/a.
+
+OBSERVED, normal days: B1b flagged 7.8 cell buckets per day against 0.0 for the system; the share of the system's own flags that it also flagged was n/a.
+
+OBSERVED, normal days: B2 flagged 57.8 cell buckets per day against 0.0 for the system; the share of the system's own flags that it also flagged was n/a.
+
+OBSERVED, normal days: B3a flagged 0.0 cell buckets per day against 0.0 for the system; the share of the system's own flags that it also flagged was n/a.
+
+OBSERVED, normal days: B3b flagged 0.0 cell buckets per day against 0.0 for the system; the share of the system's own flags that it also flagged was n/a.
+
+OBSERVED, normal days: B3c flagged 0.0 cell buckets per day against 0.0 for the system; the share of the system's own flags that it also flagged was n/a.
+
+OBSERVED, reduced days: B1 flagged 135.5 cell buckets per day against 0.5 for the system; the share of the system's own flags that it also flagged was 1.00.
+
+OBSERVED, reduced days: B1b flagged 83.0 cell buckets per day against 0.5 for the system; the share of the system's own flags that it also flagged was 1.00.
+
+OBSERVED, reduced days: B2 flagged 47.3 cell buckets per day against 0.5 for the system; the share of the system's own flags that it also flagged was 0.67.
+
+OBSERVED, reduced days: B3a flagged 30.5 cell buckets per day against 0.5 for the system; the share of the system's own flags that it also flagged was 0.67.
+
+OBSERVED, reduced days: B3b flagged 0.7 cell buckets per day against 0.5 for the system; the share of the system's own flags that it also flagged was 1.00.
+
+OBSERVED, reduced days: B3c flagged 4.0 cell buckets per day against 0.5 for the system; the share of the system's own flags that it also flagged was 1.00.
+
+OBSERVED, normal days: B4 gave 32.0 events per day against 0.0 for the system.
+
+OBSERVED, reduced days: B4 gave 208.7 events per day against 1.2 for the system.
 
 ### Limits
 
