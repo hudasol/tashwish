@@ -11,13 +11,13 @@ lawyer or by adsb.lol. Rules used in this file:
 
 ## 1. Summary table
 
-| Artifact | Licence we apply | Attribution text | Share-alike applies? | Confidence |
+| Artifact | Licence applied | Attribution text | Share alike applies? | Confidence |
 |---|---|---|---|---|
-| Source: adsb.lol globe_history archives | ODbL 1.0 (README, `LICENSE-ODbL.txt`, docs page "License: ODbL 1.0"). CC0 also asserted elsewhere, see 2.1 | Not mandated by adsb.lol in any retrieved page; ODbL 4.3 and 4.2 supply the duty once we publish | n/a | Medium |
+| Source: adsb.lol globe_history archives | ODbL 1.0 (README, `LICENSE-ODbL.txt`, docs page "License: ODbL 1.0"). CC0 also asserted elsewhere, see 2.1 | Not mandated by adsb.lol in any retrieved page; ODbL 4.3 and 4.2 supply the duty once the dataset is published | n/a | Medium |
 | Released derived dataset (per H3 cell, per 3 hour bucket counts, plus event table) | ODbL 1.0, release as a Derivative Database to be safe | Include notice in 4.1 below, ship a copy of the ODbL, keep upstream notices (ODbL 4.2.a to 4.2.c) | Probably yes. Conservative position: yes, because Substantial extraction into a new database is a Derivative Database (ODbL 4.4.b). Arguable that tiny aggregates are not, see 2.3 | Medium on "treat as ODbL", low on "must" |
 | Public web dashboard (maps and charts) | Not a database release. A Produced Work. Dashboard code stays Apache-2.0 | Notice next to the work (ODbL 4.3), wording in 3.3 | No for the dashboard itself (ODbL 4.5.b). But ODbL 4.6 applies if the dashboard is a Produced Work from a Derivative Database: offer the dataset | Medium |
 | Tashwish code | Apache-2.0 (`LICENSE`) | Standard Apache-2.0 notices | No. ODbL scope excludes computer programs (2.0, tool excerpt) | Medium |
-| Python dependencies | Individual licences, see section 5 | None needed unless we bundle or redistribute them | No | High for the metadata read, medium for transitive bundled parts |
+| Python dependencies | Individual licences, see section 5 | None needed unless the project bundles or redistributes them | No | High for the metadata read, medium for transitive bundled parts |
 
 ## 2. Derived dataset analysis
 
@@ -43,15 +43,15 @@ Retrieved statements:
 
 Inconsistency: statements 1 to 3 say ODbL, statements 4 and 5 say CC0, and the repositories ship both licence files.
 
-Our reading (UNVERIFIED, not stated by adsb.lol in any retrieved page): CC0 governs what individual feeders and partner
+Reading adopted here (UNVERIFIED, not stated by adsb.lol in any retrieved page): CC0 governs what individual feeders and partner
 aggregators contribute to adsb.lol (statements 4 and 5), while the compiled archive is published as a database under the
 ODbL (statements 1 to 3). Under that reading both are true at once: the ODbL covers the collection, and CC0 means no
 contributor can add terms to individual records (compare ODbL 2.4, tool excerpt: "this License does not cover any rights
 (other than Database Rights or in contract) in individual Contents").
 
-Which we follow: the ODbL, because the README and the data docs page name it for the archive itself, and it is the stricter
+The ODbL is followed, because the README and the data docs page name it for the archive itself, and it is the stricter
 of the two. If the ODbL turned out not to apply, releasing under ODbL anyway loses nothing for readers. If CC0 were the only
-licence, our attribution would still be good practice. Cost of being wrong in this direction is small.
+licence, the attribution would still be good practice. Cost of being wrong in this direction is small.
 
 ### 2.1a Resolved from primary text (revision)
 
@@ -85,7 +85,7 @@ attribution instruction and does not mention CC0. The partner terms are still un
   arrangement, modification".
 - 1.0 Collective Database: "Means this Database in unmodified form as part of a collection of independent databases in
   themselves".
-- 1.0 Substantial: "Means substantial in terms of quantity or quality or a combination of both." The excerpt we retrieved
+- 1.0 Substantial: "Means substantial in terms of quantity or quality or a combination of both." The excerpt retrieved
   also described repeated, systematic extraction of insubstantial parts as potentially amounting to a Substantial
   extraction (paraphrase from the tool, wording not captured verbatim; verify in the full text, UNVERIFIED as a quote).
 - 1.0 Extraction: "the permanent or temporary transfer of all or a Substantial part of the Contents to another medium".
@@ -122,31 +122,31 @@ attribution instruction and does not mention CC0. The partner terms are still un
 - 4.8 "Licensing of others.": recipients get a licence on the same terms (tool summary, not quoted).
 - 2.4: "this License does not cover any rights (other than Database Rights or in contract) in individual Contents".
 
-### 2.3 Is our dataset a Derivative Database?
+### 2.3 Is the dataset a Derivative Database?
 
 Facts: input is the Gulf subset of daily archives. Output is a table of counts per H3 cell per 3 hour bucket of aircraft
 with degraded accuracy fields, plus an event table. No raw traces, no per point positions, no identifiers retained.
 
-Arguments that it is a Derivative Database ("treat as share-alike"):
+Arguments that it is a Derivative Database ("treat as share alike"):
 
 - It is "a database based upon the Database" (1.0) and "arrangement, modification" is in the definition.
 - ODbL 4.4.b treats Extraction or Re-utilisation of a Substantial part of the Contents into a new database as creating a
-  Derivative Database. We read every record in the box across every day processed, which is systematic and may be
+  Derivative Database. The pipeline reads every record in the box across every day processed, which is systematic and may be
   Substantial in quantity even if the output is small.
-- Neither the ODbL excerpts we retrieved nor any adsb.lol page says aggregation or statistics are exempt.
+- Neither the ODbL excerpts retrieved nor any adsb.lol page says aggregation or statistics are exempt.
 
 Arguments that it is not (weaker, UNVERIFIED as to any authority):
 
 - The output contains no Contents (no records), only derived statistics, so there is arguably no Extraction or
   Re-utilisation of the Contents into the new database.
-- Database right is a sui generis right in some jurisdictions only (EU style). Whether it applies to adsb.lol or to us in the
+- Database right is a sui generis right in some jurisdictions only (EU style). Whether it applies to adsb.lol or to this project in the
   UAE was not researched, UNVERIFIED. The ODbL is also a contract (the ODbL preamble says so, tool excerpt), which may bind
   regardless.
 
 Decision: release under ODbL 1.0. Reason: lowest risk, costs nothing, matches the existing DATA_SOURCES.md decision, and
 the ODbL is generous (commercial use allowed per 3.1, tool excerpt).
 
-What follows if we treat it as a Derivative Database and publish it ("Publicly Use"):
+What follows if it is treated as a Derivative Database and publish it ("Publicly Use"):
 
 1. Licence it under ODbL 1.0 (4.4.a), include a copy or URI of the licence and keep upstream notices (4.2.b, 4.2.c).
 2. Provide a machine readable copy, free of charge over the internet, of the entire dataset or the alterations plus the method
@@ -155,10 +155,10 @@ What follows if we treat it as a Derivative Database and publish it ("Publicly U
    redistribution. DATA_SOURCES.md lists the rejected sources.
 4. No technical or contractual restriction that undercuts the licence (4.7.a). Do not put the dataset behind terms that forbid
    redistribution or commercial use.
-5. Our own added work (event definitions, the confidence scores) is inside the Derivative Database and so ships under the
+5. The project's own added work (event definitions, the confidence scores) is inside the Derivative Database and so ships under the
    same ODbL. The code that produces it remains Apache-2.0.
 
-What does not need share-alike: internal use not made public (4.5.c); the dashboard image or chart as such (4.5.b).
+What does not need share alike: internal use not made public (4.5.c); the dashboard image or chart as such (4.5.b).
 
 Cautions: (i) never redistribute raw archive files or raw trace excerpts except under the same ODbL terms with notices;
 (ii) do not release a sample of raw rows "for illustration" without treating it as a Database extract; (iii) the dataset should
@@ -169,7 +169,7 @@ state the build date and the source release tags so readers can reproduce it.
 ### 3.1 Classification
 
 A map tile image, chart, or rendered table "resulting from using ... Contents (via a search or other query)" fits the Produced
-Work definition (1.0) when produced from the archive or from our derived dataset. If the dashboard also lets visitors download
+Work definition (1.0) when produced from the archive or from the derived dataset. If the dashboard also lets visitors download
 the underlying numbers, that download is a database extract and falls under 2.3, not 3.
 
 ### 3.2 Obligations
@@ -178,7 +178,7 @@ the underlying numbers, that download is a database extract and falls under 2.3,
   quoted in 2.1a: the notice must be "reasonably calculated" to make anyone viewing or interacting with the work aware that
   Content came from the Database and is available under the ODbL. The example notice (4.3.a) is the model and is
   stated to "satisfy notice under Section 4.3".
-- No share-alike on the Produced Work: 4.5.b.
+- No share alike on the Produced Work: 4.5.b.
 - 4.6 still applies because the dashboard is "a Produced Work from a Derivative Database" if the dataset is a Derivative
   Database. Therefore link to the dataset download on the dashboard.
 - OSM caveat: if the base map uses OpenStreetMap tiles or data, that is a separate attribution duty (3.4 below). It is
@@ -201,7 +201,7 @@ Second line for the derived dataset:
 
 The README, DATA_SOURCES.md, NOTICE and the draft data card now carry exactly the primary notice, and the string lives in
 `src/tashwish/attribution.py` with a test (`tests/test_attribution.py`) that fails if any of them drifts. The dashboard (M7)
-must import it. The README link `opendatacommons.org/licenses/odbl/1.0/` is adsb.lol's own form; we use `.../1-0/`, which was
+must import it. The README link `opendatacommons.org/licenses/odbl/1.0/` is adsb.lol's own form; this project uses `.../1-0/`, which was
 retrieved for this analysis. Whether both resolve to the same page was not checked.
 
 ### 3.4 OSMF guidance (interpretive reference only, OSM specific)
@@ -218,7 +218,7 @@ interpretation. Used here only as a reference for how a body that wrote the ODbL
   Publicly"; and for OSM specifically "Attribution must be to "OpenStreetMap"." plus "Attribution must also make it clear
   that the data is available under the Open Database License."
 
-Takeaways we borrow as good practice, not as obligations to adsb.lol: put credit next to the work, make it legible, name the
+Takeaways borrowed as good practice, not as obligations to adsb.lol: put credit next to the work, make it legible, name the
 source and the licence.
 
 ## 4. Recommended attribution strings
@@ -236,8 +236,8 @@ No em dashes or emojis in any string.
 
 ## 5. Dependency licences
 
-Read with `importlib.metadata` inside `/home/claude/tashwish/.venv` (Python 3.13) on 2026-10-12. "Field" shows which metadata
-carried the answer. All requested packages were installed. We distribute none of them, so no licence notice duty arises unless
+Read with `importlib.metadata` inside the project virtual environment (Python 3.13) on 2026-10-12. "Field" shows which metadata
+carried the answer. All requested packages were installed. The project distributes none of them, so no licence notice duty arises unless
 a release bundles them (for example a container image or wheel bundle, in which case ship their licence files).
 
 | Package | Installed | Licence | Source field | Role |
@@ -257,18 +257,18 @@ a release bundles them (for example a container image or wheel bundle, in which 
 | hypothesis | 6.168.5 | MPL-2.0 | License-Expression | dev |
 | ruff | 0.17.0 | MIT | License-Expression | dev |
 
-Notes: MPL-2.0 (hypothesis) is file level copyleft and only matters if we modify and redistribute hypothesis files; we use it
+Notes: MPL-2.0 (hypothesis) is file level copyleft and only matters if the project modifies and redistributes hypothesis files; it is used
 as a dev tool only. Dependencies are separate from the ODbL data licence, which excludes computer programs (2.0, tool
 excerpt). Transitive dependencies were not enumerated.
 
 ## 6. Still uncertain
 
-1. Whether aggregated counts are a "Derivative Database" or only a statistical output. We treat them as one, conservatively.
+1. Whether aggregated counts are a "Derivative Database" or only a statistical output. They are treated as one, conservatively.
 2. What "Substantial" means for adsb.lol's archive. No adsb.lol guidance retrieved. The OSMF guideline gives no numeric
    threshold and is OSM specific.
 3. Whether the CC0 statements (partners page, privacy page) mean the archive itself is CC0 in whole or in part, or only that
-   contributors waive rights in what they send. adsb.lol does not reconcile this on any page we retrieved.
-4. Whether adsb.lol wants any particular attribution form. No page we retrieved gives one.
+   contributors waive rights in what they send. adsb.lol does not reconcile this on any page retrieved.
+4. Whether adsb.lol wants any particular attribution form. No page retrieved gives one.
 5. Whether database right or copyright subsists in adsb.lol's compilation in the jurisdictions that matter (UAE, UK, EU). Not
    researched, UNVERIFIED.
 6. RESOLVED in revision: the full wording of 4.3, "Publicly", "Convey", "Substantial" and 4.4.a was retrieved (2.1a).
@@ -341,8 +341,8 @@ Body:
 | adsb.lol historical data docs | https://www.adsb.lol/docs/open-data/historical/ | Retrieved ("License: ODbL 1.0") |
 | OSMF Licence/Community Guidelines | https://osmfoundation.org/wiki/Licence/Community_Guidelines | Retrieved (OSM specific) |
 | OSMF Licence/Attribution Guidelines | https://osmfoundation.org/wiki/Licence/Attribution_Guidelines | Retrieved (OSM specific) |
-| Python package metadata | `/home/claude/tashwish/.venv`, `importlib.metadata` | Read locally |
-| Repository docs | `/home/claude/tashwish/docs/DATA_SOURCES.md`, `README.md` | Read locally for existing decisions |
+| Python package metadata | project virtual environment, `importlib.metadata` | Read locally |
+| Repository docs | `docs/DATA_SOURCES.md`, `README.md` | Read locally for existing decisions |
 
 A web search for the adsb.lol licence returned only generic results (globe_history 2024 and 2025 repositories, OSM wiki
 licence pages); none were used beyond the pages above.
