@@ -5,12 +5,12 @@ repository, a `data` branch for storage, the default `GITHUB_TOKEN`, no other se
 
 Rules used in this file:
 
-- "Measured here" means measured by this project in its own build environment (2 cores). **GitHub runners were NOT tested
-  by us.** Nothing below about runner speed, runner disk or download speed on GitHub is measured.
+- "Measured here" means measured by this project in its own build environment (2 cores). **GitHub runners were not tested.**
+  Nothing below about runner speed, runner disk or download speed on GitHub is measured.
 - No documentation page could be retrieved when this file was first written (2026-10-12). On 2026-10-16 the official pages
   listed in section 9 were retrieved; every limit marked "retrieved 2026-10-16" below is the figure stated on that page on that
   date, with its URL in section 9. Providers change these figures; check the page again before depending on one.
-- Anything we could not determine is marked UNVERIFIED.
+- Anything that could not be determined is marked UNVERIFIED.
 
 ## 1. Pieces
 
@@ -59,7 +59,7 @@ python -m tashwish.operate.incremental --state state --processed processed --spo
 python -m tashwish.release.build --processed processed --web web/data --release release
 ```
 
-What the workflow additionally requires from the parent implementation (it calls the first CLI with `--max-days 1` in a loop):
+What the workflow additionally requires from the incremental CLI (it calls the first CLI with `--max-days 1` in a loop):
 
 1. `--max-days 1` works, and with no `--start-day` the CLI resumes from the first missing day after the days already in
    `processed/`. `--start-day D` means "begin the search at D".
@@ -81,7 +81,7 @@ What the workflow additionally requires from the parent implementation (it calls
    `--append-status` (used for slots after the first in one workflow run) keeps `days_added` and does not let a later `noop`
    overwrite an earlier `ok`.
 6. `release.build` is idempotent, reads only `--processed`, and writes `generated_at` (UTC) and `latest_day` into
-   `web/data/manifest.json` as in `docs/WEB_DATA_CONTRACT.md`. `dataset_version` is `observed-<latest_day>-<8 hex>`, where the hex
+   `web/data/manifest.json` as in [WEB_DATA_CONTRACT.md](WEB_DATA_CONTRACT.md). `dataset_version` is `observed-<latest_day>-<8 hex>`, where the hex
    is a content hash of the published cell buckets and events, so a backfill or correction changes it. Event times are rounded
    to the 3 hour bucket (start floored, end ceiled) and destination coordinates are omitted when fewer than 5 aircraft support them.
 
@@ -102,15 +102,15 @@ What the workflow additionally requires from the parent implementation (it calls
 
 `last_run_status` is `ok`, `noop` or `failed`. `generated_at` and `latest_day` only move forward on success. A failed run
 changes only `last_run_status`, `fallback_active`, `last_run_at` and `last_error`, so the previous good values (and therefore
-the dashboard age) stay honest.
+the dashboard age) stay accurate.
 
 ## 4. Free tier arithmetic
 
 Measured here (this project's environment, 2 cores, not GitHub runners):
 
-- Archive size per day: about 2.3 GiB (Jan 2026) to about 4.0 GiB (Oct 2026), prod release (docs/DATA_SOURCES.md section 1).
-- Parse: about 6 to 9 minutes per day on 2 cores, plus download time (docs/DATA_SOURCES.md section 7 says about 6 minutes
-  including download for the study window; the parent's later figure is 6 to 9 minutes of parsing).
+- Archive size per day: about 2.3 GiB (Jan 2026) to about 4.0 GiB (Oct 2026), prod release ([DATA_SOURCES.md](DATA_SOURCES.md) section 1).
+- Parse: about 6 to 9 minutes per day on 2 cores, plus download time ([DATA_SOURCES.md](DATA_SOURCES.md) section 7 gives about 6 minutes
+  including download for the study window; the later figure is 6 to 9 minutes of parsing).
 - Download is by 64 MiB byte ranges with resume (`src/tashwish/ingest/source.py`), so a cut connection loses at most one range.
 
 Retrieved 2026-10-16 from the GitHub documentation (URLs in section 9):
@@ -147,7 +147,7 @@ Arithmetic, with the stated assumptions (illustrative, not measured on GitHub):
    the first missing day. Three runs a week of 3 days each would also cover 7 days, but delays freshness by up to 2 days; it is not
    recommended. Whether daily downloads of about 4 GiB are polite use of adsb.lol's GitHub releases is
    UNVERIFIED: the adsb.lol historical data page (retrieved 2026-10-16) states no rate limit or fair use rule for `globe_history`
-   downloads. The owner should decide, and ideally ask the maintainers (docs/LICENSING.md section 6 lists the questions).
+   downloads. The owner should decide, and ideally ask the maintainers ([LICENSING.md](LICENSING.md) section 6 lists the questions).
    Backfill limit: each dispatch processes at most `max_days` days (cap 3) and `start_day` applies to the first slot only, so
    backfill is bounded by one to three days per dispatch and each dispatch is a separate run. Backfilling N days needs about N
    divided by `max_days` dispatches, and a `start_day` that leaves a gap after the last processed day is refused. Days inside the
@@ -164,7 +164,7 @@ Arithmetic, with the stated assumptions (illustrative, not measured on GitHub):
    100 MiB, and recommends repositories ideally below 1 GB and strongly below 5 GB (retrieved 2026-10-16). The size of one
    day's parquet and of the released dataset growth over many days has not been measured. If it grows too large,
    attach the versioned dataset to a GitHub Release instead of committing it (still free) and keep only `web/data` on the branch.
-6. **Hosting the dashboard.** The dashboard is static (`web/`). Options and what we know:
+6. **Hosting the dashboard.** The dashboard is static (`web/`). Options and what is known:
    - GitHub Pages (retrieved 2026-10-16): published sites at most 1 GB, source repositories recommended at most 1 GB, a soft
      bandwidth limit of 100 GB a month, a soft limit of 10 builds an hour (not applied to custom Actions workflows), a 10 minute
      deployment timeout, and Pages is not to be used as free hosting for an online business.
@@ -175,7 +175,7 @@ Arithmetic, with the stated assumptions (illustrative, not measured on GitHub):
      workspace gets 750 free instance hours a calendar month. Free services count against the workspace's included outbound
      bandwidth, whose size the page does not state (UNVERIFIED). The static JSON dashboard does not need the API.
    - A static site needs no API process at all, which is the free tier recommendation.
-7. **Publication lag of the archive was not characterised.** We do not know how long after a UTC day ends adsb.lol publishes its
+7. **Publication lag of the archive was not characterised.** It is not known how long after a UTC day ends adsb.lol publishes its
    release. Nothing in `src/tashwish/ingest/source.py`, its tests or the docs measures it (UNVERIFIED). Until measured, a run
    that finds the next day missing exits as "nothing to do", and the dashboard shows the true age. The first scheduled runs
    should log the day, the release creation time and the age at discovery; this is an open item.
@@ -232,7 +232,7 @@ for a deliberate, documented exception.
 If the source is unreachable (timeouts, 5xx, 403): do not retry in a tight loop. The CLI retries per range with a backoff
 (`src/tashwish/ingest/source.py`); after that the run fails and waits for the next trigger. Check
 `https://github.com/adsblol/globe_history_2026/releases` by hand. Do not add mirrors or proxies; if the archive is gone, the
-documented fallback is OpenSky (docs/DATA_SOURCES.md section 2), which needs an approved research account and is a separate
+documented fallback is OpenSky ([DATA_SOURCES.md](DATA_SOURCES.md) section 2), which needs an approved research account and is a separate
 piece of work.
 
 If the release naming changes: the URL pattern is the single `_URL` in `src/tashwish/ingest/source.py`
@@ -242,18 +242,18 @@ result with an already ingested day before trusting it (row counts per cell).
 
 User agent: `HttpxFetcher` previously sent httpx's default agent. It now sends
 `tashwish/0.1 (+https://github.com/hudasol/tashwish; research, sequential ranged downloads)` (`USER_AGENT` in
-`src/tashwish/ingest/source.py`), so the maintainers can identify and contact us.
+`src/tashwish/ingest/source.py`), so the maintainers can identify and contact the project.
 
 ## 7. Baseline refit policy
 
 The baseline in `state/` is frozen: scoring a new day never changes it, which keeps the dataset comparable over time and the
-held out evaluation honest. Refit manually, on a branch of `main`, when either:
+held out evaluation valid. Refit manually, on a branch of `main`, when either:
 
 - every N weeks (suggested N = 12, a project choice, not derived), or
 - after a coverage step change: the receiver network visibly changed (a drop or jump in `coverage.json` presence, a new feeder
   region, or many `coverage_lost` cells). Look at the coverage layer on the dashboard first.
 
-Commands (the refit CLI is not part of this contract; the parent should provide one, here called `tashwish.operate.refit`):
+Commands (the refit CLI is not part of this contract; it is called `tashwish.operate.refit` here):
 
 ```
 python -m tashwish.operate.refit --processed ../tashwish-data/processed --state state --window-days 21 --write
@@ -269,7 +269,7 @@ card. Do not refit from the scheduled workflow.
 timeout and cancellation of superseded runs. When this file was first written, `ruff check .` and `ruff format --check .`
 reported errors; on 2026-10-16 both pass, and the CI runs of the pull requests opened that day passed on Python 3.11 and 3.13.
 
-Badge snippets to paste into the README when the owner wants them (replace nothing; the owner and repo are `hudasol/tashwish`):
+Badge snippets (owner and repository are `hudasol/tashwish`; the README uses the first):
 
 ```
 [![CI](https://github.com/hudasol/tashwish/actions/workflows/ci.yml/badge.svg)](https://github.com/hudasol/tashwish/actions/workflows/ci.yml)
@@ -294,7 +294,7 @@ not read in that session and anything that depends on it stays UNVERIFIED.
 | Vercel Hobby non commercial restriction | https://vercel.com/docs/plans/hobby | retrieved 2026-10-16 |
 | Render free web service sleep, spin up and monthly hours | https://render.com/docs/free | retrieved 2026-10-16 |
 | adsb.lol fair use or rate guidance for the archive | https://www.adsb.lol/docs/open-data/historical/ | retrieved 2026-10-16; states no rule, so fair use stays UNVERIFIED (ask the maintainers) |
-| Archive publication lag after a UTC day ends | not documented anywhere we read | UNVERIFIED; measure it from release creation times |
+| Archive publication lag after a UTC day ends | not documented in any page read | UNVERIFIED; measure it from release creation times |
 
 ### Additional UNVERIFIED items on this free tier (kept unverified)
 
