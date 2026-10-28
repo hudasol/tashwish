@@ -1,7 +1,6 @@
 # Glossary
 
-Plain definitions of the terms used in this repository. Research and monitoring tool. Not for navigation or safety of life.
-No attribution of interference to any state or actor.
+Plain definitions of the terms used in this repository.
 
 ## Signals and data
 
@@ -71,7 +70,7 @@ report degraded accuracy. It is computed per day for the regime labels.
 
 **False coverage.** A cell that the coverage model calls covered but that had too few aircraft on the scored day.
 
-**Regime.** A mechanical label of a day, traffic normal or reduced, degraded baseline or elevated (see METHODOLOGY.md, section
+**Regime.** A mechanical label of a day, traffic normal or reduced, degraded baseline or elevated (see [METHODOLOGY.md](METHODOLOGY.md), section
 Regimes). It describes the data, not a cause.
 
 **Held out day, development day.** A development day was used to design the system and fit baselines. A held out day was fixed
