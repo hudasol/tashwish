@@ -33,6 +33,9 @@ from .source import CHUNK_BYTES, Fetcher, HttpxFetcher, choose_release, download
 from .trace import COLUMNS, parse_gz
 
 FLUSH_ROWS = 250_000
+# A compressed trace member above this size is skipped and counted, not parsed. The largest member of an ordinary
+# day is under 1 MiB; one member of 2026-03-25 was 21 MiB and exhausted 8 GB of memory in a pool worker, which hung the pool.
+MAX_MEMBER_BYTES = 8 * 2**20
 PARSE_VERSION = "1"  # bump when parsing semantics change; part of the idempotency key
 
 
@@ -153,7 +156,17 @@ class _Accumulator:
 def parse_archive(paths: list[Path], day: str, cfg: IngestConfig) -> tuple[pa.Table, Counter]:
     d0, d1 = day_bounds_ms(day)
     acc = _Accumulator()
-    jobs = ((raw, d0, d1, cfg.region, cfg.max_age_s, cfg.data_class) for _, raw in iter_trace_members(paths))
+    skipped: Counter = Counter()
+
+    def _members():
+        for name, raw in iter_trace_members(paths):
+            if len(raw) > MAX_MEMBER_BYTES:
+                skipped["skipped_oversize"] += 1
+                skipped["skipped_oversize_bytes"] += len(raw)
+                continue
+            yield name, raw
+
+    jobs = ((raw, d0, d1, cfg.region, cfg.max_age_s, cfg.data_class) for _, raw in _members())
     n_files = 0
     if cfg.workers > 1:
         with multiprocessing.get_context("spawn").Pool(cfg.workers) as pool:
@@ -164,6 +177,7 @@ def parse_archive(paths: list[Path], day: str, cfg: IngestConfig) -> tuple[pa.Ta
         for job in jobs:
             n_files += 1
             acc.add(*_parse_member(job))
+    acc.stats.update(skipped)
     acc.stats["trace_files"] = n_files
     return acc.result(), acc.stats
 
