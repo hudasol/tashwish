@@ -78,5 +78,5 @@ Every number below is computed by this script from the ingested development days
 
 _Run `python -m tashwish.metrics.feasibility` to generate._
 
-`share_ge_5` is the share of cell-buckets with at least 5 eligible aircraft (en-route, at least 2 quality samples each). It decides how much of the map can be tested at all.
+`share_ge_5` is the share of cell buckets with at least 5 eligible aircraft (en route, at least 2 quality samples each). It decides how much of the map can be tested at all.
 

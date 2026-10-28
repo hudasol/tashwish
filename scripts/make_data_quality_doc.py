@@ -109,7 +109,7 @@ if feas.exists():
 else:
     L.append("_Run `python -m tashwish.metrics.feasibility` to generate._")
 L.append(
-    "\n`share_ge_5` is the share of cell-buckets with at least 5 eligible aircraft (en-route, at least 2 quality samples each). It decides how much of the map can be tested at all.\n"
+    "\n`share_ge_5` is the share of cell buckets with at least 5 eligible aircraft (en route, at least 2 quality samples each). It decides how much of the map can be tested at all.\n"
 )
 out.write_text("\n".join(L) + "\n", encoding="utf-8", newline="\n")
 print("wrote", out)
