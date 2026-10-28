@@ -1,8 +1,7 @@
-# Next steps
+# Roadmap
 
-An honest list of what is unfinished, ordered roughly by how much it matters. Items marked UNVERIFIED could not be checked from the
-build environment and must be checked by the maintainer before anyone relies on them. Research and monitoring tool. Not for
-navigation or safety of life.
+Open work, ordered roughly by how much it matters. Items marked UNVERIFIED could not be checked from the build environment and
+need a check by the maintainer before anyone relies on them. Each item points to the document that records it.
 
 ## Data and operation
 
@@ -56,8 +55,30 @@ navigation or safety of life.
 15. **Arabic review.** The Arabic dashboard text and the Arabic safety banner were written without a native review. A fluent reader
     should check meaning, tone and the technical terms.
 16. **Zenodo release.** Follow `docs/ZENODO.md`: account, upload, metadata, DOI. A DOI exists only after publishing; none is claimed.
+    The Zenodo licence identifier for the ODbL (`odc-odbl`) is UNVERIFIED.
 17. **Merge order.** Pull request 2 and the stacked pull requests of 2026-10-16 (forward preregistration, secondary analyses,
     verification) are open; merge them in order (`docs/research/OVERNIGHT_LOG.md`).
+
+## Verification and documentation gaps
+
+These items are recorded as open in the documents named in each entry.
+
+18. **Field presence and position source.** Presence rates of NIC, NACp, SIL, SDA and ADS-B version proxies in the archive, and
+    whether the position source (ADS-B, MLAT, Mode S) is separable per point (`docs/ARCHITECTURE.md`, `docs/DATA_QUALITY.md`).
+19. **Archive publication lag.** How long after a UTC day ends adsb.lol publishes its release is UNVERIFIED. The first scheduled
+    runs should log the day, the release creation time and the age at discovery (`docs/OPERATIONS.md`, section 4).
+20. **Workflow permissions and linting.** UNVERIFIED: whether pushes to the `data` branch count as repository activity for the
+    60 day scheduling rule, whether the default workflow permission allows the `GITHUB_TOKEN` push, and a workflow linter such as
+    actionlint is not run in CI (`docs/OPERATIONS.md`, section 9).
+21. **Reference data for display.** Record the licence and source of airport coordinates and basemap data. The candidates in
+    `docs/DATA_SOURCES.md`, section 5, are marked to be verified.
+22. **OpenSky fallback.** Column names of `position_data4` and `operational_status_data4`, and the terms for releasing derived
+    data, are UNVERIFIED (`docs/DATA_SOURCES.md`, section 2).
+23. **Licence questions.** Whether database right or copyright subsists in the adsb.lol compilation in the UAE, the UK and the EU,
+    the terms for the partner datasets (FlyItalyADSB, TheAirTraffic.com), the OSMF subpages on Produced Work and Substantial, and
+    three adsb.lol documentation pages that returned errors are UNVERIFIED (`docs/LICENSING.md`, section 6).
+24. **Dashboard checks.** The vendored library fallback, the amber freshness state and the use of a real screen reader were not
+    tested. The contract shapes listed in `docs/DASHBOARD.md` are to be reconciled with the release builder.
 
 ## Not planned
 
