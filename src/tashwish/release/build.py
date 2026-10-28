@@ -106,7 +106,7 @@ def code_commit() -> str:
     try:
         return (
             subprocess.run(
-                ["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True
+                ["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True, encoding="utf-8"
             ).stdout.strip()
             or "unknown"
         )
@@ -121,7 +121,9 @@ def iso(t) -> str:
 def _dump(p: Path, obj) -> None:
     p.parent.mkdir(parents=True, exist_ok=True)
     tmp = p.with_suffix(p.suffix + ".tmp")
-    tmp.write_text(json.dumps(obj, separators=(",", ":"), allow_nan=False, default=_json_default), encoding="utf-8")
+    tmp.write_text(
+        json.dumps(obj, separators=(",", ":"), allow_nan=False, default=_json_default), encoding="utf-8", newline="\n"
+    )
     tmp.replace(p)
 
 
@@ -175,7 +177,7 @@ def content_hash(cb: pd.DataFrame, ev: pd.DataFrame) -> str:
             try:
                 h.update(pd.util.hash_pandas_object(df, index=False).to_numpy().tobytes())
             except TypeError:  # unhashable cell values: fall back to the text form
-                h.update(df.to_csv(index=False).encode())
+                h.update(df.to_csv(index=False, lineterminator="\n").encode("utf-8"))
     return h.hexdigest()
 
 
@@ -370,7 +372,7 @@ def build(a: argparse.Namespace, tmp_web: Path, tmp_rel: Path) -> bool:
     """Write the web data and the release into the temporary directories. False if there is nothing to build."""
     cb_raw, ev_raw, metas = load_processed(a.processed)
     fresh_p = a.processed / "freshness.json"
-    fresh = json.loads(fresh_p.read_text()) if fresh_p.exists() else {}
+    fresh = json.loads(fresh_p.read_text(encoding="utf-8")) if fresh_p.exists() else {}
     days = [m["day"] for m in metas]
     latest_day = max(days) if days else None
     generated_at = fresh.get("generated_at") or (iso(pd.Timestamp.now("UTC")) if days else None)
@@ -382,9 +384,9 @@ def build(a: argparse.Namespace, tmp_web: Path, tmp_rel: Path) -> bool:
             raise ValueError(f"day {m.get('day')}: data_class {m.get('data_class')!r} is not 'observed'")
     cov = pd.read_parquet(a.state / "coverage.parquet") if (a.state / "coverage.parquet").exists() else None
     headline_p = a.results / "headline.json"
-    results_block = json.loads(headline_p.read_text()) if headline_p.exists() else {"results": []}
+    results_block = json.loads(headline_p.read_text(encoding="utf-8")) if headline_p.exists() else {"results": []}
     sample = ROOT / "web" / "data" / "sample_synthetic" / "methods.json"
-    methods = json.loads(sample.read_text())["metrics"] if sample.exists() else {}
+    methods = json.loads(sample.read_text(encoding="utf-8"))["metrics"] if sample.exists() else {}
     for k, (label, label_ar, anchor) in EXTRA_METHODS.items():
         methods[k] = {"label_en": label, "label_ar": label_ar, "method_anchor": anchor}
     for k in list(methods):  # regime split rows reuse the base metric text with a regime suffix
@@ -421,12 +423,12 @@ def build(a: argparse.Namespace, tmp_web: Path, tmp_rel: Path) -> bool:
     )
 
     rel = tmp_rel
-    dr.to_csv(rel / "daily_region.csv", index=False)
+    dr.to_csv(rel / "daily_region.csv", index=False, lineterminator="\n")
     cbo.to_parquet(rel / "cell_buckets.parquet", index=False, compression="zstd")
-    cbo.to_csv(rel / "cell_buckets.csv.gz", index=False)
+    cbo.to_csv(rel / "cell_buckets.csv.gz", index=False, lineterminator="\n")
     ev_out = ev.copy()
     ev_out.to_parquet(rel / "events.parquet", index=False, compression="zstd")
-    ev_out.to_csv(rel / "events.csv.gz", index=False)
+    ev_out.to_csv(rel / "events.csv.gz", index=False, lineterminator="\n")
     if cov is not None:
         cov_out = cov.rename(columns={"cell": "h3"})[["h3", "slot", "stratum", "presence", "mean_n", "coverage_class"]]
         cov_out.to_parquet(rel / "coverage.parquet", index=False)
@@ -436,9 +438,13 @@ def build(a: argparse.Namespace, tmp_web: Path, tmp_rel: Path) -> bool:
         **results_block,
     }  # each row carries its own data_class
     val["results"] = results_block["results"] = normalise_results(results_block.get("results", []))
-    (rel / "validation.json").write_text(json.dumps(val, indent=1, default=_json_default, allow_nan=False))
+    (rel / "validation.json").write_text(
+        json.dumps(val, indent=1, default=_json_default, allow_nan=False), encoding="utf-8", newline="\n"
+    )
     (rel / "freshness.json").write_text(
-        json.dumps({**fresh, "generated_at": generated_at, "latest_day": latest_day}, indent=1)
+        json.dumps({**fresh, "generated_at": generated_at, "latest_day": latest_day}, indent=1),
+        encoding="utf-8",
+        newline="\n",
     )
     note = (
         "Validation numbers: see `validation.json` and docs/VALIDATION.md in the repository (generated from result files)."
@@ -448,11 +454,14 @@ def build(a: argparse.Namespace, tmp_web: Path, tmp_rel: Path) -> bool:
     (rel / "DATA_CARD.md").write_text(
         data_card(ROOT / "docs" / "DATA_CARD.md", metas, cb_raw, ev_raw, latest_day, code_commit(), note),
         encoding="utf-8",
+        newline="\n",
     )
     shutil.copy(ROOT / "NOTICE", rel / "NOTICE")
     shutil.copy(ROOT / "licenses" / "ODbL-1.0.txt", rel / "ODbL-1.0.txt")
     names = sorted(p.name for p in rel.iterdir() if p.is_file() and p.name not in ("manifest.json", "checksums.sha256"))
-    (rel / "checksums.sha256").write_text("".join(f"{sha256_file(rel / n)}  {n}\n" for n in names))
+    (rel / "checksums.sha256").write_text(
+        "".join(f"{sha256_file(rel / n)}  {n}\n" for n in names), encoding="utf-8", newline="\n"
+    )
     files = {
         n: {"path": n, "sha256": sha256_file(rel / n), "bytes": (rel / n).stat().st_size}
         for n in [*names, "checksums.sha256"]
@@ -464,9 +473,11 @@ def build(a: argparse.Namespace, tmp_web: Path, tmp_rel: Path) -> bool:
         "bbox": {"south": cfg.REGION.lat_min, "west": cfg.REGION.lon_min, "north": cfg.REGION.lat_max, "east": cfg.REGION.lon_max},
         "days": metas, "latest_day": latest_day, "files": files, **mode_fields(a.mode, metas),
     }  # fmt: skip
-    (rel / "manifest.json").write_text(json.dumps(manifest, indent=1, default=_json_default))
+    (rel / "manifest.json").write_text(
+        json.dumps(manifest, indent=1, default=_json_default), encoding="utf-8", newline="\n"
+    )
     a.results.mkdir(parents=True, exist_ok=True)
-    dr.to_csv(a.results / "daily_region.csv.tmp", index=False)
+    dr.to_csv(a.results / "daily_region.csv.tmp", index=False, lineterminator="\n")
     print(f"built release for {len(days)} days, latest {latest_day}, dataset_version {version}")
     return True
 
