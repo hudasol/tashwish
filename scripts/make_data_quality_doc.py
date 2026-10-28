@@ -16,7 +16,7 @@ out = Path(sys.argv[2] if len(sys.argv) > 2 else "docs/DATA_QUALITY.md")
 man = [r for r in read_manifest(interim / "manifest.jsonl") if r["status"] == "complete"]
 latest = {r["day"]: r for r in man}
 days = sorted(latest)
-reports = {d: json.loads((interim / "quality" / f"{d}.json").read_text()) for d in days}
+reports = {d: json.loads((interim / "quality" / f"{d}.json").read_text(encoding="utf-8")) for d in days}
 
 rows = []
 for d in days:
@@ -99,11 +99,11 @@ L.append(
 )
 L.append("## Grid feasibility (why H3 resolution 4 with 3-hour buckets)\n")
 if feas.exists():
-    L.append(feas.read_text())
+    L.append(feas.read_text(encoding="utf-8"))
 else:
     L.append("_Run `python -m tashwish.metrics.feasibility` to generate._")
 L.append(
     "\n`share_ge_5` is the share of cell-buckets with at least 5 eligible aircraft (en-route, at least 2 quality samples each). It decides how much of the map can be tested at all.\n"
 )
-out.write_text("\n".join(L) + "\n")
+out.write_text("\n".join(L) + "\n", encoding="utf-8", newline="\n")
 print("wrote", out)

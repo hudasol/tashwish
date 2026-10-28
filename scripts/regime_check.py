@@ -59,7 +59,7 @@ def main() -> None:
     res["only_early_sample_share"] = float(only_early["k_early"].sum() / max(only_early["n_early"].sum(), 1))
     res["note"] = ("Descriptive, dev days only. A rise for the same aircraft argues against a pure fleet mix explanation but does not "
                    "identify a cause. No attribution to any actor.")  # fmt: skip
-    out.write_text(json.dumps(res, indent=1))
+    out.write_text(json.dumps(res, indent=1), encoding="utf-8", newline="\n")
     print(json.dumps(res, indent=1))
 
 

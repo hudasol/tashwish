@@ -134,7 +134,7 @@ def main() -> None:
             "counts": rows,
         }
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps(res, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    OUT.write_text(json.dumps(res, indent=1, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
     print(json.dumps(res, indent=1))
 
 

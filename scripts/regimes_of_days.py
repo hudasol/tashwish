@@ -18,4 +18,4 @@ for name, days in (("dev", dev), ("held_out", held)):
         rows.append(
             {"day": d, "split": name, "traffic": tr, "degraded": dr, "units": st["units"], "share": st["share"]}
         )
-pd.DataFrame(rows).sort_values("day").to_csv("results/regimes.csv", index=False)
+pd.DataFrame(rows).sort_values("day").to_csv("results/regimes.csv", index=False, lineterminator="\n")

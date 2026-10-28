@@ -130,7 +130,7 @@ def main() -> int:
             print("README.md status block is out of date; run scripts/make_readme_status.py", file=sys.stderr)
             return 1
         return 0
-    readme.write_text(new, encoding="utf-8")
+    readme.write_text(new, encoding="utf-8", newline="\n")
     return 0
 
 

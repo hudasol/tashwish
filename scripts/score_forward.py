@@ -335,9 +335,9 @@ def main(argv: list[str] | None = None) -> int:
     else:
         spec = json.loads(SPEC.read_text(encoding="utf-8"))
         res, out = score(a.processed, a.state, spec, sha256_file(SPEC), a.incomplete_reason), a.out or SCORED
-        a.doc.write_text(render(res, spec), encoding="utf-8")
+        a.doc.write_text(render(res, spec), encoding="utf-8", newline="\n")
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(res, indent=1, sort_keys=True, default=float) + "\n", encoding="utf-8")
+    out.write_text(json.dumps(res, indent=1, sort_keys=True, default=float) + "\n", encoding="utf-8", newline="\n")
     print(f"wrote {out}")
     return 0
 

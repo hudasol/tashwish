@@ -230,7 +230,7 @@ def main() -> int:
             print("docs/REPORT.md is out of date; run scripts/make_report.py", file=sys.stderr)
             return 1
         return 0
-    OUT.write_text(text, encoding="utf-8")
+    OUT.write_text(text, encoding="utf-8", newline="\n")
     return 0
 
 

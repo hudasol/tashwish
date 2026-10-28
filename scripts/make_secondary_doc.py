@@ -191,7 +191,7 @@ def main() -> None:
         *injection_section(),
         *regime_section(),
     ]
-    DOC.write_text("\n".join(lines), encoding="utf-8")
+    DOC.write_text("\n".join(lines), encoding="utf-8", newline="\n")
     print(f"wrote {DOC}")
 
 
