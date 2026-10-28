@@ -343,6 +343,27 @@ def reading_section(split: str, out: dict) -> str:
     return "\n\n".join(lines)
 
 
+def headline_section(split: str, out: dict) -> str:
+    """One compact table: recall by tier (harness rule, all days), spoofing recall, and real day flags per day by regime."""
+    o = out.get(split, {})
+    jr = o.get("jam_recall", {}).get("harness", {}).get("all", {})
+    sp = o.get("spoof_recall_n_ge_3", {}).get("all", {})
+    rj, rs = o.get("real_days_jamming_like", {}), o.get("real_days_spoofing_like", {})
+    header = ["Detector", "Easy", "Medium", "Hard", "Random", "Spoofing recall, 3 or more displaced",
+              "Real days flagged per day, normal", "Real days flagged per day, reduced"]  # fmt: skip
+    rows = []
+    for det in (*JAM, "B4"):
+        row = [det]
+        for t in TIERS:
+            row.append(fnum(jr[det][t]["rate"]) if det in jr else "n/a")
+        row.append(fnum(sp[det]["rate"]) if det in sp else "n/a")
+        for reg in ("normal", "reduced"):
+            src = rj if det != "B4" else rs
+            row.append(fnum(src[reg][det]["flagged_per_day"], 1) if reg in src and det in src[reg] else "n/a")
+        rows.append(row)
+    return md_table(header, rows)
+
+
 def provenance_section(splits: dict, out: dict) -> str:
     rows = []
     for name, s in splits.items():
@@ -413,6 +434,7 @@ def build(root: Path, regimes: pd.DataFrame) -> tuple[str, dict]:
            "The system is run again inside the same loop as the baselines. The two right hand count columns show how many of its "
            "scenario outcomes equal the committed result files of the original runs.", "", provenance_section(splits, out), ""]  # fmt: skip
     n = 1
+    txt0, txt = txt, []
     for name, s in splits.items():
         label = split_label(name, s["meta"])
         txt += [f"### {n}. Jamming recall by tier: {label}", "", "Harness rule (unchanged `drop_background` and `match_scenario`). SYNTHETIC.", "",
@@ -446,6 +468,17 @@ def build(root: Path, regimes: pd.DataFrame) -> tuple[str, dict]:
                 "",
             ]
         n += 7
+    head = [
+        "### Headline comparison",
+        "",
+        "Recall is the harness rule on all days. For B4 the last two columns count spoofing-like origin units; for all others they "
+        "count jamming-like cell buckets. Real day columns are OBSERVED and have no truth. Detail, intervals and the strict rule "
+        "follow in the numbered tables.",
+        "",
+    ]
+    for name, s in splits.items():
+        head += [f"{split_label(name, s['meta'])}", "", headline_section(name, out), ""]
+    txt = txt0 + head + txt
     txt += ["### Limits", "", CAVEATS, "",
             "Sources: docs/RESEARCH.md, docs/METHODOLOGY.md, docs/PREDICTIONS_AMENDMENT.md, docs/VALIDATION.md, results/dev/synthetic_scenarios.csv, "
             "results/held_out/synthetic_scenarios.csv, results/regimes.csv, results/baselines/summary.json."]  # fmt: skip

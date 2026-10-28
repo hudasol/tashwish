@@ -83,6 +83,13 @@ def test_hand_written_part_is_kept_and_old_results_replaced(generated):
     assert text.count("<!-- BEGIN GENERATED RESULTS -->") == 1 and text.count("<!-- END GENERATED RESULTS -->") == 1
 
 
+def test_headline_table_lists_every_detector(generated):
+    text, _ = generated
+    block = text.split("### Headline comparison")[1].split("### 1.")[0]
+    for det in ("system", "B1", "B1b", "B2", "B3a", "B3b", "B3c", "B4"):
+        assert f"| {det} |" in block
+
+
 def test_held_out_numbers_carry_the_post_hoc_label_with_the_commit(generated):
     text, _ = generated
     assert "post hoc, not preregistered, baselines fixed before run (0123456789)" in text
