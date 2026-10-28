@@ -253,21 +253,29 @@ held out evaluation valid. Refit manually, on a branch of `main`, when either:
 - after a coverage step change: the receiver network visibly changed (a drop or jump in `coverage.json` presence, a new feeder
   region, or many `coverage_lost` cells). Look at the coverage layer on the dashboard first.
 
-Commands (the refit CLI is not part of this contract; it is called `tashwish.operate.refit` here):
+Commands (the refit CLI is `python -m tashwish.operate.refit`; the refit CLI is not part of the workflow contract in section 3):
 
 ```
-python -m tashwish.operate.refit --processed ../tashwish-data/processed --state state --window-days 21 --write
+python -m tashwish.operate.refit --interim data/interim --state state --processed processed --results results
 git checkout -b refit-YYYY-MM-DD && git add state && git commit -m "state: refit baseline" && open a pull request
 ```
+
+The options are `--interim` (default `data/interim`), `--state` (default `state`), `--processed` (default `processed`),
+`--results` (default `results`) and `--no-held-out`. The command always writes the state and the processed days; there is no
+separate write flag and no window length option. It fits on the development days defined in `tashwish.split` only, so it needs those
+days in `--interim`, and it scores the held out days only when `results/held_out/DONE` exists; otherwise it stops, and
+`--no-held-out` skips that step.
 
 After merging, bump the dataset version so consumers know scores before and after are not comparable, and note it in the data
 card. Do not refit from the scheduled workflow.
 
 ## 8. CI and the README badge
 
-`ci.yml` runs ruff (check and format) and pytest with coverage on Python 3.11 and 3.13, with read only permissions, a 20 minute
-timeout and cancellation of superseded runs. When this file was first written, `ruff check .` and `ruff format --check .`
-reported errors; on 2026-10-16 both pass, and the CI runs of the pull requests opened that day passed on Python 3.11 and 3.13.
+`ci.yml` runs on pushes to `main` and on pull requests. It uses a matrix of Ubuntu and Windows with Python 3.11, 3.12 and 3.13
+(six jobs, none cancelling the others), with read only permissions, a 30 minute timeout per job and cancellation of superseded
+runs. Each job installs the package with the `api` and `dev` extras, runs `ruff check .` and `ruff format --check .`, runs
+`tashwish --version` and `tashwish doctor` as a smoke test, runs pytest with coverage, and writes a coverage summary to the job
+summary.
 
 Badge snippets (owner and repository are `hudasol/tashwish`; the README uses the first):
 
