@@ -1,0 +1,15 @@
+{
+ "aircraft": 890,
+ "data_class": "observed",
+ "day": "2026-04-05",
+ "ingested_at": "2026-10-28T21:45:13Z",
+ "mode": "frozen_baseline",
+ "n_events": 1,
+ "provenance": {
+  "code_commit": "ec80d3e102190cc62be986d34a29d41fc2cc94e7",
+  "ingest_manifest_sha256": "99805e6a6e79a35b7a685d3ace28306e7c6ac75f30fa435b35c1588618ca63a5",
+  "state_sha256": "5876d0ffde95ebc46ec846cb00db06c85b41cafda604f1e40066ec3844c81dd4"
+ },
+ "rows": 221287,
+ "split": "incremental"
+}
