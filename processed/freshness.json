@@ -1,10 +1,10 @@
 {
- "days_added": [],
- "fallback_active": true,
- "generated_at": null,
- "last_error": "RuntimeError: TASHWISH_STATE_KEY must be set (at least 16 characters); it keys the persistent emitter list",
- "last_run_at": "2026-10-29T10:58:54Z",
- "last_run_status": "failed",
- "latest_day": null,
- "schema": "tashwish.freshness.v1"
+  "days_added": [],
+  "fallback_active": true,
+  "generated_at": null,
+  "last_error": "RuntimeError: TASHWISH_STATE_KEY must be set (at least 16 characters); it keys the persistent emitter list 2026-03-14: done, 416116 rows, 815 aircraft, 195.3s no processed days; nothing to build",
+  "last_run_at": "2026-10-29T11:02:12Z",
+  "last_run_status": "failed",
+  "latest_day": null,
+  "schema": "tashwish.freshness.v1"
 }
